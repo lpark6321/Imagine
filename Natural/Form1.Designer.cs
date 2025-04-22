@@ -628,16 +628,20 @@ namespace Natural
             // numericUpDown8
             // 
             numericUpDown8.Location = new Point(105, 75);
+            numericUpDown8.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericUpDown8.Name = "numericUpDown8";
             numericUpDown8.Size = new Size(36, 23);
             numericUpDown8.TabIndex = 4;
+            numericUpDown8.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // numericUpDown7
             // 
             numericUpDown7.Location = new Point(104, 46);
+            numericUpDown7.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericUpDown7.Name = "numericUpDown7";
             numericUpDown7.Size = new Size(36, 23);
             numericUpDown7.TabIndex = 3;
+            numericUpDown7.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // radioButton18
             // 

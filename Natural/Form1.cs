@@ -197,6 +197,10 @@ namespace Natural
                     radioButton17.Checked = true; // 預設選擇百分比大小
                     numericUpDown6.Value = 50; // 預設選擇 50% 大小
                     radioButton19.Checked = true; // 預設選擇置中位置
+                    numericUpDown7.Maximum = int.Parse(msTxtW.Text);
+                    numericUpDown8.Maximum = int.Parse(msTxtH.Text);
+                    numericUpDown10.Maximum = int.Parse(msTxtW.Text);
+                    numericUpDown9.Maximum = int.Parse(msTxtH.Text);
                     break;
                 case "Mask(FlickerPattern)":
                     groupBoxMask.Visible = true;
@@ -641,29 +645,47 @@ namespace Natural
                         {
                             g.DrawImage(pictureBox1.BackgroundImage, 0, 0, width, height);
                         }
-
-                        int newWidth = radioButton17.Checked ? int.Parse(msTxtW.Text) : int.Parse(numericUpDown7.Text);
-                        if (radioButton17.Checked) // 百分比大小
+                        int percent = (int)numericUpDown6.Value; // 獲取百分比大小
+                        // 百分比大小 // 實際大小
+                        int newWidth = radioButton17.Checked ? int.Parse(msTxtW.Text) * percent / 100: int.Parse(numericUpDown7.Text);
+                        int newHeight = radioButton17.Checked ? int.Parse(msTxtH.Text) * percent / 100 : int.Parse(numericUpDown8.Text);
+                        int xstart = 0;
+                        int ystart = 0;
+                        if (radioButton19.Checked) // 置中
                         {
-                            int percent = (int)numericUpDown6.Value;
-                            int newWidth = int.Parse(msTxtW.Text) * percent / 100;
-                            int newHeight = int.Parse(msTxtH.Text) * percent / 100;
-                        }
-                        else if (radioButton18.Checked) // 實際大小
+                            xstart = (width - newWidth) / 2;
+                            ystart = (height - newHeight) / 2;
+                        }else if (radioButton21.Checked)
                         {
-                            int newWidth = int.Parse(numericUpDown7.Text);
-                            int newHeight = int.Parse(numericUpDown8.Text);
+                            xstart = (int)numericUpDown10.Value;
+                            ystart = (int)numericUpDown9.Value;
+                        } else if (radioButton20.Checked)
+                        {
+                            xstart = width / 5;
+                            ystart = height / 5;
+                            newWidth = xstart;
+                            newHeight = ystart;
+                            if (radioButton16.Checked) // 純色方塊
+                            {
+                                g.FillRectangle(new SolidBrush(pictureBox2.BackColor), xstart, ystart, newWidth, newHeight);
+                            }
+                            else if (radioButton15.Checked)// 繪製圖片方塊
+                            {
+                                g.DrawImage(pictureBox2.BackgroundImage, xstart, ystart, newWidth, newHeight);
+                            }
+                            xstart = width / 5 * 3;
+                            ystart = height / 5 * 3;
                         }
 
                         if (radioButton16.Checked) // 純色方塊
                         {
-                            g.FillRectangle(new SolidBrush(pictureBox1.BackColor), 0, 0, newWidth, newheight);
+                            g.FillRectangle(new SolidBrush(pictureBox2.BackColor), xstart, ystart, newWidth, newHeight);
                         }
-                        else if (radioButton15.Checked)// 繪製圖片
+                        else if (radioButton15.Checked)// 繪製圖片方塊
                         {
-                            
-                            g.DrawImage(pictureBox1.BackgroundImage, 0, 0, width, height);
+                            g.DrawImage(pictureBox2.BackgroundImage, xstart, ystart, newWidth, newHeight);
                         }
+
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "mask":
@@ -944,7 +966,7 @@ namespace Natural
                             openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
                             if (openFileDialog.ShowDialog() == DialogResult.OK)
                             {
-                                targetPictureBox.Image = Image.FromFile(openFileDialog.FileName);
+                                targetPictureBox.BackgroundImage = Image.FromFile(openFileDialog.FileName);
                                 targetPictureBox.BackColor = Color.Transparent;
                                 targetPictureBox.Text = "";
                             }
@@ -973,7 +995,7 @@ namespace Natural
                             openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
                             if (openFileDialog.ShowDialog() == DialogResult.OK)
                             {
-                                targetPictureBox.Image = Image.FromFile(openFileDialog.FileName);
+                                targetPictureBox.BackgroundImage = Image.FromFile(openFileDialog.FileName);
                                 targetPictureBox.BackColor = Color.Transparent;
                                 targetPictureBox.Text = "";
                             }
@@ -1006,7 +1028,7 @@ namespace Natural
                             openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
                             if (openFileDialog.ShowDialog() == DialogResult.OK)
                             {
-                                pictureBox1.Image = Image.FromFile(openFileDialog.FileName);
+                                pictureBox1.BackgroundImage = Image.FromFile(openFileDialog.FileName);
                                 pictureBox1.BackColor = Color.Transparent;
                                 pictureBox1.Text = "";
                             }
@@ -1035,7 +1057,7 @@ namespace Natural
                             openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
                             if (openFileDialog.ShowDialog() == DialogResult.OK)
                             {
-                                pictureBox2.Image = Image.FromFile(openFileDialog.FileName);
+                                pictureBox2.BackgroundImage = Image.FromFile(openFileDialog.FileName);
                                 pictureBox2.BackColor = Color.Transparent;
                                 pictureBox2.Text = "";
                             }
