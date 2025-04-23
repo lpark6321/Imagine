@@ -43,6 +43,7 @@ namespace Natural
             tabImgEditor = new TabPage();
             tabimgePanel = new Panel();
             tabimgeMask = new GroupBox();
+            tabiemPanelColor_btn = new Button();
             button1 = new Button();
             tabiemPanel_pnl = new Panel();
             tabiemHNum_nud = new NumericUpDown();
@@ -187,6 +188,7 @@ namespace Natural
             Statusstrip = new StatusStrip();
             ssrStatus_lbl = new ToolStripStatusLabel();
             ssrProgressbar_prg = new ToolStripProgressBar();
+            pictureBox1 = new PictureBox();
             Menustrip.SuspendLayout();
             tabControl.SuspendLayout();
             tabImgEditor.SuspendLayout();
@@ -229,6 +231,7 @@ namespace Natural
             Showimage_flp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)showimgPicture_pic).BeginInit();
             Statusstrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // Menustrip
@@ -337,6 +340,8 @@ namespace Natural
             // 
             // tabimgeMask
             // 
+            tabimgeMask.Controls.Add(pictureBox1);
+            tabimgeMask.Controls.Add(tabiemPanelColor_btn);
             tabimgeMask.Controls.Add(button1);
             tabimgeMask.Controls.Add(tabiemPanel_pnl);
             tabimgeMask.Controls.Add(tabiemHNum_nud);
@@ -345,12 +350,21 @@ namespace Natural
             tabimgeMask.Controls.Add(tabiemWNum_lbl);
             tabimgeMask.Controls.Add(tabiemSubPixel_rdo);
             tabimgeMask.Controls.Add(tabiemPixel_rdo);
-            tabimgeMask.Location = new Point(23, 6);
+            tabimgeMask.Location = new Point(48, 3);
             tabimgeMask.Name = "tabimgeMask";
-            tabimgeMask.Size = new Size(606, 369);
+            tabimgeMask.Size = new Size(581, 372);
             tabimgeMask.TabIndex = 0;
             tabimgeMask.TabStop = false;
             tabimgeMask.Text = "Mask(FlickerPattern)";
+            // 
+            // tabiemPanelColor_btn
+            // 
+            tabiemPanelColor_btn.Location = new Point(160, 340);
+            tabiemPanelColor_btn.Name = "tabiemPanelColor_btn";
+            tabiemPanelColor_btn.Size = new Size(24, 24);
+            tabiemPanelColor_btn.TabIndex = 11;
+            tabiemPanelColor_btn.UseVisualStyleBackColor = true;
+            tabiemPanelColor_btn.Click += SetButtonBackgroundColor;
             // 
             // button1
             // 
@@ -364,15 +378,18 @@ namespace Natural
             // 
             // tabiemPanel_pnl
             // 
+            tabiemPanel_pnl.BackgroundImage = Properties.Resources.transparent;
+            tabiemPanel_pnl.BorderStyle = BorderStyle.FixedSingle;
             tabiemPanel_pnl.Cursor = Cursors.Cross;
             tabiemPanel_pnl.Location = new Point(28, 85);
             tabiemPanel_pnl.Name = "tabiemPanel_pnl";
-            tabiemPanel_pnl.Size = new Size(223, 170);
+            tabiemPanel_pnl.Size = new Size(240, 240);
             tabiemPanel_pnl.TabIndex = 9;
             // 
             // tabiemHNum_nud
             // 
             tabiemHNum_nud.Location = new Point(185, 49);
+            tabiemHNum_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             tabiemHNum_nud.Name = "tabiemHNum_nud";
             tabiemHNum_nud.Size = new Size(38, 23);
             tabiemHNum_nud.TabIndex = 5;
@@ -382,6 +399,7 @@ namespace Natural
             // tabiemWNum_nud
             // 
             tabiemWNum_nud.Location = new Point(71, 50);
+            tabiemWNum_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             tabiemWNum_nud.Name = "tabiemWNum_nud";
             tabiemWNum_nud.Size = new Size(40, 23);
             tabiemWNum_nud.TabIndex = 4;
@@ -1962,6 +1980,14 @@ namespace Natural
             ssrProgressbar_prg.Size = new Size(200, 16);
             ssrProgressbar_prg.Visible = false;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Location = new Point(363, 48);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(100, 50);
+            pictureBox1.TabIndex = 12;
+            pictureBox1.TabStop = false;
+            // 
             // Mainwindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2032,6 +2058,7 @@ namespace Natural
             ((System.ComponentModel.ISupportInitialize)showimgPicture_pic).EndInit();
             Statusstrip.ResumeLayout(false);
             Statusstrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2195,5 +2222,7 @@ namespace Natural
         private PictureBox tabieaLeftRightR_pic;
         private PictureBox tabieaLeftRightL_pic;
         private Button button1;
+        private Button tabiemPanelColor_btn;
+        private PictureBox pictureBox1;
     }
 }

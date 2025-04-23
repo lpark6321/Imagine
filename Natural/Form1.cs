@@ -209,6 +209,10 @@ namespace Natural
                 case "Mask(FlickerPattern)":
                     tabimgeMask.Visible = true;
                     tabimgeMask.Dock = DockStyle.Fill;
+                    tabiemPixel_rdo.Checked = true;
+                    tabiemHNum_nud.Value = 2;
+                    tabiemWNum_nud.Value = 2;
+                    MaskPanelCreat(sender, e);
                     break;
                 case "ImageAdjust":
                     tabimgeAdjust.Visible = true;
@@ -704,6 +708,49 @@ namespace Natural
                         break;
                     case "mask":
                         // 這裡可以添加遮罩的生成邏輯
+                        if (tabiemPixel_rdo.Checked)
+                        {
+                            //123
+                            int pixelW = (int)tabiemWNum_nud.Value;
+                            int pixelH = (int)tabiemHNum_nud.Value;
+
+                            using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
+                            {
+                                using (Graphics g2 = Graphics.FromImage(pixelimage))
+                                {
+                                    // 遍歷 tabiemPanel_pnl 的子 Panel  
+                                    foreach (Control control in tabiemPanel_pnl.Controls)
+                                    {
+                                        if (control is Panel panel)
+                                        {
+                                            // 使用 Panel 的背景顏色填充對應的區域  
+                                            using (Brush brush = new SolidBrush(panel.BackColor))
+                                            {
+                                                g2.FillRectangle(brush, 0, 0, 1, 1);
+                                            }
+                                        }
+                                    }
+
+                                    //if (pixelimage != null)
+                                    //{
+                                    //    pictureBox1.Image = pixelimage; // 顯示像素圖片
+                                    //}
+
+                                    for (int j = 0; j < height; j += pixelH)
+                                    {
+                                        for (int i = 0; i < width; i += pixelW)
+                                        {
+                                            g.DrawImage(pixelimage, i, j);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                        else if (tabiemSubPixel_rdo.Checked)
+                        {
+                            //
+                        }
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "adjust":
@@ -897,7 +944,7 @@ namespace Natural
         {
             try
             {
-                if (tabimgeFuncList.Text == "ImageAdjust")
+                if (sender is Button targetbutton && targetbutton.Text == "導入圖片")
                 {
                     using (OpenFileDialog openFileDialog = new OpenFileDialog())
                     {
@@ -1042,7 +1089,7 @@ namespace Natural
 
         private void Save_Click(object sender, EventArgs e)
         {
-            if (tabiefMass_chk.Checked & tabimgeFuncList.Text == "Frame&CrossLine&Border")
+            if (tabiefMass_chk.Checked && tabimgeFuncList.Text == "Frame&CrossLine&Border")
             {
                 // 批量儲存圖片
                 Color co = tabiefBack_btn.BackColor;
@@ -1310,7 +1357,7 @@ namespace Natural
             int blockWidth = tabiemPanel_pnl.Width / width;
             int blockHeight = tabiemPanel_pnl.Height / height;
 
-            // 生成黃色區塊
+            // 生成區塊
             for (int i = 0; i < height; i++)
             {
                 for (int j = 0; j < width; j++)
@@ -1319,19 +1366,19 @@ namespace Natural
                     {
                         Size = new Size(blockWidth, blockHeight),
                         Location = new Point(j * blockWidth, i * blockHeight),
-                        BackColor = Color.Yellow,
                         BorderStyle = BorderStyle.FixedSingle
                     };
 
                     // 設定點擊事件以填充紅色
                     block.Click += (s, args) =>
                     {
-                        block.BackColor = tabiefOtherColor_btn.BackColor;
+                        block.BackColor = tabiemPanelColor_btn.BackColor;
                     };
 
                     tabiemPanel_pnl.Controls.Add(block);
                 }
             }
         }
+
     }
 }
