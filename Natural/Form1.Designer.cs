@@ -31,6 +31,7 @@ namespace Natural
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             Menustrip = new MenuStrip();
             mnsImport_btn = new ToolStripMenuItem();
             mnsFullscreen_btn = new ToolStripMenuItem();
@@ -42,16 +43,99 @@ namespace Natural
             tabControl = new TabControl();
             tabImgEditor = new TabPage();
             tabimgePanel = new Panel();
+            tabimgeWindow = new GroupBox();
+            tabiwCustom_grp = new GroupBox();
+            tabiwCustom_cmb = new ComboBox();
+            tabiwCustomMask_grp = new GroupBox();
+            tabiwCMaskPixelGray_lbl = new Label();
+            tabiwCMaskSubPixel_rdo = new RadioButton();
+            tabiwCMaskPixel_rdo = new RadioButton();
+            tabiwCMaskPixelGray_vsc = new VScrollBar();
+            tabiwCMaskPixelColor_lbl = new Label();
+            tabiwCMaskPixelLoc_lbl = new Label();
+            tabiwCMaskPixelColor_btn = new Button();
+            tabiwCMaskPixelClear_btn = new Button();
+            tabiwCMaskPixelPanel_pnl = new Panel();
+            tabiwCMaskHNum_nud = new NumericUpDown();
+            tabiwCMaskWNum_nud = new NumericUpDown();
+            tabiwCMaskHNum_lbl = new Label();
+            tabiwCMaskWNum_lbl = new Label();
+            tabiwCustomGrad_grp = new GroupBox();
+            tabiwWin_grp = new GroupBox();
+            tabiwWin_pic = new PictureBox();
+            tabiwWinColor_rdo = new RadioButton();
+            tabiwWinCustom_rdo = new RadioButton();
+            tabiwWinImg_rdo = new RadioButton();
+            tabiwBack_grp = new GroupBox();
+            tabiwBack_pic = new PictureBox();
+            tabiwBackColor_rdo = new RadioButton();
+            tabiwBackCustom_rdo = new RadioButton();
+            tabiwBackImg_rdo = new RadioButton();
+            tabiwLineColor_lbl = new Label();
+            tabiwLineColor_btn = new Button();
+            tabiwLineCross_btn = new CheckBox();
+            tabiwLineOutside_btn = new CheckBox();
+            tabiwWinLoc_grp = new GroupBox();
+            tabiwWinLocPixcelY_nud = new NumericUpDown();
+            tabiwWinLocTwo_rdo = new RadioButton();
+            tabiwWinLocPixcelX_nud = new NumericUpDown();
+            tabiwWinLocCenter_rdo = new RadioButton();
+            tabiwWinLocPixcel_rdo = new RadioButton();
+            tabiwWinSize_grp = new GroupBox();
+            tabiwWinSizePixelH_nud = new NumericUpDown();
+            tabiwWinSizePixelW_nud = new NumericUpDown();
+            tabiwWinSizePixel_rdo = new RadioButton();
+            tabiwWinSizePercent_nud = new NumericUpDown();
+            tabiwWinSizePercent_rdo = new RadioButton();
             tabimgeMask = new GroupBox();
-            tabiemPanelColor_btn = new Button();
-            button1 = new Button();
-            tabiemPanel_pnl = new Panel();
+            tabiemPixelGray_lbl = new Label();
+            tabiemPixelGray_vsc = new VScrollBar();
+            tabiemPixelColor_lbl = new Label();
+            tabiemPixelLoc_lbl = new Label();
+            tabiemPixelColor_btn = new Button();
+            tabiemPixelClear_btn = new Button();
+            tabiemPixelPanel_pnl = new Panel();
             tabiemHNum_nud = new NumericUpDown();
             tabiemWNum_nud = new NumericUpDown();
             tabiemHNum_lbl = new Label();
             tabiemWNum_lbl = new Label();
             tabiemSubPixel_rdo = new RadioButton();
             tabiemPixel_rdo = new RadioButton();
+            tabimgeGradient = new GroupBox();
+            tabigColorBar_rdo = new RadioButton();
+            tabigOther_pnl = new Panel();
+            tabigOtherSplit_lst = new ListBox();
+            tabigOtherColorC_lbl = new Label();
+            tabigOtherColorC_btn = new Button();
+            tabigOtherColorM_btn = new Button();
+            tabigOtherColorA_btn = new Button();
+            tabigOtherColorY_btn = new Button();
+            tabigOtherColorD_btn = new Button();
+            tabigOtherColorB_btn = new Button();
+            tabigOtherColorG_btn = new Button();
+            tabigOtherColorR_btn = new Button();
+            tabigOtherColorW_btn = new Button();
+            tabigOtherSplit_lbl = new Label();
+            tabigOtherSplit_nud = new NumericUpDown();
+            tabigOtherHsplit_rdo = new RadioButton();
+            tabigOtherVSplit_rdo = new RadioButton();
+            tabigOther_btn = new Button();
+            tabigBaseColorCustom_btn = new Button();
+            tabigBaseColorB_btn = new Button();
+            tabigBaseColorG_btn = new Button();
+            tabigBaseColorR_btn = new Button();
+            tabigBaseColorW_btn = new Button();
+            tabigBaseColor_lbl = new Label();
+            tabigLastLevel_cmb = new ComboBox();
+            tabigFistLevel_cmb = new ComboBox();
+            tabigLastLevel_lbl = new Label();
+            tabigFistLevel_lbl = new Label();
+            tabigDivid_cmb = new ComboBox();
+            tabigStep_cmb = new ComboBox();
+            tabigDivid_lbl = new Label();
+            tabigStep_lbl = new Label();
+            tabigHWay_rdo = new RadioButton();
+            tabigVWay_rdo = new RadioButton();
             tabimgeAdjust = new GroupBox();
             tabieaPanel_pnl = new Panel();
             tabieaLeftRight_pnl = new Panel();
@@ -92,41 +176,6 @@ namespace Natural
             tabiefCenter_chk = new CheckBox();
             tabiefLineColor_btn = new Button();
             tabiefBack_lbl = new Label();
-            tabimgeGradient = new GroupBox();
-            tabigColorBar_rdo = new RadioButton();
-            tabigOther_pnl = new Panel();
-            tabigOtherSplit_lst = new ListBox();
-            tabigOtherColorC_lbl = new Label();
-            tabigOtherColorC_btn = new Button();
-            tabigOtherColorM_btn = new Button();
-            tabigOtherColorA_btn = new Button();
-            tabigOtherColorY_btn = new Button();
-            tabigOtherColorD_btn = new Button();
-            tabigOtherColorB_btn = new Button();
-            tabigOtherColorG_btn = new Button();
-            tabigOtherColorR_btn = new Button();
-            tabigOtherColorW_btn = new Button();
-            tabigOtherSplit_lbl = new Label();
-            tabigOtherSplit_nud = new NumericUpDown();
-            tabigOtherHsplit_rdo = new RadioButton();
-            tabigOtherVSplit_rdo = new RadioButton();
-            tabigOther_btn = new Button();
-            tabigBaseColorCustom_btn = new Button();
-            tabigBaseColorB_btn = new Button();
-            tabigBaseColorG_btn = new Button();
-            tabigBaseColorR_btn = new Button();
-            tabigBaseColorW_btn = new Button();
-            tabigBaseColor_lbl = new Label();
-            tabigLastLevel_cmb = new ComboBox();
-            tabigFistLevel_cmb = new ComboBox();
-            tabigLastLevel_lbl = new Label();
-            tabigFistLevel_lbl = new Label();
-            tabigDivid_cmb = new ComboBox();
-            tabigStep_cmb = new ComboBox();
-            tabigDivid_lbl = new Label();
-            tabigStep_lbl = new Label();
-            tabigHWay_rdo = new RadioButton();
-            tabigVWay_rdo = new RadioButton();
             tabimgeChess = new GroupBox();
             tabiecBaseColorCustom_lbl = new Label();
             tabiecGray_lbl = new Label();
@@ -144,36 +193,6 @@ namespace Natural
             tabiecBaseColorG_btn = new Button();
             tabiecBaseColorW_btn = new Button();
             tabiecBaseColorR_btn = new Button();
-            tabimgeWindow = new GroupBox();
-            tabiwWin_grp = new GroupBox();
-            tabiwWin_pic = new PictureBox();
-            tabiwWinColor_rdo = new RadioButton();
-            tabiwWinCustom_rdo = new RadioButton();
-            tabiwWinImg_rdo = new RadioButton();
-            tabiwBack_grp = new GroupBox();
-            tabiwBack_pic = new PictureBox();
-            tabiwBackColor_rdo = new RadioButton();
-            tabiwBackCustom_rdo = new RadioButton();
-            tabiwBackImg_rdo = new RadioButton();
-            tabiwCustom_pnl = new Panel();
-            tabiwCustom_lbl = new Label();
-            tabiwCustom_cmb = new ComboBox();
-            tabiwLineColor_lbl = new Label();
-            tabiwLineColor_btn = new Button();
-            tabiwLineCross_btn = new CheckBox();
-            tabiwLineOutside_btn = new CheckBox();
-            tabiwWinLoc_grp = new GroupBox();
-            tabiwWinLocPixcelY_nud = new NumericUpDown();
-            tabiwWinLocTwo_rdo = new RadioButton();
-            tabiwWinLocPixcelX_nud = new NumericUpDown();
-            tabiwWinLocCenter_rdo = new RadioButton();
-            tabiwWinLocPixcel_rdo = new RadioButton();
-            tabiwWinSize_grp = new GroupBox();
-            tabiwWinSizePixelH_nud = new NumericUpDown();
-            tabiwWinSizePixelW_nud = new NumericUpDown();
-            tabiwWinSizePixel_rdo = new RadioButton();
-            tabiwWinSizePercent_nud = new NumericUpDown();
-            tabiwWinSizePercent_rdo = new RadioButton();
             tabimgeMass = new GroupBox();
             tabimgeFuncList = new ComboBox();
             tabDirList = new TabPage();
@@ -188,14 +207,33 @@ namespace Natural
             Statusstrip = new StatusStrip();
             ssrStatus_lbl = new ToolStripStatusLabel();
             ssrProgressbar_prg = new ToolStripProgressBar();
-            pictureBox1 = new PictureBox();
+            contextMenuStrip1 = new ContextMenuStrip(components);
             Menustrip.SuspendLayout();
             tabControl.SuspendLayout();
             tabImgEditor.SuspendLayout();
             tabimgePanel.SuspendLayout();
+            tabimgeWindow.SuspendLayout();
+            tabiwCustom_grp.SuspendLayout();
+            tabiwCustomMask_grp.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwCMaskHNum_nud).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)tabiwCMaskWNum_nud).BeginInit();
+            tabiwWin_grp.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwWin_pic).BeginInit();
+            tabiwBack_grp.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwBack_pic).BeginInit();
+            tabiwWinLoc_grp.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinLocPixcelY_nud).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinLocPixcelX_nud).BeginInit();
+            tabiwWinSize_grp.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePixelH_nud).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePixelW_nud).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePercent_nud).BeginInit();
             tabimgeMask.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)tabiemHNum_nud).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tabiemWNum_nud).BeginInit();
+            tabimgeGradient.SuspendLayout();
+            tabigOther_pnl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)tabigOtherSplit_nud).BeginInit();
             tabimgeAdjust.SuspendLayout();
             tabieaPanel_pnl.SuspendLayout();
             tabieaLeftRight_pnl.SuspendLayout();
@@ -207,31 +245,14 @@ namespace Natural
             tabimgeFrame.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)tabiefBack_pic).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tabiefMassNum_nud).BeginInit();
-            tabimgeGradient.SuspendLayout();
-            tabigOther_pnl.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)tabigOtherSplit_nud).BeginInit();
             tabimgeChess.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)tabiecVNum_nud).BeginInit();
             ((System.ComponentModel.ISupportInitialize)tabiecHNum_nud).BeginInit();
-            tabimgeWindow.SuspendLayout();
-            tabiwWin_grp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)tabiwWin_pic).BeginInit();
-            tabiwBack_grp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)tabiwBack_pic).BeginInit();
-            tabiwCustom_pnl.SuspendLayout();
-            tabiwWinLoc_grp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinLocPixcelY_nud).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinLocPixcelX_nud).BeginInit();
-            tabiwWinSize_grp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePixelH_nud).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePixelW_nud).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePercent_nud).BeginInit();
             tabDirList.SuspendLayout();
             tabImgList.SuspendLayout();
             Showimage_flp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)showimgPicture_pic).BeginInit();
             Statusstrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // Menustrip
@@ -325,12 +346,12 @@ namespace Natural
             // 
             // tabimgePanel
             // 
+            tabimgePanel.Controls.Add(tabimgeWindow);
             tabimgePanel.Controls.Add(tabimgeMask);
+            tabimgePanel.Controls.Add(tabimgeGradient);
             tabimgePanel.Controls.Add(tabimgeAdjust);
             tabimgePanel.Controls.Add(tabimgeFrame);
-            tabimgePanel.Controls.Add(tabimgeGradient);
             tabimgePanel.Controls.Add(tabimgeChess);
-            tabimgePanel.Controls.Add(tabimgeWindow);
             tabimgePanel.Controls.Add(tabimgeMass);
             tabimgePanel.Dock = DockStyle.Bottom;
             tabimgePanel.Location = new Point(3, 26);
@@ -338,57 +359,596 @@ namespace Natural
             tabimgePanel.Size = new Size(654, 455);
             tabimgePanel.TabIndex = 11;
             // 
+            // tabimgeWindow
+            // 
+            tabimgeWindow.Controls.Add(tabiwCustom_grp);
+            tabimgeWindow.Controls.Add(tabiwWin_grp);
+            tabimgeWindow.Controls.Add(tabiwBack_grp);
+            tabimgeWindow.Controls.Add(tabiwLineColor_lbl);
+            tabimgeWindow.Controls.Add(tabiwLineColor_btn);
+            tabimgeWindow.Controls.Add(tabiwLineCross_btn);
+            tabimgeWindow.Controls.Add(tabiwLineOutside_btn);
+            tabimgeWindow.Controls.Add(tabiwWinLoc_grp);
+            tabimgeWindow.Controls.Add(tabiwWinSize_grp);
+            tabimgeWindow.Location = new Point(15, 9);
+            tabimgeWindow.Name = "tabimgeWindow";
+            tabimgeWindow.Size = new Size(610, 361);
+            tabimgeWindow.TabIndex = 0;
+            tabimgeWindow.TabStop = false;
+            tabimgeWindow.Text = "Window";
+            // 
+            // tabiwCustom_grp
+            // 
+            tabiwCustom_grp.Controls.Add(tabiwCustom_cmb);
+            tabiwCustom_grp.Controls.Add(tabiwCustomMask_grp);
+            tabiwCustom_grp.Controls.Add(tabiwCustomGrad_grp);
+            tabiwCustom_grp.Location = new Point(256, 14);
+            tabiwCustom_grp.Name = "tabiwCustom_grp";
+            tabiwCustom_grp.Size = new Size(386, 368);
+            tabiwCustom_grp.TabIndex = 19;
+            tabiwCustom_grp.TabStop = false;
+            tabiwCustom_grp.Text = "自製圖";
+            // 
+            // tabiwCustom_cmb
+            // 
+            tabiwCustom_cmb.DropDownStyle = ComboBoxStyle.DropDownList;
+            tabiwCustom_cmb.FormattingEnabled = true;
+            tabiwCustom_cmb.Items.AddRange(new object[] { "Mask", "Gradient" });
+            tabiwCustom_cmb.Location = new Point(201, 10);
+            tabiwCustom_cmb.Name = "tabiwCustom_cmb";
+            tabiwCustom_cmb.Size = new Size(121, 23);
+            tabiwCustom_cmb.TabIndex = 0;
+            tabiwCustom_cmb.SelectedIndexChanged += tabiwCustom_cmb_SelectedIndexChanged;
+            // 
+            // tabiwCustomMask_grp
+            // 
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskPixelGray_lbl);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskSubPixel_rdo);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskPixel_rdo);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskPixelGray_vsc);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskPixelColor_lbl);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskPixelLoc_lbl);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskPixelColor_btn);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskPixelClear_btn);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskPixelPanel_pnl);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskHNum_nud);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskWNum_nud);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskHNum_lbl);
+            tabiwCustomMask_grp.Controls.Add(tabiwCMaskWNum_lbl);
+            tabiwCustomMask_grp.Location = new Point(13, 39);
+            tabiwCustomMask_grp.Name = "tabiwCustomMask_grp";
+            tabiwCustomMask_grp.Size = new Size(300, 330);
+            tabiwCustomMask_grp.TabIndex = 2;
+            tabiwCustomMask_grp.TabStop = false;
+            tabiwCustomMask_grp.Text = "Mask";
+            tabiwCustomMask_grp.Visible = false;
+            // 
+            // tabiwCMaskPixelGray_lbl
+            // 
+            tabiwCMaskPixelGray_lbl.AutoSize = true;
+            tabiwCMaskPixelGray_lbl.Location = new Point(264, 40);
+            tabiwCMaskPixelGray_lbl.Name = "tabiwCMaskPixelGray_lbl";
+            tabiwCMaskPixelGray_lbl.Size = new Size(60, 15);
+            tabiwCMaskPixelGray_lbl.TabIndex = 27;
+            tabiwCMaskPixelGray_lbl.Text = "Gray: 255";
+            tabiwCMaskPixelGray_lbl.Visible = false;
+            // 
+            // tabiwCMaskSubPixel_rdo
+            // 
+            tabiwCMaskSubPixel_rdo.AutoSize = true;
+            tabiwCMaskSubPixel_rdo.Location = new Point(99, 15);
+            tabiwCMaskSubPixel_rdo.Name = "tabiwCMaskSubPixel_rdo";
+            tabiwCMaskSubPixel_rdo.Size = new Size(105, 19);
+            tabiwCMaskSubPixel_rdo.TabIndex = 26;
+            tabiwCMaskSubPixel_rdo.Text = "Sub Pixel Base";
+            tabiwCMaskSubPixel_rdo.UseVisualStyleBackColor = true;
+            tabiwCMaskSubPixel_rdo.CheckedChanged += Pixel_rdo_CheckedChanged;
+            // 
+            // tabiwCMaskPixel_rdo
+            // 
+            tabiwCMaskPixel_rdo.AutoSize = true;
+            tabiwCMaskPixel_rdo.Checked = true;
+            tabiwCMaskPixel_rdo.Location = new Point(13, 16);
+            tabiwCMaskPixel_rdo.Name = "tabiwCMaskPixel_rdo";
+            tabiwCMaskPixel_rdo.Size = new Size(80, 19);
+            tabiwCMaskPixel_rdo.TabIndex = 25;
+            tabiwCMaskPixel_rdo.TabStop = true;
+            tabiwCMaskPixel_rdo.Text = "Pixel Base";
+            tabiwCMaskPixel_rdo.UseVisualStyleBackColor = true;
+            tabiwCMaskPixel_rdo.CheckedChanged += Pixel_rdo_CheckedChanged;
+            // 
+            // tabiwCMaskPixelGray_vsc
+            // 
+            tabiwCMaskPixelGray_vsc.LargeChange = 1;
+            tabiwCMaskPixelGray_vsc.Location = new Point(264, 64);
+            tabiwCMaskPixelGray_vsc.Maximum = 255;
+            tabiwCMaskPixelGray_vsc.Name = "tabiwCMaskPixelGray_vsc";
+            tabiwCMaskPixelGray_vsc.Size = new Size(20, 240);
+            tabiwCMaskPixelGray_vsc.TabIndex = 24;
+            tabiwCMaskPixelGray_vsc.ValueChanged += PixelGray_vsc_ValueChanged;
+            // 
+            // tabiwCMaskPixelColor_lbl
+            // 
+            tabiwCMaskPixelColor_lbl.AutoSize = true;
+            tabiwCMaskPixelColor_lbl.Location = new Point(85, 309);
+            tabiwCMaskPixelColor_lbl.Name = "tabiwCMaskPixelColor_lbl";
+            tabiwCMaskPixelColor_lbl.Size = new Size(55, 15);
+            tabiwCMaskPixelColor_lbl.TabIndex = 23;
+            tabiwCMaskPixelColor_lbl.Text = "選擇顏色";
+            // 
+            // tabiwCMaskPixelLoc_lbl
+            // 
+            tabiwCMaskPixelLoc_lbl.AutoSize = true;
+            tabiwCMaskPixelLoc_lbl.Location = new Point(15, 308);
+            tabiwCMaskPixelLoc_lbl.Name = "tabiwCMaskPixelLoc_lbl";
+            tabiwCMaskPixelLoc_lbl.Size = new Size(30, 15);
+            tabiwCMaskPixelLoc_lbl.TabIndex = 22;
+            tabiwCMaskPixelLoc_lbl.Text = "--,--";
+            // 
+            // tabiwCMaskPixelColor_btn
+            // 
+            tabiwCMaskPixelColor_btn.Location = new Point(146, 304);
+            tabiwCMaskPixelColor_btn.Name = "tabiwCMaskPixelColor_btn";
+            tabiwCMaskPixelColor_btn.Size = new Size(24, 24);
+            tabiwCMaskPixelColor_btn.TabIndex = 21;
+            tabiwCMaskPixelColor_btn.UseVisualStyleBackColor = true;
+            tabiwCMaskPixelColor_btn.Click += SetButtonBackgroundColor;
+            // 
+            // tabiwCMaskPixelClear_btn
+            // 
+            tabiwCMaskPixelClear_btn.Location = new Point(204, 304);
+            tabiwCMaskPixelClear_btn.Name = "tabiwCMaskPixelClear_btn";
+            tabiwCMaskPixelClear_btn.Size = new Size(49, 23);
+            tabiwCMaskPixelClear_btn.TabIndex = 20;
+            tabiwCMaskPixelClear_btn.Text = "Clear";
+            tabiwCMaskPixelClear_btn.UseVisualStyleBackColor = true;
+            tabiwCMaskPixelClear_btn.Click += MaskPanelCreat;
+            // 
+            // tabiwCMaskPixelPanel_pnl
+            // 
+            tabiwCMaskPixelPanel_pnl.BackgroundImage = Properties.Resources.transparent;
+            tabiwCMaskPixelPanel_pnl.BorderStyle = BorderStyle.FixedSingle;
+            tabiwCMaskPixelPanel_pnl.Cursor = Cursors.Cross;
+            tabiwCMaskPixelPanel_pnl.Location = new Point(13, 64);
+            tabiwCMaskPixelPanel_pnl.Name = "tabiwCMaskPixelPanel_pnl";
+            tabiwCMaskPixelPanel_pnl.Size = new Size(240, 240);
+            tabiwCMaskPixelPanel_pnl.TabIndex = 19;
+            // 
+            // tabiwCMaskHNum_nud
+            // 
+            tabiwCMaskHNum_nud.Location = new Point(168, 40);
+            tabiwCMaskHNum_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            tabiwCMaskHNum_nud.Name = "tabiwCMaskHNum_nud";
+            tabiwCMaskHNum_nud.Size = new Size(38, 23);
+            tabiwCMaskHNum_nud.TabIndex = 18;
+            tabiwCMaskHNum_nud.Value = new decimal(new int[] { 2, 0, 0, 0 });
+            tabiwCMaskHNum_nud.ValueChanged += MaskPanelCreat;
+            // 
+            // tabiwCMaskWNum_nud
+            // 
+            tabiwCMaskWNum_nud.Location = new Point(61, 40);
+            tabiwCMaskWNum_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            tabiwCMaskWNum_nud.Name = "tabiwCMaskWNum_nud";
+            tabiwCMaskWNum_nud.Size = new Size(40, 23);
+            tabiwCMaskWNum_nud.TabIndex = 17;
+            tabiwCMaskWNum_nud.Value = new decimal(new int[] { 2, 0, 0, 0 });
+            tabiwCMaskWNum_nud.ValueChanged += MaskPanelCreat;
+            // 
+            // tabiwCMaskHNum_lbl
+            // 
+            tabiwCMaskHNum_lbl.AutoSize = true;
+            tabiwCMaskHNum_lbl.Location = new Point(121, 43);
+            tabiwCMaskHNum_lbl.Name = "tabiwCMaskHNum_lbl";
+            tabiwCMaskHNum_lbl.Size = new Size(45, 15);
+            tabiwCMaskHNum_lbl.TabIndex = 16;
+            tabiwCMaskHNum_lbl.Text = "Height";
+            // 
+            // tabiwCMaskWNum_lbl
+            // 
+            tabiwCMaskWNum_lbl.AutoSize = true;
+            tabiwCMaskWNum_lbl.Location = new Point(15, 43);
+            tabiwCMaskWNum_lbl.Name = "tabiwCMaskWNum_lbl";
+            tabiwCMaskWNum_lbl.Size = new Size(41, 15);
+            tabiwCMaskWNum_lbl.TabIndex = 15;
+            tabiwCMaskWNum_lbl.Text = "Width";
+            // 
+            // tabiwCustomGrad_grp
+            // 
+            tabiwCustomGrad_grp.Location = new Point(325, 35);
+            tabiwCustomGrad_grp.Name = "tabiwCustomGrad_grp";
+            tabiwCustomGrad_grp.Size = new Size(200, 100);
+            tabiwCustomGrad_grp.TabIndex = 20;
+            tabiwCustomGrad_grp.TabStop = false;
+            tabiwCustomGrad_grp.Text = "Gradient";
+            tabiwCustomGrad_grp.Visible = false;
+            // 
+            // tabiwWin_grp
+            // 
+            tabiwWin_grp.Controls.Add(tabiwWin_pic);
+            tabiwWin_grp.Controls.Add(tabiwWinColor_rdo);
+            tabiwWin_grp.Controls.Add(tabiwWinCustom_rdo);
+            tabiwWin_grp.Controls.Add(tabiwWinImg_rdo);
+            tabiwWin_grp.Location = new Point(134, 16);
+            tabiwWin_grp.Name = "tabiwWin_grp";
+            tabiwWin_grp.Size = new Size(114, 78);
+            tabiwWin_grp.TabIndex = 18;
+            tabiwWin_grp.TabStop = false;
+            tabiwWin_grp.Text = "方塊顏色";
+            // 
+            // tabiwWin_pic
+            // 
+            tabiwWin_pic.BackgroundImageLayout = ImageLayout.Zoom;
+            tabiwWin_pic.BorderStyle = BorderStyle.FixedSingle;
+            tabiwWin_pic.Image = Properties.Resources.Img;
+            tabiwWin_pic.Location = new Point(3, 21);
+            tabiwWin_pic.Name = "tabiwWin_pic";
+            tabiwWin_pic.Size = new Size(40, 40);
+            tabiwWin_pic.SizeMode = PictureBoxSizeMode.Zoom;
+            tabiwWin_pic.TabIndex = 8;
+            tabiwWin_pic.TabStop = false;
+            tabiwWin_pic.Click += windowPictureBox_Click;
+            // 
+            // tabiwWinColor_rdo
+            // 
+            tabiwWinColor_rdo.AutoSize = true;
+            tabiwWinColor_rdo.Checked = true;
+            tabiwWinColor_rdo.Location = new Point(50, 14);
+            tabiwWinColor_rdo.Name = "tabiwWinColor_rdo";
+            tabiwWinColor_rdo.Size = new Size(49, 19);
+            tabiwWinColor_rdo.TabIndex = 5;
+            tabiwWinColor_rdo.TabStop = true;
+            tabiwWinColor_rdo.Tag = "";
+            tabiwWinColor_rdo.Text = "純色";
+            tabiwWinColor_rdo.UseVisualStyleBackColor = true;
+            tabiwWinColor_rdo.Click += windowPictureBox_Click;
+            // 
+            // tabiwWinCustom_rdo
+            // 
+            tabiwWinCustom_rdo.AutoSize = true;
+            tabiwWinCustom_rdo.Enabled = false;
+            tabiwWinCustom_rdo.Location = new Point(50, 51);
+            tabiwWinCustom_rdo.Name = "tabiwWinCustom_rdo";
+            tabiwWinCustom_rdo.Size = new Size(61, 19);
+            tabiwWinCustom_rdo.TabIndex = 7;
+            tabiwWinCustom_rdo.TabStop = true;
+            tabiwWinCustom_rdo.Tag = "";
+            tabiwWinCustom_rdo.Text = "自製圖";
+            tabiwWinCustom_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinImg_rdo
+            // 
+            tabiwWinImg_rdo.AutoSize = true;
+            tabiwWinImg_rdo.Location = new Point(50, 33);
+            tabiwWinImg_rdo.Name = "tabiwWinImg_rdo";
+            tabiwWinImg_rdo.Size = new Size(49, 19);
+            tabiwWinImg_rdo.TabIndex = 6;
+            tabiwWinImg_rdo.TabStop = true;
+            tabiwWinImg_rdo.Tag = "";
+            tabiwWinImg_rdo.Text = "截圖";
+            tabiwWinImg_rdo.UseVisualStyleBackColor = true;
+            tabiwWinImg_rdo.Click += windowPictureBox_Click;
+            // 
+            // tabiwBack_grp
+            // 
+            tabiwBack_grp.Controls.Add(tabiwBack_pic);
+            tabiwBack_grp.Controls.Add(tabiwBackColor_rdo);
+            tabiwBack_grp.Controls.Add(tabiwBackCustom_rdo);
+            tabiwBack_grp.Controls.Add(tabiwBackImg_rdo);
+            tabiwBack_grp.Location = new Point(10, 16);
+            tabiwBack_grp.Name = "tabiwBack_grp";
+            tabiwBack_grp.Size = new Size(118, 79);
+            tabiwBack_grp.TabIndex = 17;
+            tabiwBack_grp.TabStop = false;
+            tabiwBack_grp.Text = "背景顏色";
+            // 
+            // tabiwBack_pic
+            // 
+            tabiwBack_pic.BackgroundImageLayout = ImageLayout.Zoom;
+            tabiwBack_pic.BorderStyle = BorderStyle.FixedSingle;
+            tabiwBack_pic.Image = Properties.Resources.Img;
+            tabiwBack_pic.InitialImage = null;
+            tabiwBack_pic.Location = new Point(5, 22);
+            tabiwBack_pic.Name = "tabiwBack_pic";
+            tabiwBack_pic.Size = new Size(40, 40);
+            tabiwBack_pic.SizeMode = PictureBoxSizeMode.Zoom;
+            tabiwBack_pic.TabIndex = 5;
+            tabiwBack_pic.TabStop = false;
+            tabiwBack_pic.Click += windowPictureBox_Click;
+            // 
+            // tabiwBackColor_rdo
+            // 
+            tabiwBackColor_rdo.AutoSize = true;
+            tabiwBackColor_rdo.Checked = true;
+            tabiwBackColor_rdo.Location = new Point(54, 16);
+            tabiwBackColor_rdo.Name = "tabiwBackColor_rdo";
+            tabiwBackColor_rdo.Size = new Size(49, 19);
+            tabiwBackColor_rdo.TabIndex = 2;
+            tabiwBackColor_rdo.TabStop = true;
+            tabiwBackColor_rdo.Tag = "";
+            tabiwBackColor_rdo.Text = "純色";
+            tabiwBackColor_rdo.UseVisualStyleBackColor = true;
+            tabiwBackColor_rdo.Click += windowPictureBox_Click;
+            // 
+            // tabiwBackCustom_rdo
+            // 
+            tabiwBackCustom_rdo.AutoSize = true;
+            tabiwBackCustom_rdo.Enabled = false;
+            tabiwBackCustom_rdo.Location = new Point(54, 53);
+            tabiwBackCustom_rdo.Name = "tabiwBackCustom_rdo";
+            tabiwBackCustom_rdo.Size = new Size(61, 19);
+            tabiwBackCustom_rdo.TabIndex = 4;
+            tabiwBackCustom_rdo.TabStop = true;
+            tabiwBackCustom_rdo.Tag = "";
+            tabiwBackCustom_rdo.Text = "自製圖";
+            tabiwBackCustom_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwBackImg_rdo
+            // 
+            tabiwBackImg_rdo.AutoSize = true;
+            tabiwBackImg_rdo.Location = new Point(54, 35);
+            tabiwBackImg_rdo.Name = "tabiwBackImg_rdo";
+            tabiwBackImg_rdo.Size = new Size(49, 19);
+            tabiwBackImg_rdo.TabIndex = 3;
+            tabiwBackImg_rdo.TabStop = true;
+            tabiwBackImg_rdo.Tag = "";
+            tabiwBackImg_rdo.Text = "截圖";
+            tabiwBackImg_rdo.UseVisualStyleBackColor = true;
+            tabiwBackImg_rdo.Click += windowPictureBox_Click;
+            // 
+            // tabiwLineColor_lbl
+            // 
+            tabiwLineColor_lbl.AutoSize = true;
+            tabiwLineColor_lbl.Location = new Point(185, 268);
+            tabiwLineColor_lbl.Name = "tabiwLineColor_lbl";
+            tabiwLineColor_lbl.Size = new Size(43, 15);
+            tabiwLineColor_lbl.TabIndex = 13;
+            tabiwLineColor_lbl.Text = "線顏色";
+            // 
+            // tabiwLineColor_btn
+            // 
+            tabiwLineColor_btn.BackColor = Color.White;
+            tabiwLineColor_btn.Location = new Point(234, 265);
+            tabiwLineColor_btn.Name = "tabiwLineColor_btn";
+            tabiwLineColor_btn.Size = new Size(24, 24);
+            tabiwLineColor_btn.TabIndex = 12;
+            tabiwLineColor_btn.UseVisualStyleBackColor = false;
+            tabiwLineColor_btn.Click += SetButtonBackgroundColor;
+            // 
+            // tabiwLineCross_btn
+            // 
+            tabiwLineCross_btn.AutoSize = true;
+            tabiwLineCross_btn.Location = new Point(188, 240);
+            tabiwLineCross_btn.Name = "tabiwLineCross_btn";
+            tabiwLineCross_btn.Size = new Size(50, 19);
+            tabiwLineCross_btn.TabIndex = 11;
+            tabiwLineCross_btn.Text = "十字";
+            tabiwLineCross_btn.UseVisualStyleBackColor = true;
+            // 
+            // tabiwLineOutside_btn
+            // 
+            tabiwLineOutside_btn.AutoSize = true;
+            tabiwLineOutside_btn.Location = new Point(188, 216);
+            tabiwLineOutside_btn.Name = "tabiwLineOutside_btn";
+            tabiwLineOutside_btn.Size = new Size(50, 19);
+            tabiwLineOutside_btn.TabIndex = 10;
+            tabiwLineOutside_btn.Text = "外框";
+            tabiwLineOutside_btn.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinLoc_grp
+            // 
+            tabiwWinLoc_grp.Controls.Add(tabiwWinLocPixcelY_nud);
+            tabiwWinLoc_grp.Controls.Add(tabiwWinLocTwo_rdo);
+            tabiwWinLoc_grp.Controls.Add(tabiwWinLocPixcelX_nud);
+            tabiwWinLoc_grp.Controls.Add(tabiwWinLocCenter_rdo);
+            tabiwWinLoc_grp.Controls.Add(tabiwWinLocPixcel_rdo);
+            tabiwWinLoc_grp.Location = new Point(6, 206);
+            tabiwWinLoc_grp.Name = "tabiwWinLoc_grp";
+            tabiwWinLoc_grp.Size = new Size(171, 98);
+            tabiwWinLoc_grp.TabIndex = 9;
+            tabiwWinLoc_grp.TabStop = false;
+            tabiwWinLoc_grp.Text = "視窗位置";
+            // 
+            // tabiwWinLocPixcelY_nud
+            // 
+            tabiwWinLocPixcelY_nud.Location = new Point(106, 67);
+            tabiwWinLocPixcelY_nud.Name = "tabiwWinLocPixcelY_nud";
+            tabiwWinLocPixcelY_nud.Size = new Size(59, 23);
+            tabiwWinLocPixcelY_nud.TabIndex = 7;
+            // 
+            // tabiwWinLocTwo_rdo
+            // 
+            tabiwWinLocTwo_rdo.AutoSize = true;
+            tabiwWinLocTwo_rdo.Location = new Point(80, 16);
+            tabiwWinLocTwo_rdo.Name = "tabiwWinLocTwo_rdo";
+            tabiwWinLocTwo_rdo.Size = new Size(49, 19);
+            tabiwWinLocTwo_rdo.TabIndex = 1;
+            tabiwWinLocTwo_rdo.Text = "兩組";
+            tabiwWinLocTwo_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinLocPixcelX_nud
+            // 
+            tabiwWinLocPixcelX_nud.Location = new Point(106, 37);
+            tabiwWinLocPixcelX_nud.Name = "tabiwWinLocPixcelX_nud";
+            tabiwWinLocPixcelX_nud.Size = new Size(59, 23);
+            tabiwWinLocPixcelX_nud.TabIndex = 6;
+            // 
+            // tabiwWinLocCenter_rdo
+            // 
+            tabiwWinLocCenter_rdo.AutoSize = true;
+            tabiwWinLocCenter_rdo.Checked = true;
+            tabiwWinLocCenter_rdo.Location = new Point(10, 16);
+            tabiwWinLocCenter_rdo.Name = "tabiwWinLocCenter_rdo";
+            tabiwWinLocCenter_rdo.Size = new Size(49, 19);
+            tabiwWinLocCenter_rdo.TabIndex = 0;
+            tabiwWinLocCenter_rdo.TabStop = true;
+            tabiwWinLocCenter_rdo.Text = "置中";
+            tabiwWinLocCenter_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinLocPixcel_rdo
+            // 
+            tabiwWinLocPixcel_rdo.AutoSize = true;
+            tabiwWinLocPixcel_rdo.Location = new Point(10, 38);
+            tabiwWinLocPixcel_rdo.Name = "tabiwWinLocPixcel_rdo";
+            tabiwWinLocPixcel_rdo.Size = new Size(93, 49);
+            tabiwWinLocPixcel_rdo.TabIndex = 5;
+            tabiwWinLocPixcel_rdo.Text = "                   X:\r\n指定Pixel  \r\n                   Y:";
+            tabiwWinLocPixcel_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinSize_grp
+            // 
+            tabiwWinSize_grp.Controls.Add(tabiwWinSizePixelH_nud);
+            tabiwWinSize_grp.Controls.Add(tabiwWinSizePixelW_nud);
+            tabiwWinSize_grp.Controls.Add(tabiwWinSizePixel_rdo);
+            tabiwWinSize_grp.Controls.Add(tabiwWinSizePercent_nud);
+            tabiwWinSize_grp.Controls.Add(tabiwWinSizePercent_rdo);
+            tabiwWinSize_grp.Location = new Point(6, 104);
+            tabiwWinSize_grp.Name = "tabiwWinSize_grp";
+            tabiwWinSize_grp.Size = new Size(171, 101);
+            tabiwWinSize_grp.TabIndex = 8;
+            tabiwWinSize_grp.TabStop = false;
+            tabiwWinSize_grp.Text = "視窗大小";
+            // 
+            // tabiwWinSizePixelH_nud
+            // 
+            tabiwWinSizePixelH_nud.Location = new Point(105, 75);
+            tabiwWinSizePixelH_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            tabiwWinSizePixelH_nud.Name = "tabiwWinSizePixelH_nud";
+            tabiwWinSizePixelH_nud.Size = new Size(60, 23);
+            tabiwWinSizePixelH_nud.TabIndex = 4;
+            tabiwWinSizePixelH_nud.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // tabiwWinSizePixelW_nud
+            // 
+            tabiwWinSizePixelW_nud.Location = new Point(104, 46);
+            tabiwWinSizePixelW_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            tabiwWinSizePixelW_nud.Name = "tabiwWinSizePixelW_nud";
+            tabiwWinSizePixelW_nud.Size = new Size(61, 23);
+            tabiwWinSizePixelW_nud.TabIndex = 3;
+            tabiwWinSizePixelW_nud.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            // 
+            // tabiwWinSizePixel_rdo
+            // 
+            tabiwWinSizePixel_rdo.AutoSize = true;
+            tabiwWinSizePixel_rdo.Location = new Point(10, 47);
+            tabiwWinSizePixel_rdo.Name = "tabiwWinSizePixel_rdo";
+            tabiwWinSizePixel_rdo.Size = new Size(94, 49);
+            tabiwWinSizePixel_rdo.TabIndex = 2;
+            tabiwWinSizePixel_rdo.Text = "                  寬:\r\n指定Pixel  \r\n                  高:";
+            tabiwWinSizePixel_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinSizePercent_nud
+            // 
+            tabiwWinSizePercent_nud.Location = new Point(90, 16);
+            tabiwWinSizePercent_nud.Name = "tabiwWinSizePercent_nud";
+            tabiwWinSizePercent_nud.Size = new Size(36, 23);
+            tabiwWinSizePercent_nud.TabIndex = 1;
+            tabiwWinSizePercent_nud.Value = new decimal(new int[] { 50, 0, 0, 0 });
+            // 
+            // tabiwWinSizePercent_rdo
+            // 
+            tabiwWinSizePercent_rdo.AutoSize = true;
+            tabiwWinSizePercent_rdo.Checked = true;
+            tabiwWinSizePercent_rdo.Location = new Point(10, 16);
+            tabiwWinSizePercent_rdo.Name = "tabiwWinSizePercent_rdo";
+            tabiwWinSizePercent_rdo.Size = new Size(80, 19);
+            tabiwWinSizePercent_rdo.TabIndex = 0;
+            tabiwWinSizePercent_rdo.TabStop = true;
+            tabiwWinSizePercent_rdo.Text = "百分比(%)";
+            tabiwWinSizePercent_rdo.UseVisualStyleBackColor = true;
+            // 
             // tabimgeMask
             // 
-            tabimgeMask.Controls.Add(pictureBox1);
-            tabimgeMask.Controls.Add(tabiemPanelColor_btn);
-            tabimgeMask.Controls.Add(button1);
-            tabimgeMask.Controls.Add(tabiemPanel_pnl);
+            tabimgeMask.Controls.Add(tabiemPixelGray_lbl);
+            tabimgeMask.Controls.Add(tabiemPixelGray_vsc);
+            tabimgeMask.Controls.Add(tabiemPixelColor_lbl);
+            tabimgeMask.Controls.Add(tabiemPixelLoc_lbl);
+            tabimgeMask.Controls.Add(tabiemPixelColor_btn);
+            tabimgeMask.Controls.Add(tabiemPixelClear_btn);
+            tabimgeMask.Controls.Add(tabiemPixelPanel_pnl);
             tabimgeMask.Controls.Add(tabiemHNum_nud);
             tabimgeMask.Controls.Add(tabiemWNum_nud);
             tabimgeMask.Controls.Add(tabiemHNum_lbl);
             tabimgeMask.Controls.Add(tabiemWNum_lbl);
             tabimgeMask.Controls.Add(tabiemSubPixel_rdo);
             tabimgeMask.Controls.Add(tabiemPixel_rdo);
-            tabimgeMask.Location = new Point(48, 3);
+            tabimgeMask.Location = new Point(246, 244);
             tabimgeMask.Name = "tabimgeMask";
-            tabimgeMask.Size = new Size(581, 372);
+            tabimgeMask.Size = new Size(119, 114);
             tabimgeMask.TabIndex = 0;
             tabimgeMask.TabStop = false;
             tabimgeMask.Text = "Mask(FlickerPattern)";
             // 
-            // tabiemPanelColor_btn
+            // tabiemPixelGray_lbl
             // 
-            tabiemPanelColor_btn.Location = new Point(160, 340);
-            tabiemPanelColor_btn.Name = "tabiemPanelColor_btn";
-            tabiemPanelColor_btn.Size = new Size(24, 24);
-            tabiemPanelColor_btn.TabIndex = 11;
-            tabiemPanelColor_btn.UseVisualStyleBackColor = true;
-            tabiemPanelColor_btn.Click += SetButtonBackgroundColor;
+            tabiemPixelGray_lbl.AutoSize = true;
+            tabiemPixelGray_lbl.Location = new Point(275, 61);
+            tabiemPixelGray_lbl.Name = "tabiemPixelGray_lbl";
+            tabiemPixelGray_lbl.Size = new Size(60, 15);
+            tabiemPixelGray_lbl.TabIndex = 15;
+            tabiemPixelGray_lbl.Text = "Gray: 255";
+            tabiemPixelGray_lbl.Visible = false;
             // 
-            // button1
+            // tabiemPixelGray_vsc
             // 
-            button1.Location = new Point(363, 116);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 10;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += MaskPanelCreat;
+            tabiemPixelGray_vsc.LargeChange = 1;
+            tabiemPixelGray_vsc.Location = new Point(279, 85);
+            tabiemPixelGray_vsc.Maximum = 255;
+            tabiemPixelGray_vsc.Name = "tabiemPixelGray_vsc";
+            tabiemPixelGray_vsc.Size = new Size(20, 240);
+            tabiemPixelGray_vsc.TabIndex = 14;
+            tabiemPixelGray_vsc.Visible = false;
+            tabiemPixelGray_vsc.ValueChanged += PixelGray_vsc_ValueChanged;
             // 
-            // tabiemPanel_pnl
+            // tabiemPixelColor_lbl
             // 
-            tabiemPanel_pnl.BackgroundImage = Properties.Resources.transparent;
-            tabiemPanel_pnl.BorderStyle = BorderStyle.FixedSingle;
-            tabiemPanel_pnl.Cursor = Cursors.Cross;
-            tabiemPanel_pnl.Location = new Point(28, 85);
-            tabiemPanel_pnl.Name = "tabiemPanel_pnl";
-            tabiemPanel_pnl.Size = new Size(240, 240);
-            tabiemPanel_pnl.TabIndex = 9;
+            tabiemPixelColor_lbl.AutoSize = true;
+            tabiemPixelColor_lbl.Location = new Point(100, 332);
+            tabiemPixelColor_lbl.Name = "tabiemPixelColor_lbl";
+            tabiemPixelColor_lbl.Size = new Size(55, 15);
+            tabiemPixelColor_lbl.TabIndex = 13;
+            tabiemPixelColor_lbl.Text = "選擇顏色";
+            // 
+            // tabiemPixelLoc_lbl
+            // 
+            tabiemPixelLoc_lbl.AutoSize = true;
+            tabiemPixelLoc_lbl.Location = new Point(28, 330);
+            tabiemPixelLoc_lbl.Name = "tabiemPixelLoc_lbl";
+            tabiemPixelLoc_lbl.Size = new Size(30, 15);
+            tabiemPixelLoc_lbl.TabIndex = 12;
+            tabiemPixelLoc_lbl.Text = "--,--";
+            // 
+            // tabiemPixelColor_btn
+            // 
+            tabiemPixelColor_btn.Location = new Point(161, 327);
+            tabiemPixelColor_btn.Name = "tabiemPixelColor_btn";
+            tabiemPixelColor_btn.Size = new Size(24, 24);
+            tabiemPixelColor_btn.TabIndex = 11;
+            tabiemPixelColor_btn.UseVisualStyleBackColor = true;
+            tabiemPixelColor_btn.Click += SetButtonBackgroundColor;
+            // 
+            // tabiemPixelClear_btn
+            // 
+            tabiemPixelClear_btn.Location = new Point(219, 328);
+            tabiemPixelClear_btn.Name = "tabiemPixelClear_btn";
+            tabiemPixelClear_btn.Size = new Size(49, 23);
+            tabiemPixelClear_btn.TabIndex = 10;
+            tabiemPixelClear_btn.Text = "Clear";
+            tabiemPixelClear_btn.UseVisualStyleBackColor = true;
+            tabiemPixelClear_btn.Click += MaskPanelCreat;
+            // 
+            // tabiemPixelPanel_pnl
+            // 
+            tabiemPixelPanel_pnl.BackgroundImage = Properties.Resources.transparent;
+            tabiemPixelPanel_pnl.BorderStyle = BorderStyle.FixedSingle;
+            tabiemPixelPanel_pnl.Cursor = Cursors.Cross;
+            tabiemPixelPanel_pnl.Location = new Point(28, 85);
+            tabiemPixelPanel_pnl.Name = "tabiemPixelPanel_pnl";
+            tabiemPixelPanel_pnl.Size = new Size(240, 240);
+            tabiemPixelPanel_pnl.TabIndex = 9;
             // 
             // tabiemHNum_nud
             // 
-            tabiemHNum_nud.Location = new Point(185, 49);
+            tabiemHNum_nud.Location = new Point(183, 61);
             tabiemHNum_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             tabiemHNum_nud.Name = "tabiemHNum_nud";
             tabiemHNum_nud.Size = new Size(38, 23);
@@ -398,7 +958,7 @@ namespace Natural
             // 
             // tabiemWNum_nud
             // 
-            tabiemWNum_nud.Location = new Point(71, 50);
+            tabiemWNum_nud.Location = new Point(76, 61);
             tabiemWNum_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             tabiemWNum_nud.Name = "tabiemWNum_nud";
             tabiemWNum_nud.Size = new Size(40, 23);
@@ -409,7 +969,7 @@ namespace Natural
             // tabiemHNum_lbl
             // 
             tabiemHNum_lbl.AutoSize = true;
-            tabiemHNum_lbl.Location = new Point(132, 52);
+            tabiemHNum_lbl.Location = new Point(136, 64);
             tabiemHNum_lbl.Name = "tabiemHNum_lbl";
             tabiemHNum_lbl.Size = new Size(45, 15);
             tabiemHNum_lbl.TabIndex = 3;
@@ -418,7 +978,7 @@ namespace Natural
             // tabiemWNum_lbl
             // 
             tabiemWNum_lbl.AutoSize = true;
-            tabiemWNum_lbl.Location = new Point(17, 55);
+            tabiemWNum_lbl.Location = new Point(30, 64);
             tabiemWNum_lbl.Name = "tabiemWNum_lbl";
             tabiemWNum_lbl.Size = new Size(41, 15);
             tabiemWNum_lbl.TabIndex = 2;
@@ -431,13 +991,14 @@ namespace Natural
             tabiemSubPixel_rdo.Name = "tabiemSubPixel_rdo";
             tabiemSubPixel_rdo.Size = new Size(105, 19);
             tabiemSubPixel_rdo.TabIndex = 1;
-            tabiemSubPixel_rdo.TabStop = true;
             tabiemSubPixel_rdo.Text = "Sub Pixel Base";
             tabiemSubPixel_rdo.UseVisualStyleBackColor = true;
+            tabiemSubPixel_rdo.CheckedChanged += Pixel_rdo_CheckedChanged;
             // 
             // tabiemPixel_rdo
             // 
             tabiemPixel_rdo.AutoSize = true;
+            tabiemPixel_rdo.Checked = true;
             tabiemPixel_rdo.Location = new Point(10, 25);
             tabiemPixel_rdo.Name = "tabiemPixel_rdo";
             tabiemPixel_rdo.Size = new Size(80, 19);
@@ -445,6 +1006,403 @@ namespace Natural
             tabiemPixel_rdo.TabStop = true;
             tabiemPixel_rdo.Text = "Pixel Base";
             tabiemPixel_rdo.UseVisualStyleBackColor = true;
+            tabiemPixel_rdo.CheckedChanged += Pixel_rdo_CheckedChanged;
+            // 
+            // tabimgeGradient
+            // 
+            tabimgeGradient.Controls.Add(tabigColorBar_rdo);
+            tabimgeGradient.Controls.Add(tabigOther_pnl);
+            tabimgeGradient.Controls.Add(tabigOther_btn);
+            tabimgeGradient.Controls.Add(tabigBaseColorCustom_btn);
+            tabimgeGradient.Controls.Add(tabigBaseColorB_btn);
+            tabimgeGradient.Controls.Add(tabigBaseColorG_btn);
+            tabimgeGradient.Controls.Add(tabigBaseColorR_btn);
+            tabimgeGradient.Controls.Add(tabigBaseColorW_btn);
+            tabimgeGradient.Controls.Add(tabigBaseColor_lbl);
+            tabimgeGradient.Controls.Add(tabigLastLevel_cmb);
+            tabimgeGradient.Controls.Add(tabigFistLevel_cmb);
+            tabimgeGradient.Controls.Add(tabigLastLevel_lbl);
+            tabimgeGradient.Controls.Add(tabigFistLevel_lbl);
+            tabimgeGradient.Controls.Add(tabigDivid_cmb);
+            tabimgeGradient.Controls.Add(tabigStep_cmb);
+            tabimgeGradient.Controls.Add(tabigDivid_lbl);
+            tabimgeGradient.Controls.Add(tabigStep_lbl);
+            tabimgeGradient.Controls.Add(tabigHWay_rdo);
+            tabimgeGradient.Controls.Add(tabigVWay_rdo);
+            tabimgeGradient.Location = new Point(454, 273);
+            tabimgeGradient.Name = "tabimgeGradient";
+            tabimgeGradient.Size = new Size(153, 96);
+            tabimgeGradient.TabIndex = 10;
+            tabimgeGradient.TabStop = false;
+            tabimgeGradient.Text = "Gradient";
+            tabimgeGradient.Visible = false;
+            // 
+            // tabigColorBar_rdo
+            // 
+            tabigColorBar_rdo.AutoSize = true;
+            tabigColorBar_rdo.Location = new Point(272, 20);
+            tabigColorBar_rdo.Name = "tabigColorBar_rdo";
+            tabigColorBar_rdo.Size = new Size(98, 19);
+            tabigColorBar_rdo.TabIndex = 18;
+            tabigColorBar_rdo.TabStop = true;
+            tabigColorBar_rdo.Text = "ColorBar模式";
+            tabigColorBar_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabigOther_pnl
+            // 
+            tabigOther_pnl.Controls.Add(tabigOtherSplit_lst);
+            tabigOther_pnl.Controls.Add(tabigOtherColorC_lbl);
+            tabigOther_pnl.Controls.Add(tabigOtherColorC_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherColorM_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherColorA_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherColorY_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherColorD_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherColorB_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherColorG_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherColorR_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherColorW_btn);
+            tabigOther_pnl.Controls.Add(tabigOtherSplit_lbl);
+            tabigOther_pnl.Controls.Add(tabigOtherSplit_nud);
+            tabigOther_pnl.Controls.Add(tabigOtherHsplit_rdo);
+            tabigOther_pnl.Controls.Add(tabigOtherVSplit_rdo);
+            tabigOther_pnl.Enabled = false;
+            tabigOther_pnl.Location = new Point(27, 133);
+            tabigOther_pnl.Name = "tabigOther_pnl";
+            tabigOther_pnl.Size = new Size(455, 173);
+            tabigOther_pnl.TabIndex = 17;
+            // 
+            // tabigOtherSplit_lst
+            // 
+            tabigOtherSplit_lst.Cursor = Cursors.Cross;
+            tabigOtherSplit_lst.FormattingEnabled = true;
+            tabigOtherSplit_lst.ItemHeight = 15;
+            tabigOtherSplit_lst.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7" });
+            tabigOtherSplit_lst.Location = new Point(39, 33);
+            tabigOtherSplit_lst.Name = "tabigOtherSplit_lst";
+            tabigOtherSplit_lst.SelectionMode = SelectionMode.MultiExtended;
+            tabigOtherSplit_lst.Size = new Size(218, 109);
+            tabigOtherSplit_lst.TabIndex = 22;
+            // 
+            // tabigOtherColorC_lbl
+            // 
+            tabigOtherColorC_lbl.AutoSize = true;
+            tabigOtherColorC_lbl.Location = new Point(308, 105);
+            tabigOtherColorC_lbl.Name = "tabigOtherColorC_lbl";
+            tabigOtherColorC_lbl.Size = new Size(55, 15);
+            tabigOtherColorC_lbl.TabIndex = 21;
+            tabigOtherColorC_lbl.Text = "選取顏色";
+            // 
+            // tabigOtherColorC_btn
+            // 
+            tabigOtherColorC_btn.BackgroundImage = Properties.Resources.custom;
+            tabigOtherColorC_btn.Location = new Point(363, 100);
+            tabigOtherColorC_btn.Name = "tabigOtherColorC_btn";
+            tabigOtherColorC_btn.Size = new Size(24, 24);
+            tabigOtherColorC_btn.TabIndex = 18;
+            tabigOtherColorC_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherColorM_btn
+            // 
+            tabigOtherColorM_btn.BackColor = Color.Magenta;
+            tabigOtherColorM_btn.ForeColor = Color.Black;
+            tabigOtherColorM_btn.Location = new Point(393, 70);
+            tabigOtherColorM_btn.Name = "tabigOtherColorM_btn";
+            tabigOtherColorM_btn.Size = new Size(24, 24);
+            tabigOtherColorM_btn.TabIndex = 20;
+            tabigOtherColorM_btn.Text = "M";
+            tabigOtherColorM_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherColorA_btn
+            // 
+            tabigOtherColorA_btn.BackColor = Color.Aqua;
+            tabigOtherColorA_btn.ForeColor = Color.Black;
+            tabigOtherColorA_btn.Location = new Point(363, 70);
+            tabigOtherColorA_btn.Name = "tabigOtherColorA_btn";
+            tabigOtherColorA_btn.Size = new Size(24, 24);
+            tabigOtherColorA_btn.TabIndex = 19;
+            tabigOtherColorA_btn.Text = "A";
+            tabigOtherColorA_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherColorY_btn
+            // 
+            tabigOtherColorY_btn.BackColor = Color.Yellow;
+            tabigOtherColorY_btn.ForeColor = Color.Black;
+            tabigOtherColorY_btn.Location = new Point(327, 69);
+            tabigOtherColorY_btn.Name = "tabigOtherColorY_btn";
+            tabigOtherColorY_btn.Size = new Size(24, 24);
+            tabigOtherColorY_btn.TabIndex = 18;
+            tabigOtherColorY_btn.Text = "Y";
+            tabigOtherColorY_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherColorD_btn
+            // 
+            tabigOtherColorD_btn.BackColor = Color.Black;
+            tabigOtherColorD_btn.ForeColor = Color.White;
+            tabigOtherColorD_btn.Location = new Point(297, 69);
+            tabigOtherColorD_btn.Name = "tabigOtherColorD_btn";
+            tabigOtherColorD_btn.Size = new Size(24, 24);
+            tabigOtherColorD_btn.TabIndex = 17;
+            tabigOtherColorD_btn.Text = "D";
+            tabigOtherColorD_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherColorB_btn
+            // 
+            tabigOtherColorB_btn.BackColor = Color.Blue;
+            tabigOtherColorB_btn.ForeColor = Color.White;
+            tabigOtherColorB_btn.Location = new Point(393, 40);
+            tabigOtherColorB_btn.Name = "tabigOtherColorB_btn";
+            tabigOtherColorB_btn.Size = new Size(24, 24);
+            tabigOtherColorB_btn.TabIndex = 15;
+            tabigOtherColorB_btn.Text = "B";
+            tabigOtherColorB_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherColorG_btn
+            // 
+            tabigOtherColorG_btn.BackColor = Color.Lime;
+            tabigOtherColorG_btn.ForeColor = Color.White;
+            tabigOtherColorG_btn.Location = new Point(363, 40);
+            tabigOtherColorG_btn.Name = "tabigOtherColorG_btn";
+            tabigOtherColorG_btn.Size = new Size(24, 24);
+            tabigOtherColorG_btn.TabIndex = 14;
+            tabigOtherColorG_btn.Text = "G";
+            tabigOtherColorG_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherColorR_btn
+            // 
+            tabigOtherColorR_btn.BackColor = Color.Red;
+            tabigOtherColorR_btn.ForeColor = Color.White;
+            tabigOtherColorR_btn.Location = new Point(326, 39);
+            tabigOtherColorR_btn.Name = "tabigOtherColorR_btn";
+            tabigOtherColorR_btn.Size = new Size(24, 24);
+            tabigOtherColorR_btn.TabIndex = 13;
+            tabigOtherColorR_btn.Text = "R";
+            tabigOtherColorR_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherColorW_btn
+            // 
+            tabigOtherColorW_btn.BackColor = Color.White;
+            tabigOtherColorW_btn.Location = new Point(297, 39);
+            tabigOtherColorW_btn.Name = "tabigOtherColorW_btn";
+            tabigOtherColorW_btn.Size = new Size(24, 24);
+            tabigOtherColorW_btn.TabIndex = 12;
+            tabigOtherColorW_btn.Text = "W";
+            tabigOtherColorW_btn.UseVisualStyleBackColor = false;
+            // 
+            // tabigOtherSplit_lbl
+            // 
+            tabigOtherSplit_lbl.AutoSize = true;
+            tabigOtherSplit_lbl.Location = new Point(245, 9);
+            tabigOtherSplit_lbl.Name = "tabigOtherSplit_lbl";
+            tabigOtherSplit_lbl.Size = new Size(49, 15);
+            tabigOtherSplit_lbl.TabIndex = 3;
+            tabigOtherSplit_lbl.Text = "Bar格數";
+            // 
+            // tabigOtherSplit_nud
+            // 
+            tabigOtherSplit_nud.Location = new Point(297, 7);
+            tabigOtherSplit_nud.Name = "tabigOtherSplit_nud";
+            tabigOtherSplit_nud.Size = new Size(120, 23);
+            tabigOtherSplit_nud.TabIndex = 2;
+            tabigOtherSplit_nud.Value = new decimal(new int[] { 8, 0, 0, 0 });
+            // 
+            // tabigOtherHsplit_rdo
+            // 
+            tabigOtherHsplit_rdo.AutoSize = true;
+            tabigOtherHsplit_rdo.Location = new Point(108, 6);
+            tabigOtherHsplit_rdo.Name = "tabigOtherHsplit_rdo";
+            tabigOtherHsplit_rdo.Size = new Size(58, 19);
+            tabigOtherHsplit_rdo.TabIndex = 1;
+            tabigOtherHsplit_rdo.Text = "H分割";
+            tabigOtherHsplit_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabigOtherVSplit_rdo
+            // 
+            tabigOtherVSplit_rdo.AutoSize = true;
+            tabigOtherVSplit_rdo.Checked = true;
+            tabigOtherVSplit_rdo.Location = new Point(11, 8);
+            tabigOtherVSplit_rdo.Name = "tabigOtherVSplit_rdo";
+            tabigOtherVSplit_rdo.Size = new Size(57, 19);
+            tabigOtherVSplit_rdo.TabIndex = 0;
+            tabigOtherVSplit_rdo.TabStop = true;
+            tabigOtherVSplit_rdo.Text = "V分割";
+            tabigOtherVSplit_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabigOther_btn
+            // 
+            tabigOther_btn.Location = new Point(333, 102);
+            tabigOther_btn.Name = "tabigOther_btn";
+            tabigOther_btn.Size = new Size(75, 23);
+            tabigOther_btn.TabIndex = 16;
+            tabigOther_btn.Text = "其他顏色";
+            tabigOther_btn.UseVisualStyleBackColor = true;
+            tabigOther_btn.Click += tabigOther_btn_Click;
+            // 
+            // tabigBaseColorCustom_btn
+            // 
+            tabigBaseColorCustom_btn.BackgroundImage = Properties.Resources.colorbar;
+            tabigBaseColorCustom_btn.Location = new Point(240, 100);
+            tabigBaseColorCustom_btn.Name = "tabigBaseColorCustom_btn";
+            tabigBaseColorCustom_btn.Size = new Size(24, 24);
+            tabigBaseColorCustom_btn.TabIndex = 15;
+            tabigBaseColorCustom_btn.UseVisualStyleBackColor = false;
+            tabigBaseColorCustom_btn.Click += GradientColor_Click;
+            // 
+            // tabigBaseColorB_btn
+            // 
+            tabigBaseColorB_btn.BackColor = Color.Blue;
+            tabigBaseColorB_btn.ForeColor = Color.White;
+            tabigBaseColorB_btn.Location = new Point(210, 100);
+            tabigBaseColorB_btn.Name = "tabigBaseColorB_btn";
+            tabigBaseColorB_btn.Size = new Size(24, 24);
+            tabigBaseColorB_btn.TabIndex = 14;
+            tabigBaseColorB_btn.Text = "B";
+            tabigBaseColorB_btn.UseVisualStyleBackColor = false;
+            tabigBaseColorB_btn.Click += GradientColor_Click;
+            // 
+            // tabigBaseColorG_btn
+            // 
+            tabigBaseColorG_btn.BackColor = Color.Lime;
+            tabigBaseColorG_btn.ForeColor = Color.White;
+            tabigBaseColorG_btn.Location = new Point(180, 100);
+            tabigBaseColorG_btn.Name = "tabigBaseColorG_btn";
+            tabigBaseColorG_btn.Size = new Size(24, 24);
+            tabigBaseColorG_btn.TabIndex = 13;
+            tabigBaseColorG_btn.Text = "G";
+            tabigBaseColorG_btn.UseVisualStyleBackColor = false;
+            tabigBaseColorG_btn.Click += GradientColor_Click;
+            // 
+            // tabigBaseColorR_btn
+            // 
+            tabigBaseColorR_btn.BackColor = Color.Red;
+            tabigBaseColorR_btn.ForeColor = Color.White;
+            tabigBaseColorR_btn.Location = new Point(150, 100);
+            tabigBaseColorR_btn.Name = "tabigBaseColorR_btn";
+            tabigBaseColorR_btn.Size = new Size(24, 24);
+            tabigBaseColorR_btn.TabIndex = 12;
+            tabigBaseColorR_btn.Text = "R";
+            tabigBaseColorR_btn.UseVisualStyleBackColor = false;
+            tabigBaseColorR_btn.Click += GradientColor_Click;
+            // 
+            // tabigBaseColorW_btn
+            // 
+            tabigBaseColorW_btn.BackColor = Color.White;
+            tabigBaseColorW_btn.Location = new Point(120, 100);
+            tabigBaseColorW_btn.Name = "tabigBaseColorW_btn";
+            tabigBaseColorW_btn.Size = new Size(24, 24);
+            tabigBaseColorW_btn.TabIndex = 11;
+            tabigBaseColorW_btn.Text = "W";
+            tabigBaseColorW_btn.UseVisualStyleBackColor = false;
+            tabigBaseColorW_btn.Click += GradientColor_Click;
+            // 
+            // tabigBaseColor_lbl
+            // 
+            tabigBaseColor_lbl.AutoSize = true;
+            tabigBaseColor_lbl.BorderStyle = BorderStyle.FixedSingle;
+            tabigBaseColor_lbl.Font = new Font("Microsoft JhengHei UI", 16F);
+            tabigBaseColor_lbl.Location = new Point(12, 100);
+            tabigBaseColor_lbl.Name = "tabigBaseColor_lbl";
+            tabigBaseColor_lbl.Size = new Size(102, 30);
+            tabigBaseColor_lbl.TabIndex = 10;
+            tabigBaseColor_lbl.Text = "基底色彩";
+            // 
+            // tabigLastLevel_cmb
+            // 
+            tabigLastLevel_cmb.FormattingEnabled = true;
+            tabigLastLevel_cmb.Items.AddRange(new object[] { "0", "31", "63", "95", "127", "159", "191", "223", "255" });
+            tabigLastLevel_cmb.Location = new Point(406, 73);
+            tabigLastLevel_cmb.Name = "tabigLastLevel_cmb";
+            tabigLastLevel_cmb.Size = new Size(121, 23);
+            tabigLastLevel_cmb.TabIndex = 9;
+            tabigLastLevel_cmb.Text = "255";
+            // 
+            // tabigFistLevel_cmb
+            // 
+            tabigFistLevel_cmb.FormattingEnabled = true;
+            tabigFistLevel_cmb.Items.AddRange(new object[] { "0", "31", "63", "95", "127", "159", "191", "223", "255" });
+            tabigFistLevel_cmb.Location = new Point(406, 43);
+            tabigFistLevel_cmb.Name = "tabigFistLevel_cmb";
+            tabigFistLevel_cmb.Size = new Size(121, 23);
+            tabigFistLevel_cmb.TabIndex = 8;
+            tabigFistLevel_cmb.Text = "0";
+            // 
+            // tabigLastLevel_lbl
+            // 
+            tabigLastLevel_lbl.AutoSize = true;
+            tabigLastLevel_lbl.Location = new Point(321, 77);
+            tabigLastLevel_lbl.Name = "tabigLastLevel_lbl";
+            tabigLastLevel_lbl.Size = new Size(58, 15);
+            tabigLastLevel_lbl.TabIndex = 7;
+            tabigLastLevel_lbl.Text = "LastLevel";
+            // 
+            // tabigFistLevel_lbl
+            // 
+            tabigFistLevel_lbl.AutoSize = true;
+            tabigFistLevel_lbl.Location = new Point(313, 48);
+            tabigFistLevel_lbl.Name = "tabigFistLevel_lbl";
+            tabigFistLevel_lbl.Size = new Size(54, 15);
+            tabigFistLevel_lbl.TabIndex = 6;
+            tabigFistLevel_lbl.Text = "FistLevel";
+            // 
+            // tabigDivid_cmb
+            // 
+            tabigDivid_cmb.FormattingEnabled = true;
+            tabigDivid_cmb.Items.AddRange(new object[] { "1", "2", "4" });
+            tabigDivid_cmb.Location = new Point(138, 69);
+            tabigDivid_cmb.Name = "tabigDivid_cmb";
+            tabigDivid_cmb.Size = new Size(121, 23);
+            tabigDivid_cmb.TabIndex = 5;
+            tabigDivid_cmb.Text = "1";
+            // 
+            // tabigStep_cmb
+            // 
+            tabigStep_cmb.FormattingEnabled = true;
+            tabigStep_cmb.Items.AddRange(new object[] { "16", "32", "64", "128", "256" });
+            tabigStep_cmb.Location = new Point(8, 69);
+            tabigStep_cmb.Name = "tabigStep_cmb";
+            tabigStep_cmb.Size = new Size(121, 23);
+            tabigStep_cmb.TabIndex = 4;
+            tabigStep_cmb.Text = "256";
+            // 
+            // tabigDivid_lbl
+            // 
+            tabigDivid_lbl.AutoSize = true;
+            tabigDivid_lbl.Location = new Point(138, 47);
+            tabigDivid_lbl.Name = "tabigDivid_lbl";
+            tabigDivid_lbl.Size = new Size(67, 15);
+            tabigDivid_lbl.TabIndex = 3;
+            tabigDivid_lbl.Text = "畫面幾等分";
+            // 
+            // tabigStep_lbl
+            // 
+            tabigStep_lbl.AutoSize = true;
+            tabigStep_lbl.Location = new Point(20, 51);
+            tabigStep_lbl.Name = "tabigStep_lbl";
+            tabigStep_lbl.Size = new Size(67, 15);
+            tabigStep_lbl.TabIndex = 2;
+            tabigStep_lbl.Text = "漸層分幾階";
+            // 
+            // tabigHWay_rdo
+            // 
+            tabigHWay_rdo.AutoSize = true;
+            tabigHWay_rdo.Location = new Point(135, 20);
+            tabigHWay_rdo.Name = "tabigHWay_rdo";
+            tabigHWay_rdo.Size = new Size(111, 19);
+            tabigHWay_rdo.TabIndex = 1;
+            tabigHWay_rdo.TabStop = true;
+            tabigHWay_rdo.Text = "Horizontal 漸層";
+            tabigHWay_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabigVWay_rdo
+            // 
+            tabigVWay_rdo.AutoSize = true;
+            tabigVWay_rdo.Checked = true;
+            tabigVWay_rdo.Location = new Point(10, 20);
+            tabigVWay_rdo.Name = "tabigVWay_rdo";
+            tabigVWay_rdo.Size = new Size(94, 19);
+            tabigVWay_rdo.TabIndex = 0;
+            tabigVWay_rdo.TabStop = true;
+            tabigVWay_rdo.Text = "Vertical 漸層";
+            tabigVWay_rdo.UseVisualStyleBackColor = true;
             // 
             // tabimgeAdjust
             // 
@@ -460,9 +1418,9 @@ namespace Natural
             tabimgeAdjust.Controls.Add(tabieaRotate90_rdo);
             tabimgeAdjust.Controls.Add(tabieaLeftRight_rdo);
             tabimgeAdjust.Controls.Add(tabieaUpDown_rdo);
-            tabimgeAdjust.Location = new Point(454, 139);
+            tabimgeAdjust.Location = new Point(440, 145);
             tabimgeAdjust.Name = "tabimgeAdjust";
-            tabimgeAdjust.Size = new Size(146, 114);
+            tabimgeAdjust.Size = new Size(158, 67);
             tabimgeAdjust.TabIndex = 0;
             tabimgeAdjust.TabStop = false;
             tabimgeAdjust.Text = "  ImgAdjus";
@@ -579,7 +1537,6 @@ namespace Natural
             tabieaVFlip_rdo.Name = "tabieaVFlip_rdo";
             tabieaVFlip_rdo.Size = new Size(73, 19);
             tabieaVFlip_rdo.TabIndex = 10;
-            tabieaVFlip_rdo.TabStop = true;
             tabieaVFlip_rdo.Text = "垂直翻轉";
             tabieaVFlip_rdo.UseVisualStyleBackColor = true;
             tabieaVFlip_rdo.CheckedChanged += tabiea_rdo_CheckedChanged;
@@ -591,7 +1548,6 @@ namespace Natural
             tabieaHFlip_rdo.Name = "tabieaHFlip_rdo";
             tabieaHFlip_rdo.Size = new Size(73, 19);
             tabieaHFlip_rdo.TabIndex = 9;
-            tabieaHFlip_rdo.TabStop = true;
             tabieaHFlip_rdo.Text = "水平翻轉";
             tabieaHFlip_rdo.UseVisualStyleBackColor = true;
             tabieaHFlip_rdo.CheckedChanged += tabiea_rdo_CheckedChanged;
@@ -599,6 +1555,7 @@ namespace Natural
             // tabieaResize_rdo
             // 
             tabieaResize_rdo.AutoSize = true;
+            tabieaResize_rdo.Checked = true;
             tabieaResize_rdo.Location = new Point(20, 50);
             tabieaResize_rdo.Name = "tabieaResize_rdo";
             tabieaResize_rdo.Size = new Size(63, 19);
@@ -635,7 +1592,6 @@ namespace Natural
             tabieaRotate270_rdo.Name = "tabieaRotate270_rdo";
             tabieaRotate270_rdo.Size = new Size(75, 19);
             tabieaRotate270_rdo.TabIndex = 4;
-            tabieaRotate270_rdo.TabStop = true;
             tabieaRotate270_rdo.Text = "旋轉270°";
             tabieaRotate270_rdo.UseVisualStyleBackColor = true;
             tabieaRotate270_rdo.CheckedChanged += tabiea_rdo_CheckedChanged;
@@ -647,7 +1603,6 @@ namespace Natural
             tabieaRotate180_rdo.Name = "tabieaRotate180_rdo";
             tabieaRotate180_rdo.Size = new Size(75, 19);
             tabieaRotate180_rdo.TabIndex = 3;
-            tabieaRotate180_rdo.TabStop = true;
             tabieaRotate180_rdo.Text = "旋轉180°";
             tabieaRotate180_rdo.UseVisualStyleBackColor = true;
             tabieaRotate180_rdo.CheckedChanged += tabiea_rdo_CheckedChanged;
@@ -659,7 +1614,6 @@ namespace Natural
             tabieaRotate90_rdo.Name = "tabieaRotate90_rdo";
             tabieaRotate90_rdo.Size = new Size(68, 19);
             tabieaRotate90_rdo.TabIndex = 2;
-            tabieaRotate90_rdo.TabStop = true;
             tabieaRotate90_rdo.Text = "旋轉90°";
             tabieaRotate90_rdo.UseVisualStyleBackColor = true;
             tabieaRotate90_rdo.CheckedChanged += tabiea_rdo_CheckedChanged;
@@ -671,7 +1625,6 @@ namespace Natural
             tabieaLeftRight_rdo.Name = "tabieaLeftRight_rdo";
             tabieaLeftRight_rdo.Size = new Size(73, 19);
             tabieaLeftRight_rdo.TabIndex = 1;
-            tabieaLeftRight_rdo.TabStop = true;
             tabieaLeftRight_rdo.Text = "左右組合";
             tabieaLeftRight_rdo.UseVisualStyleBackColor = true;
             tabieaLeftRight_rdo.CheckedChanged += tabiea_rdo_CheckedChanged;
@@ -683,7 +1636,6 @@ namespace Natural
             tabieaUpDown_rdo.Name = "tabieaUpDown_rdo";
             tabieaUpDown_rdo.Size = new Size(73, 19);
             tabieaUpDown_rdo.TabIndex = 0;
-            tabieaUpDown_rdo.TabStop = true;
             tabieaUpDown_rdo.Text = "上下組合";
             tabieaUpDown_rdo.UseVisualStyleBackColor = true;
             tabieaUpDown_rdo.CheckedChanged += tabiea_rdo_CheckedChanged;
@@ -710,9 +1662,9 @@ namespace Natural
             tabimgeFrame.Controls.Add(tabiefLineColor_btn);
             tabimgeFrame.Controls.Add(tabiefBack_lbl);
             tabimgeFrame.ImeMode = ImeMode.On;
-            tabimgeFrame.Location = new Point(235, 6);
+            tabimgeFrame.Location = new Point(224, 6);
             tabimgeFrame.Name = "tabimgeFrame";
-            tabimgeFrame.Size = new Size(175, 99);
+            tabimgeFrame.Size = new Size(159, 85);
             tabimgeFrame.TabIndex = 10;
             tabimgeFrame.TabStop = false;
             tabimgeFrame.Text = "Frame&&CrossLine&&Border";
@@ -720,7 +1672,6 @@ namespace Natural
             // tabiefBack_btn
             // 
             tabiefBack_btn.BackColor = Color.Black;
-            tabiefBack_btn.ForeColor = Color.Black;
             tabiefBack_btn.Location = new Point(72, 16);
             tabiefBack_btn.Name = "tabiefBack_btn";
             tabiefBack_btn.Size = new Size(24, 24);
@@ -911,397 +1862,6 @@ namespace Natural
             tabiefBack_lbl.TabIndex = 11;
             tabiefBack_lbl.Text = "背景顏色                導入截圖";
             // 
-            // tabimgeGradient
-            // 
-            tabimgeGradient.Controls.Add(tabigColorBar_rdo);
-            tabimgeGradient.Controls.Add(tabigOther_pnl);
-            tabimgeGradient.Controls.Add(tabigOther_btn);
-            tabimgeGradient.Controls.Add(tabigBaseColorCustom_btn);
-            tabimgeGradient.Controls.Add(tabigBaseColorB_btn);
-            tabimgeGradient.Controls.Add(tabigBaseColorG_btn);
-            tabimgeGradient.Controls.Add(tabigBaseColorR_btn);
-            tabimgeGradient.Controls.Add(tabigBaseColorW_btn);
-            tabimgeGradient.Controls.Add(tabigBaseColor_lbl);
-            tabimgeGradient.Controls.Add(tabigLastLevel_cmb);
-            tabimgeGradient.Controls.Add(tabigFistLevel_cmb);
-            tabimgeGradient.Controls.Add(tabigLastLevel_lbl);
-            tabimgeGradient.Controls.Add(tabigFistLevel_lbl);
-            tabimgeGradient.Controls.Add(tabigDivid_cmb);
-            tabimgeGradient.Controls.Add(tabigStep_cmb);
-            tabimgeGradient.Controls.Add(tabigDivid_lbl);
-            tabimgeGradient.Controls.Add(tabigStep_lbl);
-            tabimgeGradient.Controls.Add(tabigHWay_rdo);
-            tabimgeGradient.Controls.Add(tabigVWay_rdo);
-            tabimgeGradient.Location = new Point(40, 19);
-            tabimgeGradient.Name = "tabimgeGradient";
-            tabimgeGradient.Size = new Size(132, 88);
-            tabimgeGradient.TabIndex = 10;
-            tabimgeGradient.TabStop = false;
-            tabimgeGradient.Text = "Gradient";
-            tabimgeGradient.Visible = false;
-            // 
-            // tabigColorBar_rdo
-            // 
-            tabigColorBar_rdo.AutoSize = true;
-            tabigColorBar_rdo.Location = new Point(272, 20);
-            tabigColorBar_rdo.Name = "tabigColorBar_rdo";
-            tabigColorBar_rdo.Size = new Size(98, 19);
-            tabigColorBar_rdo.TabIndex = 18;
-            tabigColorBar_rdo.TabStop = true;
-            tabigColorBar_rdo.Text = "ColorBar模式";
-            tabigColorBar_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabigOther_pnl
-            // 
-            tabigOther_pnl.Controls.Add(tabigOtherSplit_lst);
-            tabigOther_pnl.Controls.Add(tabigOtherColorC_lbl);
-            tabigOther_pnl.Controls.Add(tabigOtherColorC_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherColorM_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherColorA_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherColorY_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherColorD_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherColorB_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherColorG_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherColorR_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherColorW_btn);
-            tabigOther_pnl.Controls.Add(tabigOtherSplit_lbl);
-            tabigOther_pnl.Controls.Add(tabigOtherSplit_nud);
-            tabigOther_pnl.Controls.Add(tabigOtherHsplit_rdo);
-            tabigOther_pnl.Controls.Add(tabigOtherVSplit_rdo);
-            tabigOther_pnl.Enabled = false;
-            tabigOther_pnl.Location = new Point(27, 133);
-            tabigOther_pnl.Name = "tabigOther_pnl";
-            tabigOther_pnl.Size = new Size(455, 173);
-            tabigOther_pnl.TabIndex = 17;
-            // 
-            // tabigOtherSplit_lst
-            // 
-            tabigOtherSplit_lst.Cursor = Cursors.Cross;
-            tabigOtherSplit_lst.FormattingEnabled = true;
-            tabigOtherSplit_lst.ItemHeight = 15;
-            tabigOtherSplit_lst.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7" });
-            tabigOtherSplit_lst.Location = new Point(39, 33);
-            tabigOtherSplit_lst.Name = "tabigOtherSplit_lst";
-            tabigOtherSplit_lst.SelectionMode = SelectionMode.MultiExtended;
-            tabigOtherSplit_lst.Size = new Size(218, 109);
-            tabigOtherSplit_lst.TabIndex = 22;
-            // 
-            // tabigOtherColorC_lbl
-            // 
-            tabigOtherColorC_lbl.AutoSize = true;
-            tabigOtherColorC_lbl.Location = new Point(308, 105);
-            tabigOtherColorC_lbl.Name = "tabigOtherColorC_lbl";
-            tabigOtherColorC_lbl.Size = new Size(55, 15);
-            tabigOtherColorC_lbl.TabIndex = 21;
-            tabigOtherColorC_lbl.Text = "選取顏色";
-            // 
-            // tabigOtherColorC_btn
-            // 
-            tabigOtherColorC_btn.BackgroundImage = Properties.Resources.custom;
-            tabigOtherColorC_btn.Location = new Point(363, 100);
-            tabigOtherColorC_btn.Name = "tabigOtherColorC_btn";
-            tabigOtherColorC_btn.Size = new Size(24, 24);
-            tabigOtherColorC_btn.TabIndex = 18;
-            tabigOtherColorC_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherColorM_btn
-            // 
-            tabigOtherColorM_btn.BackColor = Color.Magenta;
-            tabigOtherColorM_btn.ForeColor = Color.Black;
-            tabigOtherColorM_btn.Location = new Point(393, 70);
-            tabigOtherColorM_btn.Name = "tabigOtherColorM_btn";
-            tabigOtherColorM_btn.Size = new Size(24, 24);
-            tabigOtherColorM_btn.TabIndex = 20;
-            tabigOtherColorM_btn.Text = "M";
-            tabigOtherColorM_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherColorA_btn
-            // 
-            tabigOtherColorA_btn.BackColor = Color.Aqua;
-            tabigOtherColorA_btn.ForeColor = Color.Black;
-            tabigOtherColorA_btn.Location = new Point(363, 70);
-            tabigOtherColorA_btn.Name = "tabigOtherColorA_btn";
-            tabigOtherColorA_btn.Size = new Size(24, 24);
-            tabigOtherColorA_btn.TabIndex = 19;
-            tabigOtherColorA_btn.Text = "A";
-            tabigOtherColorA_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherColorY_btn
-            // 
-            tabigOtherColorY_btn.BackColor = Color.Yellow;
-            tabigOtherColorY_btn.ForeColor = Color.Black;
-            tabigOtherColorY_btn.Location = new Point(327, 69);
-            tabigOtherColorY_btn.Name = "tabigOtherColorY_btn";
-            tabigOtherColorY_btn.Size = new Size(24, 24);
-            tabigOtherColorY_btn.TabIndex = 18;
-            tabigOtherColorY_btn.Text = "Y";
-            tabigOtherColorY_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherColorD_btn
-            // 
-            tabigOtherColorD_btn.BackColor = Color.Black;
-            tabigOtherColorD_btn.ForeColor = Color.White;
-            tabigOtherColorD_btn.Location = new Point(297, 69);
-            tabigOtherColorD_btn.Name = "tabigOtherColorD_btn";
-            tabigOtherColorD_btn.Size = new Size(24, 24);
-            tabigOtherColorD_btn.TabIndex = 17;
-            tabigOtherColorD_btn.Text = "D";
-            tabigOtherColorD_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherColorB_btn
-            // 
-            tabigOtherColorB_btn.BackColor = Color.Blue;
-            tabigOtherColorB_btn.ForeColor = Color.White;
-            tabigOtherColorB_btn.Location = new Point(393, 40);
-            tabigOtherColorB_btn.Name = "tabigOtherColorB_btn";
-            tabigOtherColorB_btn.Size = new Size(24, 24);
-            tabigOtherColorB_btn.TabIndex = 15;
-            tabigOtherColorB_btn.Text = "B";
-            tabigOtherColorB_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherColorG_btn
-            // 
-            tabigOtherColorG_btn.BackColor = Color.Lime;
-            tabigOtherColorG_btn.ForeColor = Color.White;
-            tabigOtherColorG_btn.Location = new Point(363, 40);
-            tabigOtherColorG_btn.Name = "tabigOtherColorG_btn";
-            tabigOtherColorG_btn.Size = new Size(24, 24);
-            tabigOtherColorG_btn.TabIndex = 14;
-            tabigOtherColorG_btn.Text = "G";
-            tabigOtherColorG_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherColorR_btn
-            // 
-            tabigOtherColorR_btn.BackColor = Color.Red;
-            tabigOtherColorR_btn.ForeColor = Color.White;
-            tabigOtherColorR_btn.Location = new Point(326, 39);
-            tabigOtherColorR_btn.Name = "tabigOtherColorR_btn";
-            tabigOtherColorR_btn.Size = new Size(24, 24);
-            tabigOtherColorR_btn.TabIndex = 13;
-            tabigOtherColorR_btn.Text = "R";
-            tabigOtherColorR_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherColorW_btn
-            // 
-            tabigOtherColorW_btn.BackColor = Color.White;
-            tabigOtherColorW_btn.Location = new Point(297, 39);
-            tabigOtherColorW_btn.Name = "tabigOtherColorW_btn";
-            tabigOtherColorW_btn.Size = new Size(24, 24);
-            tabigOtherColorW_btn.TabIndex = 12;
-            tabigOtherColorW_btn.Text = "W";
-            tabigOtherColorW_btn.UseVisualStyleBackColor = false;
-            // 
-            // tabigOtherSplit_lbl
-            // 
-            tabigOtherSplit_lbl.AutoSize = true;
-            tabigOtherSplit_lbl.Location = new Point(245, 9);
-            tabigOtherSplit_lbl.Name = "tabigOtherSplit_lbl";
-            tabigOtherSplit_lbl.Size = new Size(49, 15);
-            tabigOtherSplit_lbl.TabIndex = 3;
-            tabigOtherSplit_lbl.Text = "Bar格數";
-            // 
-            // tabigOtherSplit_nud
-            // 
-            tabigOtherSplit_nud.Location = new Point(297, 7);
-            tabigOtherSplit_nud.Name = "tabigOtherSplit_nud";
-            tabigOtherSplit_nud.Size = new Size(120, 23);
-            tabigOtherSplit_nud.TabIndex = 2;
-            tabigOtherSplit_nud.Value = new decimal(new int[] { 8, 0, 0, 0 });
-            // 
-            // tabigOtherHsplit_rdo
-            // 
-            tabigOtherHsplit_rdo.AutoSize = true;
-            tabigOtherHsplit_rdo.Location = new Point(108, 6);
-            tabigOtherHsplit_rdo.Name = "tabigOtherHsplit_rdo";
-            tabigOtherHsplit_rdo.Size = new Size(58, 19);
-            tabigOtherHsplit_rdo.TabIndex = 1;
-            tabigOtherHsplit_rdo.TabStop = true;
-            tabigOtherHsplit_rdo.Text = "H分割";
-            tabigOtherHsplit_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabigOtherVSplit_rdo
-            // 
-            tabigOtherVSplit_rdo.AutoSize = true;
-            tabigOtherVSplit_rdo.Location = new Point(11, 8);
-            tabigOtherVSplit_rdo.Name = "tabigOtherVSplit_rdo";
-            tabigOtherVSplit_rdo.Size = new Size(57, 19);
-            tabigOtherVSplit_rdo.TabIndex = 0;
-            tabigOtherVSplit_rdo.TabStop = true;
-            tabigOtherVSplit_rdo.Text = "V分割";
-            tabigOtherVSplit_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabigOther_btn
-            // 
-            tabigOther_btn.Location = new Point(333, 102);
-            tabigOther_btn.Name = "tabigOther_btn";
-            tabigOther_btn.Size = new Size(75, 23);
-            tabigOther_btn.TabIndex = 16;
-            tabigOther_btn.Text = "其他顏色";
-            tabigOther_btn.UseVisualStyleBackColor = true;
-            tabigOther_btn.Click += tabigOther_btn_Click;
-            // 
-            // tabigBaseColorCustom_btn
-            // 
-            tabigBaseColorCustom_btn.BackgroundImage = Properties.Resources.colorbar;
-            tabigBaseColorCustom_btn.Location = new Point(240, 100);
-            tabigBaseColorCustom_btn.Name = "tabigBaseColorCustom_btn";
-            tabigBaseColorCustom_btn.Size = new Size(24, 24);
-            tabigBaseColorCustom_btn.TabIndex = 15;
-            tabigBaseColorCustom_btn.UseVisualStyleBackColor = false;
-            tabigBaseColorCustom_btn.Click += GradientColor_Click;
-            // 
-            // tabigBaseColorB_btn
-            // 
-            tabigBaseColorB_btn.BackColor = Color.Blue;
-            tabigBaseColorB_btn.ForeColor = Color.White;
-            tabigBaseColorB_btn.Location = new Point(210, 100);
-            tabigBaseColorB_btn.Name = "tabigBaseColorB_btn";
-            tabigBaseColorB_btn.Size = new Size(24, 24);
-            tabigBaseColorB_btn.TabIndex = 14;
-            tabigBaseColorB_btn.Text = "B";
-            tabigBaseColorB_btn.UseVisualStyleBackColor = false;
-            tabigBaseColorB_btn.Click += GradientColor_Click;
-            // 
-            // tabigBaseColorG_btn
-            // 
-            tabigBaseColorG_btn.BackColor = Color.Lime;
-            tabigBaseColorG_btn.ForeColor = Color.White;
-            tabigBaseColorG_btn.Location = new Point(180, 100);
-            tabigBaseColorG_btn.Name = "tabigBaseColorG_btn";
-            tabigBaseColorG_btn.Size = new Size(24, 24);
-            tabigBaseColorG_btn.TabIndex = 13;
-            tabigBaseColorG_btn.Text = "G";
-            tabigBaseColorG_btn.UseVisualStyleBackColor = false;
-            tabigBaseColorG_btn.Click += GradientColor_Click;
-            // 
-            // tabigBaseColorR_btn
-            // 
-            tabigBaseColorR_btn.BackColor = Color.Red;
-            tabigBaseColorR_btn.ForeColor = Color.White;
-            tabigBaseColorR_btn.Location = new Point(150, 100);
-            tabigBaseColorR_btn.Name = "tabigBaseColorR_btn";
-            tabigBaseColorR_btn.Size = new Size(24, 24);
-            tabigBaseColorR_btn.TabIndex = 12;
-            tabigBaseColorR_btn.Text = "R";
-            tabigBaseColorR_btn.UseVisualStyleBackColor = false;
-            tabigBaseColorR_btn.Click += GradientColor_Click;
-            // 
-            // tabigBaseColorW_btn
-            // 
-            tabigBaseColorW_btn.BackColor = Color.White;
-            tabigBaseColorW_btn.Location = new Point(120, 100);
-            tabigBaseColorW_btn.Name = "tabigBaseColorW_btn";
-            tabigBaseColorW_btn.Size = new Size(24, 24);
-            tabigBaseColorW_btn.TabIndex = 11;
-            tabigBaseColorW_btn.Text = "W";
-            tabigBaseColorW_btn.UseVisualStyleBackColor = false;
-            tabigBaseColorW_btn.Click += GradientColor_Click;
-            // 
-            // tabigBaseColor_lbl
-            // 
-            tabigBaseColor_lbl.AutoSize = true;
-            tabigBaseColor_lbl.BorderStyle = BorderStyle.FixedSingle;
-            tabigBaseColor_lbl.Font = new Font("Microsoft JhengHei UI", 16F);
-            tabigBaseColor_lbl.Location = new Point(12, 100);
-            tabigBaseColor_lbl.Name = "tabigBaseColor_lbl";
-            tabigBaseColor_lbl.Size = new Size(102, 30);
-            tabigBaseColor_lbl.TabIndex = 10;
-            tabigBaseColor_lbl.Text = "基底色彩";
-            // 
-            // tabigLastLevel_cmb
-            // 
-            tabigLastLevel_cmb.FormattingEnabled = true;
-            tabigLastLevel_cmb.Items.AddRange(new object[] { "0", "31", "63", "95", "127", "159", "191", "223", "255" });
-            tabigLastLevel_cmb.Location = new Point(406, 73);
-            tabigLastLevel_cmb.Name = "tabigLastLevel_cmb";
-            tabigLastLevel_cmb.Size = new Size(121, 23);
-            tabigLastLevel_cmb.TabIndex = 9;
-            // 
-            // tabigFistLevel_cmb
-            // 
-            tabigFistLevel_cmb.FormattingEnabled = true;
-            tabigFistLevel_cmb.Items.AddRange(new object[] { "0", "31", "63", "95", "127", "159", "191", "223", "255" });
-            tabigFistLevel_cmb.Location = new Point(406, 43);
-            tabigFistLevel_cmb.Name = "tabigFistLevel_cmb";
-            tabigFistLevel_cmb.Size = new Size(121, 23);
-            tabigFistLevel_cmb.TabIndex = 8;
-            // 
-            // tabigLastLevel_lbl
-            // 
-            tabigLastLevel_lbl.AutoSize = true;
-            tabigLastLevel_lbl.Location = new Point(321, 77);
-            tabigLastLevel_lbl.Name = "tabigLastLevel_lbl";
-            tabigLastLevel_lbl.Size = new Size(58, 15);
-            tabigLastLevel_lbl.TabIndex = 7;
-            tabigLastLevel_lbl.Text = "LastLevel";
-            // 
-            // tabigFistLevel_lbl
-            // 
-            tabigFistLevel_lbl.AutoSize = true;
-            tabigFistLevel_lbl.Location = new Point(313, 48);
-            tabigFistLevel_lbl.Name = "tabigFistLevel_lbl";
-            tabigFistLevel_lbl.Size = new Size(54, 15);
-            tabigFistLevel_lbl.TabIndex = 6;
-            tabigFistLevel_lbl.Text = "FistLevel";
-            // 
-            // tabigDivid_cmb
-            // 
-            tabigDivid_cmb.FormattingEnabled = true;
-            tabigDivid_cmb.Items.AddRange(new object[] { "1", "2", "4" });
-            tabigDivid_cmb.Location = new Point(138, 69);
-            tabigDivid_cmb.Name = "tabigDivid_cmb";
-            tabigDivid_cmb.Size = new Size(121, 23);
-            tabigDivid_cmb.TabIndex = 5;
-            // 
-            // tabigStep_cmb
-            // 
-            tabigStep_cmb.FormattingEnabled = true;
-            tabigStep_cmb.Items.AddRange(new object[] { "16", "32", "64", "128", "256" });
-            tabigStep_cmb.Location = new Point(8, 69);
-            tabigStep_cmb.Name = "tabigStep_cmb";
-            tabigStep_cmb.Size = new Size(121, 23);
-            tabigStep_cmb.TabIndex = 4;
-            // 
-            // tabigDivid_lbl
-            // 
-            tabigDivid_lbl.AutoSize = true;
-            tabigDivid_lbl.Location = new Point(138, 47);
-            tabigDivid_lbl.Name = "tabigDivid_lbl";
-            tabigDivid_lbl.Size = new Size(67, 15);
-            tabigDivid_lbl.TabIndex = 3;
-            tabigDivid_lbl.Text = "畫面幾等分";
-            // 
-            // tabigStep_lbl
-            // 
-            tabigStep_lbl.AutoSize = true;
-            tabigStep_lbl.Location = new Point(20, 51);
-            tabigStep_lbl.Name = "tabigStep_lbl";
-            tabigStep_lbl.Size = new Size(67, 15);
-            tabigStep_lbl.TabIndex = 2;
-            tabigStep_lbl.Text = "漸層分幾階";
-            // 
-            // tabigHWay_rdo
-            // 
-            tabigHWay_rdo.AutoSize = true;
-            tabigHWay_rdo.Location = new Point(135, 20);
-            tabigHWay_rdo.Name = "tabigHWay_rdo";
-            tabigHWay_rdo.Size = new Size(111, 19);
-            tabigHWay_rdo.TabIndex = 1;
-            tabigHWay_rdo.TabStop = true;
-            tabigHWay_rdo.Text = "Horizontal 漸層";
-            tabigHWay_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabigVWay_rdo
-            // 
-            tabigVWay_rdo.AutoSize = true;
-            tabigVWay_rdo.Location = new Point(10, 20);
-            tabigVWay_rdo.Name = "tabigVWay_rdo";
-            tabigVWay_rdo.Size = new Size(94, 19);
-            tabigVWay_rdo.TabIndex = 0;
-            tabigVWay_rdo.TabStop = true;
-            tabigVWay_rdo.Text = "Vertical 漸層";
-            tabigVWay_rdo.UseVisualStyleBackColor = true;
-            // 
             // tabimgeChess
             // 
             tabimgeChess.Controls.Add(tabiecBaseColorCustom_lbl);
@@ -1322,7 +1882,7 @@ namespace Natural
             tabimgeChess.Controls.Add(tabiecBaseColorR_btn);
             tabimgeChess.Location = new Point(26, 143);
             tabimgeChess.Name = "tabimgeChess";
-            tabimgeChess.Size = new Size(174, 81);
+            tabimgeChess.Size = new Size(160, 83);
             tabimgeChess.TabIndex = 0;
             tabimgeChess.TabStop = false;
             tabimgeChess.Text = "Chess";
@@ -1345,9 +1905,9 @@ namespace Natural
             tabiecGray_lbl.ImageAlign = ContentAlignment.MiddleRight;
             tabiecGray_lbl.Location = new Point(43, 130);
             tabiecGray_lbl.Name = "tabiecGray_lbl";
-            tabiecGray_lbl.Size = new Size(82, 37);
+            tabiecGray_lbl.Size = new Size(130, 37);
             tabiecGray_lbl.TabIndex = 38;
-            tabiecGray_lbl.Text = "Gray:";
+            tabiecGray_lbl.Text = "Gray:255";
             // 
             // tabiecBaseColorCustom_btn
             // 
@@ -1368,6 +1928,7 @@ namespace Natural
             tabiecGray_hsc.Name = "tabiecGray_hsc";
             tabiecGray_hsc.Size = new Size(349, 19);
             tabiecGray_hsc.TabIndex = 37;
+            tabiecGray_hsc.Value = 255;
             tabiecGray_hsc.ValueChanged += hScrollBar1_ValueChanged;
             // 
             // tabiecBaseColorM_btn
@@ -1496,342 +2057,6 @@ namespace Natural
             tabiecBaseColorR_btn.Text = "R";
             tabiecBaseColorR_btn.UseVisualStyleBackColor = false;
             tabiecBaseColorR_btn.Click += GetButtonBackgroundColor;
-            // 
-            // tabimgeWindow
-            // 
-            tabimgeWindow.Controls.Add(tabiwWin_grp);
-            tabimgeWindow.Controls.Add(tabiwBack_grp);
-            tabimgeWindow.Controls.Add(tabiwCustom_pnl);
-            tabimgeWindow.Controls.Add(tabiwLineColor_lbl);
-            tabimgeWindow.Controls.Add(tabiwLineColor_btn);
-            tabimgeWindow.Controls.Add(tabiwLineCross_btn);
-            tabimgeWindow.Controls.Add(tabiwLineOutside_btn);
-            tabimgeWindow.Controls.Add(tabiwWinLoc_grp);
-            tabimgeWindow.Controls.Add(tabiwWinSize_grp);
-            tabimgeWindow.Location = new Point(460, 19);
-            tabimgeWindow.Name = "tabimgeWindow";
-            tabimgeWindow.Size = new Size(150, 75);
-            tabimgeWindow.TabIndex = 0;
-            tabimgeWindow.TabStop = false;
-            tabimgeWindow.Text = "Window";
-            // 
-            // tabiwWin_grp
-            // 
-            tabiwWin_grp.Controls.Add(tabiwWin_pic);
-            tabiwWin_grp.Controls.Add(tabiwWinColor_rdo);
-            tabiwWin_grp.Controls.Add(tabiwWinCustom_rdo);
-            tabiwWin_grp.Controls.Add(tabiwWinImg_rdo);
-            tabiwWin_grp.Location = new Point(134, 16);
-            tabiwWin_grp.Name = "tabiwWin_grp";
-            tabiwWin_grp.Size = new Size(114, 78);
-            tabiwWin_grp.TabIndex = 18;
-            tabiwWin_grp.TabStop = false;
-            tabiwWin_grp.Text = "方塊顏色";
-            // 
-            // tabiwWin_pic
-            // 
-            tabiwWin_pic.BackgroundImage = Properties.Resources.Img;
-            tabiwWin_pic.BackgroundImageLayout = ImageLayout.Zoom;
-            tabiwWin_pic.BorderStyle = BorderStyle.FixedSingle;
-            tabiwWin_pic.Location = new Point(3, 21);
-            tabiwWin_pic.Name = "tabiwWin_pic";
-            tabiwWin_pic.Size = new Size(40, 40);
-            tabiwWin_pic.SizeMode = PictureBoxSizeMode.Zoom;
-            tabiwWin_pic.TabIndex = 8;
-            tabiwWin_pic.TabStop = false;
-            tabiwWin_pic.Click += windowPictureBox_Click;
-            // 
-            // tabiwWinColor_rdo
-            // 
-            tabiwWinColor_rdo.AutoSize = true;
-            tabiwWinColor_rdo.Location = new Point(50, 14);
-            tabiwWinColor_rdo.Name = "tabiwWinColor_rdo";
-            tabiwWinColor_rdo.Size = new Size(49, 19);
-            tabiwWinColor_rdo.TabIndex = 5;
-            tabiwWinColor_rdo.TabStop = true;
-            tabiwWinColor_rdo.Tag = "";
-            tabiwWinColor_rdo.Text = "純色";
-            tabiwWinColor_rdo.UseVisualStyleBackColor = true;
-            tabiwWinColor_rdo.Click += windowPictureBox_Click;
-            // 
-            // tabiwWinCustom_rdo
-            // 
-            tabiwWinCustom_rdo.AutoSize = true;
-            tabiwWinCustom_rdo.Enabled = false;
-            tabiwWinCustom_rdo.Location = new Point(50, 51);
-            tabiwWinCustom_rdo.Name = "tabiwWinCustom_rdo";
-            tabiwWinCustom_rdo.Size = new Size(61, 19);
-            tabiwWinCustom_rdo.TabIndex = 7;
-            tabiwWinCustom_rdo.TabStop = true;
-            tabiwWinCustom_rdo.Tag = "";
-            tabiwWinCustom_rdo.Text = "自製圖";
-            tabiwWinCustom_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinImg_rdo
-            // 
-            tabiwWinImg_rdo.AutoSize = true;
-            tabiwWinImg_rdo.Location = new Point(50, 33);
-            tabiwWinImg_rdo.Name = "tabiwWinImg_rdo";
-            tabiwWinImg_rdo.Size = new Size(49, 19);
-            tabiwWinImg_rdo.TabIndex = 6;
-            tabiwWinImg_rdo.TabStop = true;
-            tabiwWinImg_rdo.Tag = "";
-            tabiwWinImg_rdo.Text = "截圖";
-            tabiwWinImg_rdo.UseVisualStyleBackColor = true;
-            tabiwWinImg_rdo.Click += windowPictureBox_Click;
-            // 
-            // tabiwBack_grp
-            // 
-            tabiwBack_grp.Controls.Add(tabiwBack_pic);
-            tabiwBack_grp.Controls.Add(tabiwBackColor_rdo);
-            tabiwBack_grp.Controls.Add(tabiwBackCustom_rdo);
-            tabiwBack_grp.Controls.Add(tabiwBackImg_rdo);
-            tabiwBack_grp.Location = new Point(10, 16);
-            tabiwBack_grp.Name = "tabiwBack_grp";
-            tabiwBack_grp.Size = new Size(118, 79);
-            tabiwBack_grp.TabIndex = 17;
-            tabiwBack_grp.TabStop = false;
-            tabiwBack_grp.Text = "背景顏色";
-            // 
-            // tabiwBack_pic
-            // 
-            tabiwBack_pic.BackgroundImage = Properties.Resources.Img;
-            tabiwBack_pic.BackgroundImageLayout = ImageLayout.Zoom;
-            tabiwBack_pic.BorderStyle = BorderStyle.FixedSingle;
-            tabiwBack_pic.InitialImage = null;
-            tabiwBack_pic.Location = new Point(5, 22);
-            tabiwBack_pic.Name = "tabiwBack_pic";
-            tabiwBack_pic.Size = new Size(40, 40);
-            tabiwBack_pic.SizeMode = PictureBoxSizeMode.Zoom;
-            tabiwBack_pic.TabIndex = 5;
-            tabiwBack_pic.TabStop = false;
-            tabiwBack_pic.Click += windowPictureBox_Click;
-            // 
-            // tabiwBackColor_rdo
-            // 
-            tabiwBackColor_rdo.AutoSize = true;
-            tabiwBackColor_rdo.Location = new Point(54, 16);
-            tabiwBackColor_rdo.Name = "tabiwBackColor_rdo";
-            tabiwBackColor_rdo.Size = new Size(49, 19);
-            tabiwBackColor_rdo.TabIndex = 2;
-            tabiwBackColor_rdo.TabStop = true;
-            tabiwBackColor_rdo.Tag = "";
-            tabiwBackColor_rdo.Text = "純色";
-            tabiwBackColor_rdo.UseVisualStyleBackColor = true;
-            tabiwBackColor_rdo.Click += windowPictureBox_Click;
-            // 
-            // tabiwBackCustom_rdo
-            // 
-            tabiwBackCustom_rdo.AutoSize = true;
-            tabiwBackCustom_rdo.Enabled = false;
-            tabiwBackCustom_rdo.Location = new Point(54, 53);
-            tabiwBackCustom_rdo.Name = "tabiwBackCustom_rdo";
-            tabiwBackCustom_rdo.Size = new Size(61, 19);
-            tabiwBackCustom_rdo.TabIndex = 4;
-            tabiwBackCustom_rdo.TabStop = true;
-            tabiwBackCustom_rdo.Tag = "";
-            tabiwBackCustom_rdo.Text = "自製圖";
-            tabiwBackCustom_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwBackImg_rdo
-            // 
-            tabiwBackImg_rdo.AutoSize = true;
-            tabiwBackImg_rdo.Location = new Point(54, 35);
-            tabiwBackImg_rdo.Name = "tabiwBackImg_rdo";
-            tabiwBackImg_rdo.Size = new Size(49, 19);
-            tabiwBackImg_rdo.TabIndex = 3;
-            tabiwBackImg_rdo.TabStop = true;
-            tabiwBackImg_rdo.Tag = "";
-            tabiwBackImg_rdo.Text = "截圖";
-            tabiwBackImg_rdo.UseVisualStyleBackColor = true;
-            tabiwBackImg_rdo.Click += windowPictureBox_Click;
-            // 
-            // tabiwCustom_pnl
-            // 
-            tabiwCustom_pnl.Controls.Add(tabiwCustom_lbl);
-            tabiwCustom_pnl.Controls.Add(tabiwCustom_cmb);
-            tabiwCustom_pnl.Location = new Point(282, 21);
-            tabiwCustom_pnl.Name = "tabiwCustom_pnl";
-            tabiwCustom_pnl.Size = new Size(287, 292);
-            tabiwCustom_pnl.TabIndex = 14;
-            tabiwCustom_pnl.Visible = false;
-            // 
-            // tabiwCustom_lbl
-            // 
-            tabiwCustom_lbl.AutoSize = true;
-            tabiwCustom_lbl.Location = new Point(38, 11);
-            tabiwCustom_lbl.Name = "tabiwCustom_lbl";
-            tabiwCustom_lbl.Size = new Size(43, 15);
-            tabiwCustom_lbl.TabIndex = 1;
-            tabiwCustom_lbl.Text = "自製圖";
-            // 
-            // tabiwCustom_cmb
-            // 
-            tabiwCustom_cmb.FormattingEnabled = true;
-            tabiwCustom_cmb.Location = new Point(114, 6);
-            tabiwCustom_cmb.Name = "tabiwCustom_cmb";
-            tabiwCustom_cmb.Size = new Size(121, 23);
-            tabiwCustom_cmb.TabIndex = 0;
-            // 
-            // tabiwLineColor_lbl
-            // 
-            tabiwLineColor_lbl.AutoSize = true;
-            tabiwLineColor_lbl.Location = new Point(185, 268);
-            tabiwLineColor_lbl.Name = "tabiwLineColor_lbl";
-            tabiwLineColor_lbl.Size = new Size(43, 15);
-            tabiwLineColor_lbl.TabIndex = 13;
-            tabiwLineColor_lbl.Text = "線顏色";
-            // 
-            // tabiwLineColor_btn
-            // 
-            tabiwLineColor_btn.Location = new Point(234, 265);
-            tabiwLineColor_btn.Name = "tabiwLineColor_btn";
-            tabiwLineColor_btn.Size = new Size(24, 24);
-            tabiwLineColor_btn.TabIndex = 12;
-            tabiwLineColor_btn.UseVisualStyleBackColor = true;
-            tabiwLineColor_btn.Click += SetButtonBackgroundColor;
-            // 
-            // tabiwLineCross_btn
-            // 
-            tabiwLineCross_btn.AutoSize = true;
-            tabiwLineCross_btn.Location = new Point(188, 240);
-            tabiwLineCross_btn.Name = "tabiwLineCross_btn";
-            tabiwLineCross_btn.Size = new Size(50, 19);
-            tabiwLineCross_btn.TabIndex = 11;
-            tabiwLineCross_btn.Text = "十字";
-            tabiwLineCross_btn.UseVisualStyleBackColor = true;
-            // 
-            // tabiwLineOutside_btn
-            // 
-            tabiwLineOutside_btn.AutoSize = true;
-            tabiwLineOutside_btn.Location = new Point(188, 216);
-            tabiwLineOutside_btn.Name = "tabiwLineOutside_btn";
-            tabiwLineOutside_btn.Size = new Size(50, 19);
-            tabiwLineOutside_btn.TabIndex = 10;
-            tabiwLineOutside_btn.Text = "外框";
-            tabiwLineOutside_btn.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinLoc_grp
-            // 
-            tabiwWinLoc_grp.Controls.Add(tabiwWinLocPixcelY_nud);
-            tabiwWinLoc_grp.Controls.Add(tabiwWinLocTwo_rdo);
-            tabiwWinLoc_grp.Controls.Add(tabiwWinLocPixcelX_nud);
-            tabiwWinLoc_grp.Controls.Add(tabiwWinLocCenter_rdo);
-            tabiwWinLoc_grp.Controls.Add(tabiwWinLocPixcel_rdo);
-            tabiwWinLoc_grp.Location = new Point(6, 206);
-            tabiwWinLoc_grp.Name = "tabiwWinLoc_grp";
-            tabiwWinLoc_grp.Size = new Size(171, 98);
-            tabiwWinLoc_grp.TabIndex = 9;
-            tabiwWinLoc_grp.TabStop = false;
-            tabiwWinLoc_grp.Text = "視窗位置";
-            // 
-            // tabiwWinLocPixcelY_nud
-            // 
-            tabiwWinLocPixcelY_nud.Location = new Point(106, 67);
-            tabiwWinLocPixcelY_nud.Name = "tabiwWinLocPixcelY_nud";
-            tabiwWinLocPixcelY_nud.Size = new Size(59, 23);
-            tabiwWinLocPixcelY_nud.TabIndex = 7;
-            // 
-            // tabiwWinLocTwo_rdo
-            // 
-            tabiwWinLocTwo_rdo.AutoSize = true;
-            tabiwWinLocTwo_rdo.Location = new Point(80, 16);
-            tabiwWinLocTwo_rdo.Name = "tabiwWinLocTwo_rdo";
-            tabiwWinLocTwo_rdo.Size = new Size(49, 19);
-            tabiwWinLocTwo_rdo.TabIndex = 1;
-            tabiwWinLocTwo_rdo.TabStop = true;
-            tabiwWinLocTwo_rdo.Text = "兩組";
-            tabiwWinLocTwo_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinLocPixcelX_nud
-            // 
-            tabiwWinLocPixcelX_nud.Location = new Point(106, 37);
-            tabiwWinLocPixcelX_nud.Name = "tabiwWinLocPixcelX_nud";
-            tabiwWinLocPixcelX_nud.Size = new Size(59, 23);
-            tabiwWinLocPixcelX_nud.TabIndex = 6;
-            // 
-            // tabiwWinLocCenter_rdo
-            // 
-            tabiwWinLocCenter_rdo.AutoSize = true;
-            tabiwWinLocCenter_rdo.Location = new Point(10, 16);
-            tabiwWinLocCenter_rdo.Name = "tabiwWinLocCenter_rdo";
-            tabiwWinLocCenter_rdo.Size = new Size(49, 19);
-            tabiwWinLocCenter_rdo.TabIndex = 0;
-            tabiwWinLocCenter_rdo.TabStop = true;
-            tabiwWinLocCenter_rdo.Text = "置中";
-            tabiwWinLocCenter_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinLocPixcel_rdo
-            // 
-            tabiwWinLocPixcel_rdo.AutoSize = true;
-            tabiwWinLocPixcel_rdo.Location = new Point(10, 38);
-            tabiwWinLocPixcel_rdo.Name = "tabiwWinLocPixcel_rdo";
-            tabiwWinLocPixcel_rdo.Size = new Size(93, 49);
-            tabiwWinLocPixcel_rdo.TabIndex = 5;
-            tabiwWinLocPixcel_rdo.TabStop = true;
-            tabiwWinLocPixcel_rdo.Text = "                   X:\r\n指定Pixel  \r\n                   Y:";
-            tabiwWinLocPixcel_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinSize_grp
-            // 
-            tabiwWinSize_grp.Controls.Add(tabiwWinSizePixelH_nud);
-            tabiwWinSize_grp.Controls.Add(tabiwWinSizePixelW_nud);
-            tabiwWinSize_grp.Controls.Add(tabiwWinSizePixel_rdo);
-            tabiwWinSize_grp.Controls.Add(tabiwWinSizePercent_nud);
-            tabiwWinSize_grp.Controls.Add(tabiwWinSizePercent_rdo);
-            tabiwWinSize_grp.Location = new Point(6, 104);
-            tabiwWinSize_grp.Name = "tabiwWinSize_grp";
-            tabiwWinSize_grp.Size = new Size(171, 101);
-            tabiwWinSize_grp.TabIndex = 8;
-            tabiwWinSize_grp.TabStop = false;
-            tabiwWinSize_grp.Text = "視窗大小";
-            // 
-            // tabiwWinSizePixelH_nud
-            // 
-            tabiwWinSizePixelH_nud.Location = new Point(105, 75);
-            tabiwWinSizePixelH_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            tabiwWinSizePixelH_nud.Name = "tabiwWinSizePixelH_nud";
-            tabiwWinSizePixelH_nud.Size = new Size(60, 23);
-            tabiwWinSizePixelH_nud.TabIndex = 4;
-            tabiwWinSizePixelH_nud.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // tabiwWinSizePixelW_nud
-            // 
-            tabiwWinSizePixelW_nud.Location = new Point(104, 46);
-            tabiwWinSizePixelW_nud.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            tabiwWinSizePixelW_nud.Name = "tabiwWinSizePixelW_nud";
-            tabiwWinSizePixelW_nud.Size = new Size(61, 23);
-            tabiwWinSizePixelW_nud.TabIndex = 3;
-            tabiwWinSizePixelW_nud.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // tabiwWinSizePixel_rdo
-            // 
-            tabiwWinSizePixel_rdo.AutoSize = true;
-            tabiwWinSizePixel_rdo.Location = new Point(10, 47);
-            tabiwWinSizePixel_rdo.Name = "tabiwWinSizePixel_rdo";
-            tabiwWinSizePixel_rdo.Size = new Size(94, 49);
-            tabiwWinSizePixel_rdo.TabIndex = 2;
-            tabiwWinSizePixel_rdo.TabStop = true;
-            tabiwWinSizePixel_rdo.Text = "                  寬:\r\n指定Pixel  \r\n                  高:";
-            tabiwWinSizePixel_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinSizePercent_nud
-            // 
-            tabiwWinSizePercent_nud.Location = new Point(90, 16);
-            tabiwWinSizePercent_nud.Name = "tabiwWinSizePercent_nud";
-            tabiwWinSizePercent_nud.Size = new Size(36, 23);
-            tabiwWinSizePercent_nud.TabIndex = 1;
-            // 
-            // tabiwWinSizePercent_rdo
-            // 
-            tabiwWinSizePercent_rdo.AutoSize = true;
-            tabiwWinSizePercent_rdo.Location = new Point(10, 16);
-            tabiwWinSizePercent_rdo.Name = "tabiwWinSizePercent_rdo";
-            tabiwWinSizePercent_rdo.Size = new Size(80, 19);
-            tabiwWinSizePercent_rdo.TabIndex = 0;
-            tabiwWinSizePercent_rdo.TabStop = true;
-            tabiwWinSizePercent_rdo.Text = "百分比(%)";
-            tabiwWinSizePercent_rdo.UseVisualStyleBackColor = true;
             // 
             // tabimgeMass
             // 
@@ -1980,13 +2205,10 @@ namespace Natural
             ssrProgressbar_prg.Size = new Size(200, 16);
             ssrProgressbar_prg.Visible = false;
             // 
-            // pictureBox1
+            // contextMenuStrip1
             // 
-            pictureBox1.Location = new Point(363, 48);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(100, 50);
-            pictureBox1.TabIndex = 12;
-            pictureBox1.TabStop = false;
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(61, 4);
             // 
             // Mainwindow
             // 
@@ -2006,10 +2228,37 @@ namespace Natural
             tabControl.ResumeLayout(false);
             tabImgEditor.ResumeLayout(false);
             tabimgePanel.ResumeLayout(false);
+            tabimgeWindow.ResumeLayout(false);
+            tabimgeWindow.PerformLayout();
+            tabiwCustom_grp.ResumeLayout(false);
+            tabiwCustomMask_grp.ResumeLayout(false);
+            tabiwCustomMask_grp.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwCMaskHNum_nud).EndInit();
+            ((System.ComponentModel.ISupportInitialize)tabiwCMaskWNum_nud).EndInit();
+            tabiwWin_grp.ResumeLayout(false);
+            tabiwWin_grp.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwWin_pic).EndInit();
+            tabiwBack_grp.ResumeLayout(false);
+            tabiwBack_grp.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwBack_pic).EndInit();
+            tabiwWinLoc_grp.ResumeLayout(false);
+            tabiwWinLoc_grp.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinLocPixcelY_nud).EndInit();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinLocPixcelX_nud).EndInit();
+            tabiwWinSize_grp.ResumeLayout(false);
+            tabiwWinSize_grp.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePixelH_nud).EndInit();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePixelW_nud).EndInit();
+            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePercent_nud).EndInit();
             tabimgeMask.ResumeLayout(false);
             tabimgeMask.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)tabiemHNum_nud).EndInit();
             ((System.ComponentModel.ISupportInitialize)tabiemWNum_nud).EndInit();
+            tabimgeGradient.ResumeLayout(false);
+            tabimgeGradient.PerformLayout();
+            tabigOther_pnl.ResumeLayout(false);
+            tabigOther_pnl.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)tabigOtherSplit_nud).EndInit();
             tabimgeAdjust.ResumeLayout(false);
             tabimgeAdjust.PerformLayout();
             tabieaPanel_pnl.ResumeLayout(false);
@@ -2023,34 +2272,10 @@ namespace Natural
             tabimgeFrame.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)tabiefBack_pic).EndInit();
             ((System.ComponentModel.ISupportInitialize)tabiefMassNum_nud).EndInit();
-            tabimgeGradient.ResumeLayout(false);
-            tabimgeGradient.PerformLayout();
-            tabigOther_pnl.ResumeLayout(false);
-            tabigOther_pnl.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)tabigOtherSplit_nud).EndInit();
             tabimgeChess.ResumeLayout(false);
             tabimgeChess.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)tabiecVNum_nud).EndInit();
             ((System.ComponentModel.ISupportInitialize)tabiecHNum_nud).EndInit();
-            tabimgeWindow.ResumeLayout(false);
-            tabimgeWindow.PerformLayout();
-            tabiwWin_grp.ResumeLayout(false);
-            tabiwWin_grp.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)tabiwWin_pic).EndInit();
-            tabiwBack_grp.ResumeLayout(false);
-            tabiwBack_grp.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)tabiwBack_pic).EndInit();
-            tabiwCustom_pnl.ResumeLayout(false);
-            tabiwCustom_pnl.PerformLayout();
-            tabiwWinLoc_grp.ResumeLayout(false);
-            tabiwWinLoc_grp.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinLocPixcelY_nud).EndInit();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinLocPixcelX_nud).EndInit();
-            tabiwWinSize_grp.ResumeLayout(false);
-            tabiwWinSize_grp.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePixelH_nud).EndInit();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePixelW_nud).EndInit();
-            ((System.ComponentModel.ISupportInitialize)tabiwWinSizePercent_nud).EndInit();
             tabDirList.ResumeLayout(false);
             tabImgList.ResumeLayout(false);
             Showimage_flp.ResumeLayout(false);
@@ -2058,7 +2283,6 @@ namespace Natural
             ((System.ComponentModel.ISupportInitialize)showimgPicture_pic).EndInit();
             Statusstrip.ResumeLayout(false);
             Statusstrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2171,7 +2395,7 @@ namespace Natural
         private Label tabiemWNum_lbl;
         private RadioButton tabiemSubPixel_rdo;
         private RadioButton tabiemPixel_rdo;
-        private Panel tabiemPanel_pnl;
+        private Panel tabiemPixelPanel_pnl;
         private GroupBox tabiwWinLoc_grp;
         private GroupBox tabiwWinSize_grp;
         private RadioButton tabiwWinSizePixel_rdo;
@@ -2194,8 +2418,6 @@ namespace Natural
         private Button tabiwLineColor_btn;
         private CheckBox tabiwLineCross_btn;
         private CheckBox tabiwLineOutside_btn;
-        private Panel tabiwCustom_pnl;
-        private Label tabiwCustom_lbl;
         private ComboBox tabiwCustom_cmb;
         private GroupBox tabimgeMass;
         private CheckBox tabiefMass_chk;
@@ -2221,8 +2443,28 @@ namespace Natural
         private PictureBox tabieaUpDownU_pic;
         private PictureBox tabieaLeftRightR_pic;
         private PictureBox tabieaLeftRightL_pic;
-        private Button button1;
-        private Button tabiemPanelColor_btn;
-        private PictureBox pictureBox1;
+        private Button tabiemPixelClear_btn;
+        private Button tabiemPixelColor_btn;
+        private GroupBox tabiwCustomGrad_grp;
+        private GroupBox tabiwCustom_grp;
+        private GroupBox tabiwCustomMask_grp;
+        private VScrollBar tabiwCMaskPixelGray_vsc;
+        private Label tabiwCMaskPixelColor_lbl;
+        private Label tabiwCMaskPixelLoc_lbl;
+        private Button tabiwCMaskPixelColor_btn;
+        private Button tabiwCMaskPixelClear_btn;
+        private Panel tabiwCMaskPixelPanel_pnl;
+        private NumericUpDown tabiwCMaskHNum_nud;
+        private NumericUpDown tabiwCMaskWNum_nud;
+        private Label tabiwCMaskHNum_lbl;
+        private Label tabiwCMaskWNum_lbl;
+        private VScrollBar tabiemPixelGray_vsc;
+        private Label tabiemPixelColor_lbl;
+        private Label tabiemPixelLoc_lbl;
+        private ContextMenuStrip contextMenuStrip1;
+        private RadioButton tabiwCMaskSubPixel_rdo;
+        private RadioButton tabiwCMaskPixel_rdo;
+        private Label tabiemPixelGray_lbl;
+        private Label tabiwCMaskPixelGray_lbl;
     }
 }
