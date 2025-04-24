@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -8,6 +9,8 @@ using Natural.Properties;
 using Natural1;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.DataFormats;
+using Object = System.Object;
+using String = System.String;
 
 
 namespace Natural
@@ -286,12 +289,10 @@ namespace Natural
             {
                 Dock = DockStyle.Fill, // 填充整個表單  
                 Image = showimgPicture_pic.Image, // 使用原始 PictureBox 的圖片  
-                SizeMode = PictureBoxSizeMode.Zoom // 縮放圖片以適應螢幕  
+                SizeMode = PictureBoxSizeMode.Zoom, // 縮放圖片以適應螢幕  
             };
-
             // 將 PictureBox 添加到表單  
             fullScreenForm.Controls.Add(fullScreenPictureBox);
-
             // 雙擊退出全螢幕  
             fullScreenPictureBox.DoubleClick += (s, args) => fullScreenForm.Close();
 
@@ -303,9 +304,19 @@ namespace Natural
                     fullScreenForm.Close();
                 }
             };
-
+            // 綁定右鍵
+            fullScreenPictureBox.ContextMenuStrip = contextMenuStrip;
             // 顯示全螢幕表單  
             fullScreenForm.ShowDialog();
+        }
+
+        private void PictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (sender is PictureBox targerBox)
+            {
+                // 更新 ToolTip 的內容為滑鼠座標
+                toolTip.SetToolTip(targerBox, $"{e.Location}");
+            }
         }
 
         private void Screenlist(object sender, EventArgs e)
@@ -770,13 +781,13 @@ namespace Natural
                                     int subpixelb = panel3.BackColor.B;
 
                                     Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
-                                    
+
                                     // 解析 Panel 的座標 (Tag 格式為 "x,y")  
                                     string[] coordinates = panel1.Tag.ToString().Split(',');
-                                    int x = int.Parse(coordinates[0])/3;
+                                    int x = int.Parse(coordinates[0]) / 3;
                                     int y = int.Parse(coordinates[1]);
                                     // 在這裡可以使用 combinedColor，例如：  
-                                    pixelimage.SetPixel(x, y, combinedColor);  
+                                    pixelimage.SetPixel(x, y, combinedColor);
                                 }
                             }
                         }
@@ -1393,7 +1404,7 @@ namespace Natural
                 int blockWidth;
                 int blockHeight;
                 string pixelType;
-                VScrollBar brightnessvsc; 
+                VScrollBar brightnessvsc;
                 if (control.Parent != null && control.Parent.Name == "tabimgeMask")
                 {
                     // 取得並清空面板
@@ -1480,7 +1491,7 @@ namespace Natural
                     width = width * 3;
                     // 設定每個區塊的W
                     blockWidth = targetPanel.Width / width;
-                    
+
                     // 生成SubPixel區塊
                     for (int y = 0; y < height; y++)
                     {
@@ -1490,7 +1501,7 @@ namespace Natural
                             {
                                 Size = new Size(blockWidth, blockHeight),
                                 Location = new Point(x * blockWidth, y * blockHeight),
-                                BackColor = x % 3 == 0 ? Color.FromArgb(255-brightnessvsc.Value, 0, 0) : x % 3 == 1 ? Color.FromArgb(0, 255 - brightnessvsc.Value, 0) : Color.FromArgb(0, 0, 255 - brightnessvsc.Value),
+                                BackColor = x % 3 == 0 ? Color.FromArgb(255 - brightnessvsc.Value, 0, 0) : x % 3 == 1 ? Color.FromArgb(0, 255 - brightnessvsc.Value, 0) : Color.FromArgb(0, 0, 255 - brightnessvsc.Value),
                                 BorderStyle = BorderStyle.FixedSingle,
                                 Tag = $"{x},{y}" // 儲存區塊的座標
                             };
@@ -1501,7 +1512,7 @@ namespace Natural
                                 if (args.Button == MouseButtons.Right)
                                 {
                                     int x = int.Parse(block.Tag.ToString().Split(",")[0]);
-                                    block.BackColor = x % 3 == 0 ? Color.FromArgb(255-brightnessvsc.Value, 0, 0) : x % 3 == 1 ? Color.FromArgb(0, 255 - brightnessvsc.Value, 0) : Color.FromArgb(0, 0, 255 - brightnessvsc.Value);
+                                    block.BackColor = x % 3 == 0 ? Color.FromArgb(255 - brightnessvsc.Value, 0, 0) : x % 3 == 1 ? Color.FromArgb(0, 255 - brightnessvsc.Value, 0) : Color.FromArgb(0, 0, 255 - brightnessvsc.Value);
                                 }
                                 else if (args.Button == MouseButtons.Left)
                                 {
@@ -1540,7 +1551,7 @@ namespace Natural
                     Label targetLbl = parentbox.Controls.OfType<Label>()
                     .FirstOrDefault(lbl => lbl.Name.Contains("PixelGray"));
                     targetLbl.Visible = targetradio.Name.Contains("SubPixel");
-                    
+
                     targetLbl = parentbox.Controls.OfType<Label>()
                     .FirstOrDefault(lbl => lbl.Name.Contains("PixelColor"));
                     targetLbl.Visible = !targetradio.Name.Contains("SubPixel");
@@ -1585,7 +1596,7 @@ namespace Natural
 
                     Panel targetPnl = parentbox.Controls.OfType<Panel>()
                     .FirstOrDefault(pnl => pnl.Name.Contains("PixelPanel"));
-                    foreach(Control control in targetPnl.Controls)
+                    foreach (Control control in targetPnl.Controls)
                     {
                         if (control is Panel panel && panel.BackColor != Color.Transparent)
                         {
@@ -1595,6 +1606,55 @@ namespace Natural
                     }
                 }
             }
+        }
+
+        private void contextMenuStrip_Opened(object sender, EventArgs e)
+        {
+            if (sender is ContextMenuStrip cms && cms.SourceControl is Control sourceControl)
+            {
+                Point mousePosition = sourceControl.PointToClient(Cursor.Position);
+                cmsShowLoc.Text = $"顯示座標_X: {mousePosition.X}, Y: {mousePosition.Y}";
+            }
+            else
+            {
+                cmsShowLoc.Text = "顯示座標(無法取得座標)";
+            }
+        }
+
+        private void cmsShowLoc_Click(object sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem menuItem && menuItem.Owner is ContextMenuStrip contextMenu && contextMenu.SourceControl is PictureBox targetPictureBox)
+            {
+                if (cmsShowLoc.ForeColor != Color.Red )
+                {
+                    // 取消訂閱 PictureBox 的 MouseMove 事件  
+                    targetPictureBox.MouseMove -= PictureBox_MouseMove;
+                    cmsShowLoc.ForeColor = Color.Red;
+                }
+                else
+                {
+                    // 訂閱 PictureBox 的 MouseMove 事件  
+                    targetPictureBox.MouseMove += PictureBox_MouseMove;
+                    cmsShowLoc.ForeColor = Color.Black;
+                }
+            }
+
+        }
+        private bool IsMouseMoveBound(Object targetObject, String targerString)
+        {
+            var fieldInfo = typeof(Control).GetField(targerString, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            if (fieldInfo != null)
+            {
+                var eventKey = fieldInfo.GetValue(null);
+                var eventHandlerList = targetObject.GetType().GetProperty("Events", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(targetObject) as EventHandlerList;
+
+                if (eventHandlerList != null)
+                {
+                    var eventDelegate = eventHandlerList[eventKey] as Delegate;
+                    return eventDelegate != null && eventDelegate.GetInvocationList().Length > 0;
+                }
+            }
+            return false;
         }
     }
 }

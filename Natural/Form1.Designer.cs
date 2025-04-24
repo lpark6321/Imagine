@@ -32,7 +32,7 @@ namespace Natural
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            Menustrip = new MenuStrip();
+            menuStrip = new MenuStrip();
             mnsImport_btn = new ToolStripMenuItem();
             mnsFullscreen_btn = new ToolStripMenuItem();
             mnsH_txt = new ToolStripTextBox();
@@ -203,12 +203,18 @@ namespace Natural
             showimgSave_btn = new Button();
             showimgGenerate_btn = new Button();
             showimgPicture_pic = new PictureBox();
+            contextMenuStrip = new ContextMenuStrip(components);
+            cmsShowLoc = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            cmsRotate = new ToolStripMenuItem();
+            cmsToBeContinued = new ToolStripMenuItem();
+            cms = new ToolStripTextBox();
             showimgSize_btn = new Label();
-            Statusstrip = new StatusStrip();
+            statusStrip = new StatusStrip();
             ssrStatus_lbl = new ToolStripStatusLabel();
             ssrProgressbar_prg = new ToolStripProgressBar();
-            contextMenuStrip1 = new ContextMenuStrip(components);
-            Menustrip.SuspendLayout();
+            toolTip = new ToolTip(components);
+            menuStrip.SuspendLayout();
             tabControl.SuspendLayout();
             tabImgEditor.SuspendLayout();
             tabimgePanel.SuspendLayout();
@@ -252,17 +258,18 @@ namespace Natural
             tabImgList.SuspendLayout();
             Showimage_flp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)showimgPicture_pic).BeginInit();
-            Statusstrip.SuspendLayout();
+            contextMenuStrip.SuspendLayout();
+            statusStrip.SuspendLayout();
             SuspendLayout();
             // 
-            // Menustrip
+            // menuStrip
             // 
-            Menustrip.Items.AddRange(new ToolStripItem[] { mnsImport_btn, mnsFullscreen_btn, mnsH_txt, mnsX_lbl, mnsW_txt, mnsScreenlist_cmb, mnsPattername_txt });
-            Menustrip.Location = new Point(0, 0);
-            Menustrip.Name = "Menustrip";
-            Menustrip.Size = new Size(999, 27);
-            Menustrip.TabIndex = 12;
-            Menustrip.Text = "menuStrip";
+            menuStrip.Items.AddRange(new ToolStripItem[] { mnsImport_btn, mnsFullscreen_btn, mnsH_txt, mnsX_lbl, mnsW_txt, mnsScreenlist_cmb, mnsPattername_txt });
+            menuStrip.Location = new Point(0, 0);
+            menuStrip.Name = "menuStrip";
+            menuStrip.Size = new Size(999, 27);
+            menuStrip.TabIndex = 12;
+            menuStrip.Text = "menuStrip";
             // 
             // mnsImport_btn
             // 
@@ -2163,6 +2170,7 @@ namespace Natural
             showimgPicture_pic.AllowDrop = true;
             showimgPicture_pic.BackColor = SystemColors.InactiveCaption;
             showimgPicture_pic.BackgroundImageLayout = ImageLayout.Center;
+            showimgPicture_pic.ContextMenuStrip = contextMenuStrip;
             showimgPicture_pic.Location = new Point(3, 283);
             showimgPicture_pic.MinimumSize = new Size(200, 0);
             showimgPicture_pic.Name = "showimgPicture_pic";
@@ -2173,6 +2181,48 @@ namespace Natural
             showimgPicture_pic.DragEnter += pictureBox_DragEnter;
             showimgPicture_pic.DoubleClick += FullScreen;
             // 
+            // contextMenuStrip
+            // 
+            contextMenuStrip.Items.AddRange(new ToolStripItem[] { cmsShowLoc, toolStripSeparator1, cmsRotate, cmsToBeContinued, cms });
+            contextMenuStrip.Name = "contextMenuStrip1";
+            contextMenuStrip.Size = new Size(181, 116);
+            contextMenuStrip.Opened += contextMenuStrip_Opened;
+            // 
+            // cmsShowLoc
+            // 
+            cmsShowLoc.Name = "cmsShowLoc";
+            cmsShowLoc.Size = new Size(180, 22);
+            cmsShowLoc.Text = "顯示座標";
+            cmsShowLoc.Click += cmsShowLoc_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(177, 6);
+            // 
+            // cmsRotate
+            // 
+            cmsRotate.Name = "cmsRotate";
+            cmsRotate.Size = new Size(180, 22);
+            cmsRotate.Text = "旋轉";
+            // 
+            // cmsToBeContinued
+            // 
+            cmsToBeContinued.Name = "cmsToBeContinued";
+            cmsToBeContinued.Size = new Size(180, 22);
+            cmsToBeContinued.Text = "ToBeContinued";
+            // 
+            // cms
+            // 
+            cms.AutoToolTip = true;
+            cms.BorderStyle = BorderStyle.None;
+            cms.Enabled = false;
+            cms.Name = "cms";
+            cms.ReadOnly = true;
+            cms.Size = new Size(100, 16);
+            cms.Text = "ToBeContinued";
+            cms.ToolTipText = "{e}";
+            // 
             // showimgSize_btn
             // 
             showimgSize_btn.AutoSize = true;
@@ -2181,16 +2231,16 @@ namespace Natural
             showimgSize_btn.Size = new Size(0, 15);
             showimgSize_btn.TabIndex = 8;
             // 
-            // Statusstrip
+            // statusStrip
             // 
-            Statusstrip.Items.AddRange(new ToolStripItem[] { ssrStatus_lbl, ssrProgressbar_prg });
-            Statusstrip.LayoutStyle = ToolStripLayoutStyle.Flow;
-            Statusstrip.Location = new Point(0, 539);
-            Statusstrip.MinimumSize = new Size(300, 0);
-            Statusstrip.Name = "Statusstrip";
-            Statusstrip.Size = new Size(999, 20);
-            Statusstrip.TabIndex = 14;
-            Statusstrip.Text = "statusStrip1";
+            statusStrip.Items.AddRange(new ToolStripItem[] { ssrStatus_lbl, ssrProgressbar_prg });
+            statusStrip.LayoutStyle = ToolStripLayoutStyle.Flow;
+            statusStrip.Location = new Point(0, 539);
+            statusStrip.MinimumSize = new Size(300, 0);
+            statusStrip.Name = "statusStrip";
+            statusStrip.Size = new Size(999, 20);
+            statusStrip.TabIndex = 14;
+            statusStrip.Text = "statusStrip1";
             // 
             // ssrStatus_lbl
             // 
@@ -2205,10 +2255,12 @@ namespace Natural
             ssrProgressbar_prg.Size = new Size(200, 16);
             ssrProgressbar_prg.Visible = false;
             // 
-            // contextMenuStrip1
+            // toolTip
             // 
-            contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(61, 4);
+            toolTip.AutoPopDelay = 5000;
+            toolTip.InitialDelay = 500;
+            toolTip.ReshowDelay = 1000;
+            toolTip.ShowAlways = true;
             // 
             // Mainwindow
             // 
@@ -2217,14 +2269,14 @@ namespace Natural
             ClientSize = new Size(999, 559);
             Controls.Add(Showimage_flp);
             Controls.Add(tabControl);
-            Controls.Add(Statusstrip);
-            Controls.Add(Menustrip);
-            MainMenuStrip = Menustrip;
+            Controls.Add(statusStrip);
+            Controls.Add(menuStrip);
+            MainMenuStrip = menuStrip;
             MinimumSize = new Size(888, 555);
             Name = "Mainwindow";
             Text = "PatternMagic";
-            Menustrip.ResumeLayout(false);
-            Menustrip.PerformLayout();
+            menuStrip.ResumeLayout(false);
+            menuStrip.PerformLayout();
             tabControl.ResumeLayout(false);
             tabImgEditor.ResumeLayout(false);
             tabimgePanel.ResumeLayout(false);
@@ -2281,14 +2333,16 @@ namespace Natural
             Showimage_flp.ResumeLayout(false);
             Showimage_flp.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)showimgPicture_pic).EndInit();
-            Statusstrip.ResumeLayout(false);
-            Statusstrip.PerformLayout();
+            contextMenuStrip.ResumeLayout(false);
+            contextMenuStrip.PerformLayout();
+            statusStrip.ResumeLayout(false);
+            statusStrip.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-        private MenuStrip Menustrip;
+        private MenuStrip menuStrip;
         private ToolStripMenuItem mnsImport_btn;
         private ToolStripMenuItem mnsFullscreen_btn;
         private ToolStripComboBox mnsScreenlist_cmb;
@@ -2383,7 +2437,7 @@ namespace Natural
         private RadioButton tabieaRotate180_rdo;
         private RadioButton tabieaRotate90_rdo;
         private RadioButton tabieaRotate270_rdo;
-        private StatusStrip Statusstrip;
+        private StatusStrip statusStrip;
         private ToolStripStatusLabel ssrStatus_lbl;
         private ToolStripProgressBar ssrProgressbar_prg;
         private Button tabieaTrans_btn;
@@ -2461,10 +2515,16 @@ namespace Natural
         private VScrollBar tabiemPixelGray_vsc;
         private Label tabiemPixelColor_lbl;
         private Label tabiemPixelLoc_lbl;
-        private ContextMenuStrip contextMenuStrip1;
+        private ContextMenuStrip contextMenuStrip;
         private RadioButton tabiwCMaskSubPixel_rdo;
         private RadioButton tabiwCMaskPixel_rdo;
         private Label tabiemPixelGray_lbl;
         private Label tabiwCMaskPixelGray_lbl;
+        private ToolStripMenuItem cmsShowLoc;
+        private ToolStripMenuItem cmsRotate;
+        private ToolStripMenuItem cmsToBeContinued;
+        private ToolTip toolTip;
+        private ToolStripTextBox cms;
+        private ToolStripSeparator toolStripSeparator1;
     }
 }
