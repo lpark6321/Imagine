@@ -44,9 +44,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.button1);
-            this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.Name = "Form2";
             this.Text = "Form2";
             this.ResumeLayout(false);
