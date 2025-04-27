@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Deployment.Application;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -14,6 +15,7 @@ namespace Thunder
 {
     public partial class Mainwindow : Form
     {
+        private bool _isMouseDown = false;
         public Mainwindow()
         {
             InitializeComponent();
@@ -33,7 +35,8 @@ namespace Thunder
             }
             tabimgeFuncList.SelectedIndex = 1; // 功能預設選擇第一個項目
             tabieaResize_rdo.Select(); //圖片館例預設選取RESIZE
-            MaskPanelCreat(sender, e); //先產生MaskPanel
+            MaskPanelCreat(tabiemPixelClear_btn, e); //先產生MaskPanel
+            SplitPanelCreat(tabigOtherSplit_nud, e);//先產生GradSplitPanel
         }
         public MyPicture mypicture { get; private set; }
 
@@ -144,7 +147,6 @@ namespace Thunder
                                     return _currentBitmap; // 回傳圖片
                                 }
                             }
-                            MessageBox.Show("無法載入圖片，可能是圖片過大或格式不支援！(可以另存為JPEG、BMP、PNG)");
                         }
                         catch (Exception ex)
                         {
@@ -313,7 +315,7 @@ namespace Thunder
         private void FullScreen(object sender, EventArgs e)
         {
             // 獲取選擇的螢幕  
-            string selectedScreen = mnsScreenlist_cmb.SelectedItem?.ToString();
+            string selectedScreen = mnsScreenlist_cmb.SelectedText == "" ? Screen.AllScreens[0].DeviceName : mnsScreenlist_cmb.SelectedText ;
             Screen secondScreen = Screen.AllScreens.FirstOrDefault(screen => screen.DeviceName == selectedScreen);
 
             // 創建全螢幕表單  
@@ -324,7 +326,7 @@ namespace Thunder
                 StartPosition = FormStartPosition.Manual, // 手動設置位置  
                 Location = secondScreen.Bounds.Location, // 設置到選擇的螢幕  
                 Size = secondScreen.Bounds.Size, // 設置大小為選擇螢幕大小  
-                //BackColor = Color.Black, // 背景設置為黑色  
+                BackColor = Color.Black, // 背景設置為黑色  
                 KeyPreview = true // 啟用按鍵事件預覽  
             };
 
@@ -629,64 +631,58 @@ namespace Thunder
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "gradient":
-                        int tabigStep = int.Parse(tabigStep_cmb.Text); // 獲取漸層階數
-                        int divisions = int.Parse(tabigDivid_cmb.Text); // 獲取畫面等分數  
-                        int startColorValue = int.Parse(tabigFirstLevel_cmb.Text); // 開始顏色值  
-                        int endColorValue = int.Parse(tabigLastLevel_cmb.Text); // 結束顏色值  // 獲取漸層階數  
-                        int gradientSteps = endColorValue - startColorValue < 0 ? endColorValue - startColorValue + 1 : startColorValue - endColorValue +1; // 獲取漸層階數  
-                        int divisionHeight = int.Parse(mnsH_txt.Text) / divisions; // 每等分的高度 
-
-                        int stepValue = 00;
-                        MessageBox.Show($"stepValue={stepValue}"); // 測試用
-                        if (tabigHWay_rdo.Checked) // 如果選擇了橫向漸層  
+                        Bitmap backBitmap = new Bitmap(width, height);
+                        using (Graphics g2 = Graphics.FromImage(backBitmap))
                         {
-                            for (int i = 0; i < divisions; i++)
+                            if (tabigOther_chk.Checked) // 如果選擇了colorbar  
                             {
-                                for (int j = 0; j < gradientSteps; j++)
-                                    {
-                                        int currentValue = startColorValue + j * stepValue;
-                                        Color gradientColor = Color.FromArgb(
-                                            Math.Min(tabigBaseColor_lbl.BackColor.R, currentValue),
-                                            Math.Min(tabigBaseColor_lbl.BackColor.G, currentValue),
-                                            Math.Min(tabigBaseColor_lbl.BackColor.B, currentValue)
-                                        );
-                                        using (Brush brush = new SolidBrush(gradientColor))
-                                        {
-                                            int yStart = i * divisionHeight + (j * divisionHeight / gradientSteps);
-                                            int yEnd = yStart + (divisionHeight / gradientSteps);
-                                            g.FillRectangle(brush, 0, yStart, int.Parse(mnsW_txt.Text), yEnd - yStart + 1);
-                                        }
-                                    }
-                            }
-                        }
-                        else if (tabigVWay_rdo.Checked) // 如果選擇了縱向漸層
-                        {
-                            int divisionWidth = int.Parse(mnsW_txt.Text) / divisions; // 每等分的寬度 
-                            for (int i = 0; i < divisions; i++)
-                            {
-                                for (int j = 0; j < gradientSteps; j++)
+                                foreach (Control control in tabigOtherSplit_pnl.Controls)
                                 {
-                                    int currentValue = startColorValue + j * stepValue;
-                                    Color gradientColor = Color.FromArgb(
-                                        Math.Min(tabigBaseColor_lbl.BackColor.R, currentValue),
-                                        Math.Min(tabigBaseColor_lbl.BackColor.G, currentValue),
-                                        Math.Min(tabigBaseColor_lbl.BackColor.B, currentValue)
-                                    );
-                                    using (Brush brush = new SolidBrush(gradientColor))
+                                    if (control is Panel panel && panel.BackColor != Color.Transparent)
                                     {
-                                        int xStart = i * divisionWidth + (j * divisionWidth / gradientSteps);
-                                        int xEnd = xStart + (divisionWidth / gradientSteps);
-                                        g.FillRectangle(brush, xStart, 0, xEnd - xStart + 1, int.Parse(mnsH_txt.Text));
+                                        string[] tagParts = panel.Tag.ToString().Split(',');
+                                        if (tagParts.Length == 2)
+                                        {
+                                            string direction = tagParts[0];
+                                            int index = int.Parse(tagParts[1]);
+
+                                            if (direction == "H") // 水平分割  
+                                            {
+                                                int blockHeight = height / tabigOtherSplit_pnl.Controls.Count;
+                                                g2.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight, width, blockHeight);
+                                            }
+                                            else if (direction == "V") // 垂直分割  
+                                            {
+                                                int blockWidth = width / tabigOtherSplit_pnl.Controls.Count;
+                                                g2.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth, 0, blockWidth, height);
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            else
+                            {
+                                g2.Clear(tabigBaseColor_lbl.BackColor); // 填滿整個backBitmap  
+                            }
                         }
-                        else if (tabigColorBar_rdo.Checked) // 如果選擇了colorbar
+
+                        if (!tabigColorBar_rdo.Checked)
                         {
+                            int divisions = int.Parse(tabigDivid_cmb.Text); // 獲取畫面等分數  
+                            int divisionSize = tabigHWay_rdo.Checked ? width / divisions : height / divisions; // 計算每個分區的寬度或高度
+                            int stepNum = Math.Min(int.Parse(tabigStep_cmb.Text), divisionSize); // 獲取漸層階數
+                            int startColorValue = int.Parse(tabigFirstLevel_cmb.Text); // 開始顏色值  
+                            int endColorValue = int.Parse(tabigLastLevel_cmb.Text); // 結束顏色值  
 
+                            backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions);
+                            CurrentBitmap = ConvertARGBToRGB(backBitmap);
+                        }
+                        else
+                        {
+                            CurrentBitmap = backBitmap;
                         }
 
-                        mypicture.Setpicture(CurrentBitmap);
+                            mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "chess":
                         for (int y = 0; y < height; y += height / (int)tabiecVNum_nud.Value)
@@ -865,6 +861,131 @@ namespace Thunder
                 }
             }
         }
+        public Bitmap ApplyTransparency(Bitmap originalBitmap, int startAlpha, int endAlpha, bool isVertical, int steps, int segments)
+        {
+            // 複製原始圖片，避免直接修改
+            Bitmap resultBitmap = new Bitmap(originalBitmap);
+
+            // 鎖定圖片的像素資料
+            Rectangle rect = new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height);
+            BitmapData bitmapData = resultBitmap.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+
+            // 取得像素資料的指標
+            IntPtr ptr = bitmapData.Scan0;
+            int bytes = Math.Abs(bitmapData.Stride) * resultBitmap.Height;
+            byte[] pixelValues = new byte[bytes];
+            System.Runtime.InteropServices.Marshal.Copy(ptr, pixelValues, 0, bytes);
+
+            // 計算每個分區的長度
+            int dimension = isVertical ? resultBitmap.Height : resultBitmap.Width;
+            int segmentLength = dimension / segments;
+
+            // 處理分階數大於分區長度的情況
+            steps = Math.Min(steps, segmentLength);
+
+            // 計算每個階段的透明度變化量
+            int alphaRange = endAlpha - startAlpha;
+            float alphaStep = (float)alphaRange / (steps-1);
+
+            // 遍歷每個像素
+            for (int y = 0; y < resultBitmap.Height; y++)
+            {
+                for (int x = 0; x < resultBitmap.Width; x++)
+                {
+                    int index = (y * bitmapData.Stride) + (x * 4); // 每個像素佔 4 個位元組 (BGRA)
+
+                    // 計算當前像素所在的分區
+                    int position = isVertical ? y : x;
+                    int segmentIndex = position / segmentLength;
+
+                    // 計算當前像素在分區內的位置
+                    int positionInSegment = position % segmentLength;
+
+                    // 計算透明度
+                    int stepIndex = (int)((float)positionInSegment / segmentLength * (steps));
+                    byte alpha = (byte)(startAlpha + alphaStep * stepIndex);
+
+                    //// 如果透明度方向是從 255 到 0，則反轉透明度
+                    //if (startAlpha > endAlpha)
+                    //{
+                    //    alpha = (byte)(startAlpha + alphaStep * stepIndex);
+                    //}
+
+                    // 修改 Alpha 值
+                    pixelValues[index + 3] = alpha; // Alpha 通道
+                }
+            }
+
+            // 將修改後的像素資料寫回圖片
+            System.Runtime.InteropServices.Marshal.Copy(pixelValues, 0, ptr, bytes);
+            resultBitmap.UnlockBits(bitmapData);
+
+            return resultBitmap;
+        }
+        public Bitmap ConvertARGBToRGB(Bitmap originalBitmap)
+        {
+            // 建立與原始圖片相同大小的 RGB Bitmap
+            Bitmap rgbBitmap = new Bitmap(originalBitmap.Width, originalBitmap.Height, PixelFormat.Format24bppRgb);
+
+            // 鎖定原始圖片的像素資料
+            Rectangle rect = new Rectangle(0, 0, originalBitmap.Width, originalBitmap.Height);
+            BitmapData originalData = originalBitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+            // 鎖定新圖片的像素資料
+            BitmapData rgbData = rgbBitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+
+            // 取得像素資料的指標
+            IntPtr originalPtr = originalData.Scan0;
+            IntPtr rgbPtr = rgbData.Scan0;
+
+            // 計算像素資料的大小
+            int originalBytes = Math.Abs(originalData.Stride) * originalBitmap.Height;
+            int rgbBytes = Math.Abs(rgbData.Stride) * rgbBitmap.Height;
+
+            // 建立緩衝區
+            byte[] originalPixels = new byte[originalBytes];
+            byte[] rgbPixels = new byte[rgbBytes];
+
+            // 複製像素資料到緩衝區
+            System.Runtime.InteropServices.Marshal.Copy(originalPtr, originalPixels, 0, originalBytes);
+
+            // 遍歷每個像素
+            for (int y = 0; y < originalBitmap.Height; y++)
+            {
+                for (int x = 0; x < originalBitmap.Width; x++)
+                {
+                    // 計算像素索引
+                    int originalIndex = y * originalData.Stride + x * 4; // ARGB 每像素 4 bytes
+                    int rgbIndex = y * rgbData.Stride + x * 3; // RGB 每像素 3 bytes
+
+                    // 取得原始像素的 ARGB 值
+                    byte b = originalPixels[originalIndex];
+                    byte g = originalPixels[originalIndex + 1];
+                    byte r = originalPixels[originalIndex + 2];
+                    byte a = originalPixels[originalIndex + 3];
+
+                    // 計算與黑色背景混合後的 RGB 值
+                    byte finalR = (byte)((r * a) / 255);
+                    byte finalG = (byte)((g * a) / 255);
+                    byte finalB = (byte)((b * a) / 255);
+
+                    // 寫入 RGB 像素資料
+                    rgbPixels[rgbIndex] = finalB;
+                    rgbPixels[rgbIndex + 1] = finalG;
+                    rgbPixels[rgbIndex + 2] = finalR;
+                }
+            }
+
+            // 將修改後的像素資料寫回新圖片
+            System.Runtime.InteropServices.Marshal.Copy(rgbPixels, 0, rgbPtr, rgbBytes);
+
+            // 解鎖像素資料
+            originalBitmap.UnlockBits(originalData);
+            rgbBitmap.UnlockBits(rgbData);
+
+            return rgbBitmap;
+        }
+
 
         private async void tabieaTrans_btn_Click(object sender, EventArgs e)
         {
@@ -1168,11 +1289,6 @@ namespace Thunder
             }
         }
 
-
-        private void tabigOther_btn_Click(object sender, EventArgs e)
-        {
-            tabigOther_pnl.Enabled = !tabigOther_pnl.Enabled;  // 顯示Gradient的其他顏色
-        }
         private void SetButtonBackgroundColor(object sender, EventArgs e)
         {
             // 將 targetButton 修改為事件的觸發按鈕  
@@ -1289,18 +1405,34 @@ namespace Thunder
         {
             if (sender is Button targetbutton)
             {
-                if (targetbutton.Text == "")
+                if (targetbutton.Name.Contains("tabigBaseColor"))
                 {
-                    tabigBaseColor_lbl.BackColor = Color.White;
-                    tabigBaseColor_lbl.Text = "        ";
-                }
-                else
-                {
-                    tabigBaseColor_lbl.Image = null;
+
+                    if (targetbutton.Text == "")
+                    {
+                        GetButtonBackgroundColor(sender, e);
+                    }
                     tabigBaseColor_lbl.BackColor = targetbutton.BackColor;
-                    tabigBaseColor_lbl.Text = "基底色彩";
+                    tabigBaseColor_lbl.ForeColor = (tabigBaseColor_lbl.BackColor.R + tabigBaseColor_lbl.BackColor.G + tabigBaseColor_lbl.BackColor.B) / 3 < 127 ? Color.White : Color.Black;
                 }
-                tabigOther_pnl.Enabled = false; // 隱藏顏色選擇面板
+                else if (targetbutton.Name.Contains("tabigOtherColor"))
+                {
+                    if (targetbutton.Text == "")
+                    {
+                        GetButtonBackgroundColor(sender, e);
+                    }
+                    tabigOtherColor_lbl.BackColor = targetbutton.BackColor;
+                    tabigOtherColor_lbl.ForeColor = (tabigOtherColor_lbl.BackColor.R + tabigOtherColor_lbl.BackColor.G + tabigOtherColor_lbl.BackColor.B) / 3 < 127 ? Color.White : Color.Black;
+                }
+                else if (targetbutton.Name.Contains("tabiecBaseColor"))
+                {
+                    if (targetbutton.Text == "")
+                    {
+                        GetButtonBackgroundColor(sender, e);
+                    }
+                    tabiecGray_lbl.BackColor = targetbutton.BackColor;
+                    tabiecGray_lbl.ForeColor = (tabiecGray_lbl.BackColor.R + tabiecGray_lbl.BackColor.G + tabiecGray_lbl.BackColor.B) / 3 < 127 ? Color.White : Color.Black;
+                }
             }
         }
 
@@ -1691,7 +1823,7 @@ namespace Thunder
                     .FirstOrDefault(pnl => pnl.Name.Contains("PixelPanel"));
                     foreach (Control control in targetPnl.Controls)
                     {
-                        if (control is Panel panel && panel.BackColor != Color.Transparent)
+                        if (control is Panel panel && panel.BackColor != Color.Black)
                         {
                             int x = int.Parse(panel.Tag.ToString().Split(',')[0]);
                             panel.BackColor = x % 3 == 0 ? Color.FromArgb(255 - targetvsc.Value, 0, 0) : x % 3 == 1 ? Color.FromArgb(0, 255 - targetvsc.Value, 0) : Color.FromArgb(0, 0, 255 - targetvsc.Value);
@@ -1750,5 +1882,140 @@ namespace Thunder
             return false;
         }
 
+        private void otherColor_CheckedChanged(object sender, EventArgs e)
+        {
+            if (tabigColorBar_rdo.Checked)
+            {
+                tabigOther_chk.Checked = true;
+            }
+            if (tabigOther_chk.Checked)
+            {
+                panel1.Enabled = false;
+                tabigOther_grp.Enabled = true; // 顯示顏色選擇面板
+            }
+            else
+            {
+                panel1.Enabled = true;
+                tabigOther_grp.Enabled = false; // 隱藏顏色選擇面板
+            }
+        }
+        private void SplitPanelCreat(object sender, EventArgs e)
+        {
+            if (sender is Control control && control != null)
+            {
+                Panel targetPanel;
+                int splitnum;
+                int width;
+                int height;
+                int blockWidth;
+                int blockHeight;
+                string splitType;
+                if (control.Parent != null && control.Parent.Name == "tabigOther_grp")
+                {
+                    // 取得並清空面板
+                    targetPanel = tabigOtherSplit_pnl;
+                    targetPanel.Controls.Clear();
+                    // 取得寬度與高度 tabigOtherSplit_nud
+                    splitnum = (int)tabigOtherSplit_nud.Value;
+                    width = (int)tabiemWNum_nud.Value;
+                    height = (int)tabiemHNum_nud.Value;
+                }
+                else
+                {
+                    // 取得並清空面板
+                    targetPanel = tabiwCGradOtherSplit_pnl;
+                    targetPanel.Controls.Clear();
+                    // 取得寬度與高度
+                    splitnum = (int)tabigOtherSplit_nud.Value;
+                    width = (int)tabiemWNum_nud.Value;
+                    height = (int)tabiemHNum_nud.Value;
+                    splitType = tabigOtherVSplit_rdo.Checked ? "Vsplit" : "Hplit";
+                }
+                if (tabigOtherVSplit_rdo.Checked)
+                {
+                    blockWidth = targetPanel.Width / splitnum;
+                    blockHeight = targetPanel.Height;
+                }
+                else
+                {
+                    blockWidth = targetPanel.Width;
+                    blockHeight = targetPanel.Height / splitnum;
+                }
+
+
+                // 生成分割區塊
+                for (int i = 0; i < splitnum; i++)
+                {
+                    Panel block = new Panel
+                    {
+                        Size = new Size(blockWidth, blockHeight),
+                        Location = tabigOtherHSplit_rdo.Checked
+                            ? new Point(0, i * blockHeight)
+                            : new Point(i * blockWidth, 0),
+                        BorderStyle = BorderStyle.FixedSingle,
+                        Tag = $"{(tabigOtherHSplit_rdo.Checked ? "H" : "V")},{i}" // 儲存區塊的方向與索引
+                    };
+
+                    // 設定點擊事件以填充顏色
+                    block.MouseDown += (s, args) =>
+                    {
+                        //if (args.Button == MouseButtons.Left)
+                        //{
+                        //    block.BackColor = tabigOtherColor_lbl.BackColor; // 使用選取的顏色
+                        //}
+                        //else if (args.Button == MouseButtons.Right)
+                        //{
+                        //    block.BackColor = Color.Transparent; // 右鍵清除顏色
+                        //}
+                        //MessageBox.Show("121");
+                        if (args.Button == MouseButtons.Left && s is Panel panel)
+                        {
+
+                            //_isMouseDown = true;
+                            panel.BackColor = tabigOtherColor_lbl.BackColor; // 改變背景顏色
+                        }
+                        //else if (args.Button == MouseButtons.Right)
+                        //{
+                        //    _isMouseDown = false;
+                        //}
+                    };
+                    block.MouseUp += (s, args) =>
+                    {
+                        if (args.Button == MouseButtons.Left && s is Panel panel)
+                        {
+                            _isMouseDown = false;
+                        }
+                    };
+
+                    // 設定滑鼠移入事件以顯示座標
+                    block.MouseEnter += (s, args) =>
+                    //block.MouseMove += (s, args) =>
+                    {
+                        tabigOtherSplitLoc_lbl.Text = $"座標: {block.Tag}"; // 更新 Label 顯示區塊座標
+
+                        if (_isMouseDown && s is Panel panel)
+                        //if (args.Button == MouseButtons.Left && s is Panel panel)
+                        {
+                            panel.BackColor = tabigOtherColor_lbl.BackColor; // 改變背景顏色
+                        }
+                    };
+
+                    targetPanel.Controls.Add(block);
+                }
+            }
+        }
+
+        private void ColorBar_btn_Click(object sender, EventArgs e)
+        {
+            tabigOtherSplit_nud.Value = 4;
+            Color[] colors = { Color.White, Color.Red, Color.Lime, Color.Blue };
+            int colorIndex = 0;
+
+            foreach (Panel panel in tabigOtherSplit_pnl.Controls)
+            {
+                panel.BackColor = colors[colorIndex % colors.Length];
+                colorIndex++;
+            }
+        }
     }
 }

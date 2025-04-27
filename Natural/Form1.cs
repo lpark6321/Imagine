@@ -129,7 +129,6 @@ namespace Natural
                                     return _currentBitmap; // 回傳圖片
                                 }
                             }
-                            MessageBox.Show("無法載入圖片，可能是圖片過大或格式不支援！(可以另存為JPEG、BMP、PNG)");
                         }
                         catch (Exception ex)
                         {
