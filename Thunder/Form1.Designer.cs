@@ -40,83 +40,49 @@ namespace Thunder
             this.mnsX_lbl = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsW_txt = new System.Windows.Forms.ToolStripTextBox();
             this.mnsScreenlist_cmb = new System.Windows.Forms.ToolStripComboBox();
-            this.mnsPattername_txt = new System.Windows.Forms.ToolStripTextBox();
             this.mnsGenerate_btn = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnsPattername_txt = new System.Windows.Forms.ToolStripTextBox();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabImgEditor = new System.Windows.Forms.TabPage();
             this.tabimgePanel = new System.Windows.Forms.Panel();
-            this.tabimgeGradient = new System.Windows.Forms.GroupBox();
-            this.tabigOther_chk = new System.Windows.Forms.CheckBox();
-            this.tabigOther_grp = new System.Windows.Forms.GroupBox();
-            this.tabigOtherSplitLoc_lbl = new System.Windows.Forms.Label();
-            this.tabigOtherVSplit_rdo = new System.Windows.Forms.RadioButton();
-            this.tabigOtherSplit_pnl = new System.Windows.Forms.Panel();
-            this.tabigOtherHSplit_rdo = new System.Windows.Forms.RadioButton();
-            this.tabigFourColor_btn = new System.Windows.Forms.Button();
-            this.tabigOtherSplit_nud = new System.Windows.Forms.NumericUpDown();
-            this.tabigOtherColor_lbl = new System.Windows.Forms.Label();
-            this.tabigOtherSplit_lbl = new System.Windows.Forms.Label();
-            this.tabigOtherColorC_btn = new System.Windows.Forms.Button();
-            this.tabigOtherColorW_btn = new System.Windows.Forms.Button();
-            this.tabigOtherColorM_btn = new System.Windows.Forms.Button();
-            this.tabigOtherColorR_btn = new System.Windows.Forms.Button();
-            this.tabigOtherColorA_btn = new System.Windows.Forms.Button();
-            this.tabigOtherColorG_btn = new System.Windows.Forms.Button();
-            this.tabigOtherColorY_btn = new System.Windows.Forms.Button();
-            this.tabigOtherColorB_btn = new System.Windows.Forms.Button();
-            this.tabigOtherColorD_btn = new System.Windows.Forms.Button();
-            this.tabigStep_lbl = new System.Windows.Forms.Label();
-            this.tabigStep_cmb = new System.Windows.Forms.ComboBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.tabigBaseColorCustom_btn = new System.Windows.Forms.Button();
-            this.tabigBaseColor_lbl = new System.Windows.Forms.Label();
-            this.tabigBaseColorB_btn = new System.Windows.Forms.Button();
-            this.tabigBaseColorW_btn = new System.Windows.Forms.Button();
-            this.tabigBaseColorG_btn = new System.Windows.Forms.Button();
-            this.tabigBaseColorR_btn = new System.Windows.Forms.Button();
-            this.tabigVWay_rdo = new System.Windows.Forms.RadioButton();
-            this.tabigDivid_cmb = new System.Windows.Forms.ComboBox();
-            this.tabigColorBar_rdo = new System.Windows.Forms.RadioButton();
-            this.tabigFirstLevel_lbl = new System.Windows.Forms.Label();
-            this.tabigHWay_rdo = new System.Windows.Forms.RadioButton();
-            this.tabigFirstLevel_cmb = new System.Windows.Forms.ComboBox();
-            this.tabigLastLevel_cmb = new System.Windows.Forms.ComboBox();
             this.tabimgeWindow = new System.Windows.Forms.GroupBox();
             this.tabiwCustom_grp = new System.Windows.Forms.GroupBox();
+            this.tabiwCustom_btn = new System.Windows.Forms.Button();
             this.tabiwCustomGrad_grp = new System.Windows.Forms.GroupBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.tabiwCGradFirstLevel_lbl = new System.Windows.Forms.Label();
+            this.tabiwCGradOther_grp = new System.Windows.Forms.GroupBox();
+            this.tabiwCGradEightColor_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherVSplit_rdo = new System.Windows.Forms.RadioButton();
             this.tabiwCGradOtherSplit_pnl = new System.Windows.Forms.Panel();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.button1 = new System.Windows.Forms.Button();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
-            this.button9 = new System.Windows.Forms.Button();
-            this.button10 = new System.Windows.Forms.Button();
-            this.tabiwCGrad0 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.button11 = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
-            this.button12 = new System.Windows.Forms.Button();
-            this.button13 = new System.Windows.Forms.Button();
-            this.button14 = new System.Windows.Forms.Button();
-            this.button15 = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherHSplit_rdo = new System.Windows.Forms.RadioButton();
+            this.tabiwCGradFourColor_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherSplit_nud = new System.Windows.Forms.NumericUpDown();
+            this.tabiwCGradOtherColor_lbl = new System.Windows.Forms.Label();
+            this.tabiwCGradOtherSplit_lbl = new System.Windows.Forms.Label();
+            this.tabiwCGradOtherColorC_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherColorW_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherColorM_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherColorR_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherColorA_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherColorG_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherColorY_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherColorB_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradOtherColorD_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradStep_lbl = new System.Windows.Forms.Label();
+            this.tabiwCGradStep_cmb = new System.Windows.Forms.ComboBox();
+            this.tabiwCGradBaseColor_pnl = new System.Windows.Forms.Panel();
+            this.tabiwCGradBaseColorCustom_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradBaseColor_lbl = new System.Windows.Forms.Label();
+            this.tabiwCGradBaseColorB_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradBaseColorW_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradBaseColorG_btn = new System.Windows.Forms.Button();
+            this.tabiwCGradBaseColorR_btn = new System.Windows.Forms.Button();
             this.tabiwCGradVWay_rdo = new System.Windows.Forms.RadioButton();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.tabiwCGrad = new System.Windows.Forms.RadioButton();
+            this.tabiwCGradDivid_cmb = new System.Windows.Forms.ComboBox();
+            this.tabiwCGradColorBar_rdo = new System.Windows.Forms.RadioButton();
             this.tabiwCGradHWay_rdo = new System.Windows.Forms.RadioButton();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
-            this.comboBox4 = new System.Windows.Forms.ComboBox();
+            this.tabiwCGradFirstLevel_cmb = new System.Windows.Forms.ComboBox();
+            this.tabiwCGradLastLevel_cmb = new System.Windows.Forms.ComboBox();
             this.tabiwCustom_cmb = new System.Windows.Forms.ComboBox();
             this.tabiwCustomMask_grp = new System.Windows.Forms.GroupBox();
             this.tabiwCMaskPixelGray_lbl = new System.Windows.Forms.Label();
@@ -158,6 +124,43 @@ namespace Thunder
             this.tabiwWinSizePixel_rdo = new System.Windows.Forms.RadioButton();
             this.tabiwWinSizePercent_nud = new System.Windows.Forms.NumericUpDown();
             this.tabiwWinSizePercent_rdo = new System.Windows.Forms.RadioButton();
+            this.tabimgeGradient = new System.Windows.Forms.GroupBox();
+            this.tabigOther_chk = new System.Windows.Forms.CheckBox();
+            this.tabigOther_grp = new System.Windows.Forms.GroupBox();
+            this.tabigEightColor_btn = new System.Windows.Forms.Button();
+            this.tabigOtherSplitLoc_lbl = new System.Windows.Forms.Label();
+            this.tabigOtherVSplit_rdo = new System.Windows.Forms.RadioButton();
+            this.tabigOtherSplit_pnl = new System.Windows.Forms.Panel();
+            this.tabigOtherHSplit_rdo = new System.Windows.Forms.RadioButton();
+            this.tabigFourColor_btn = new System.Windows.Forms.Button();
+            this.tabigOtherSplit_nud = new System.Windows.Forms.NumericUpDown();
+            this.tabigOtherColor_lbl = new System.Windows.Forms.Label();
+            this.tabigOtherSplit_lbl = new System.Windows.Forms.Label();
+            this.tabigOtherColorC_btn = new System.Windows.Forms.Button();
+            this.tabigOtherColorW_btn = new System.Windows.Forms.Button();
+            this.tabigOtherColorM_btn = new System.Windows.Forms.Button();
+            this.tabigOtherColorR_btn = new System.Windows.Forms.Button();
+            this.tabigOtherColorA_btn = new System.Windows.Forms.Button();
+            this.tabigOtherColorG_btn = new System.Windows.Forms.Button();
+            this.tabigOtherColorY_btn = new System.Windows.Forms.Button();
+            this.tabigOtherColorB_btn = new System.Windows.Forms.Button();
+            this.tabigOtherColorD_btn = new System.Windows.Forms.Button();
+            this.tabigStep_lbl = new System.Windows.Forms.Label();
+            this.tabigStep_cmb = new System.Windows.Forms.ComboBox();
+            this.tabigBaseColor_pnl = new System.Windows.Forms.Panel();
+            this.tabigBaseColorCustom_btn = new System.Windows.Forms.Button();
+            this.tabigBaseColor_lbl = new System.Windows.Forms.Label();
+            this.tabigBaseColorB_btn = new System.Windows.Forms.Button();
+            this.tabigBaseColorW_btn = new System.Windows.Forms.Button();
+            this.tabigBaseColorG_btn = new System.Windows.Forms.Button();
+            this.tabigBaseColorR_btn = new System.Windows.Forms.Button();
+            this.tabigVWay_rdo = new System.Windows.Forms.RadioButton();
+            this.tabigDivid_cmb = new System.Windows.Forms.ComboBox();
+            this.tabigColorBar_rdo = new System.Windows.Forms.RadioButton();
+            this.tabigFirstLevel_lbl = new System.Windows.Forms.Label();
+            this.tabigHWay_rdo = new System.Windows.Forms.RadioButton();
+            this.tabigFirstLevel_cmb = new System.Windows.Forms.ComboBox();
+            this.tabigLastLevel_cmb = new System.Windows.Forms.ComboBox();
             this.tabimgeMask = new System.Windows.Forms.GroupBox();
             this.tabiemPixelGray_lbl = new System.Windows.Forms.Label();
             this.tabiemPixelGray_vsc = new System.Windows.Forms.VScrollBar();
@@ -231,7 +234,7 @@ namespace Thunder
             this.tabieaLeftRight_rdo = new System.Windows.Forms.RadioButton();
             this.tabieaUpDown_rdo = new System.Windows.Forms.RadioButton();
             this.tabimgeMass = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.tabiema = new System.Windows.Forms.Label();
             this.tabimgeFuncList = new System.Windows.Forms.ComboBox();
             this.tabDirList = new System.Windows.Forms.TabPage();
             this.tabdlPatternList_lvw = new System.Windows.Forms.ListView();
@@ -258,20 +261,18 @@ namespace Thunder
             this.ssrStatus_lbl = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssrProgressbar_prg = new System.Windows.Forms.ToolStripProgressBar();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.tabiwCGradOther_chk = new System.Windows.Forms.CheckBox();
+            this.tabiwCGradOtherSplitLoc_lbl = new System.Windows.Forms.Label();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabImgEditor.SuspendLayout();
             this.tabimgePanel.SuspendLayout();
-            this.tabimgeGradient.SuspendLayout();
-            this.tabigOther_grp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabigOtherSplit_nud)).BeginInit();
-            this.panel1.SuspendLayout();
             this.tabimgeWindow.SuspendLayout();
             this.tabiwCustom_grp.SuspendLayout();
             this.tabiwCustomGrad_grp.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            this.panel3.SuspendLayout();
+            this.tabiwCGradOther_grp.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiwCGradOtherSplit_nud)).BeginInit();
+            this.tabiwCGradBaseColor_pnl.SuspendLayout();
             this.tabiwCustomMask_grp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwCMaskHNum_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwCMaskWNum_nud)).BeginInit();
@@ -286,6 +287,10 @@ namespace Thunder
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePixelH_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePixelW_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePercent_nud)).BeginInit();
+            this.tabimgeGradient.SuspendLayout();
+            this.tabigOther_grp.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabigOtherSplit_nud)).BeginInit();
+            this.tabigBaseColor_pnl.SuspendLayout();
             this.tabimgeMask.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabiemHNum_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiemWNum_nud)).BeginInit();
@@ -322,12 +327,12 @@ namespace Thunder
             this.mnsX_lbl,
             this.mnsW_txt,
             this.mnsScreenlist_cmb,
-            this.mnsPattername_txt,
-            this.mnsGenerate_btn});
+            this.mnsGenerate_btn,
+            this.mnsPattername_txt});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menuStrip.Size = new System.Drawing.Size(1392, 27);
+            this.menuStrip.Size = new System.Drawing.Size(948, 27);
             this.menuStrip.TabIndex = 12;
             this.menuStrip.Text = "menuStrip";
             // 
@@ -379,14 +384,6 @@ namespace Thunder
             this.mnsScreenlist_cmb.SelectedIndexChanged += new System.EventHandler(this.menuToolStripCmb_SelectedIndexChanged);
             this.mnsScreenlist_cmb.Click += new System.EventHandler(this.Screenlist);
             // 
-            // mnsPattername_txt
-            // 
-            this.mnsPattername_txt.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.mnsPattername_txt.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
-            this.mnsPattername_txt.Name = "mnsPattername_txt";
-            this.mnsPattername_txt.Size = new System.Drawing.Size(129, 23);
-            this.mnsPattername_txt.Text = "PatternName";
-            // 
             // mnsGenerate_btn
             // 
             this.mnsGenerate_btn.Name = "mnsGenerate_btn";
@@ -394,6 +391,14 @@ namespace Thunder
             this.mnsGenerate_btn.Size = new System.Drawing.Size(71, 23);
             this.mnsGenerate_btn.Text = "Generate";
             this.mnsGenerate_btn.Click += new System.EventHandler(this.Generate_Click);
+            // 
+            // mnsPattername_txt
+            // 
+            this.mnsPattername_txt.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.mnsPattername_txt.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
+            this.mnsPattername_txt.Name = "mnsPattername_txt";
+            this.mnsPattername_txt.Size = new System.Drawing.Size(129, 23);
+            this.mnsPattername_txt.Text = "PatternName";
             // 
             // tabControl
             // 
@@ -406,7 +411,7 @@ namespace Thunder
             this.tabControl.Multiline = true;
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(807, 516);
+            this.tabControl.Size = new System.Drawing.Size(807, 484);
             this.tabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.tabControl.TabIndex = 6;
             this.tabControl.SelectedIndexChanged += new System.EventHandler(this.tabControl_SelectedIndexChanged);
@@ -419,7 +424,7 @@ namespace Thunder
             this.tabImgEditor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabImgEditor.Name = "tabImgEditor";
             this.tabImgEditor.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabImgEditor.Size = new System.Drawing.Size(799, 490);
+            this.tabImgEditor.Size = new System.Drawing.Size(799, 458);
             this.tabImgEditor.TabIndex = 0;
             this.tabImgEditor.Text = "ImgEditor";
             this.tabImgEditor.UseVisualStyleBackColor = true;
@@ -437,8 +442,1053 @@ namespace Thunder
             this.tabimgePanel.Location = new System.Drawing.Point(3, 26);
             this.tabimgePanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgePanel.Name = "tabimgePanel";
-            this.tabimgePanel.Size = new System.Drawing.Size(793, 462);
+            this.tabimgePanel.Size = new System.Drawing.Size(793, 430);
             this.tabimgePanel.TabIndex = 11;
+            // 
+            // tabimgeWindow
+            // 
+            this.tabimgeWindow.Controls.Add(this.tabiwCustom_grp);
+            this.tabimgeWindow.Controls.Add(this.tabiwWin_grp);
+            this.tabimgeWindow.Controls.Add(this.tabiwBack_grp);
+            this.tabimgeWindow.Controls.Add(this.tabiwLineColor_lbl);
+            this.tabimgeWindow.Controls.Add(this.tabiwLineColor_btn);
+            this.tabimgeWindow.Controls.Add(this.tabiwLineCross_btn);
+            this.tabimgeWindow.Controls.Add(this.tabiwLineOutside_btn);
+            this.tabimgeWindow.Controls.Add(this.tabiwWinLoc_grp);
+            this.tabimgeWindow.Controls.Add(this.tabiwWinSize_grp);
+            this.tabimgeWindow.Location = new System.Drawing.Point(40, 0);
+            this.tabimgeWindow.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabimgeWindow.Name = "tabimgeWindow";
+            this.tabimgeWindow.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabimgeWindow.Size = new System.Drawing.Size(747, 444);
+            this.tabimgeWindow.TabIndex = 0;
+            this.tabimgeWindow.TabStop = false;
+            this.tabimgeWindow.Text = "Window";
+            // 
+            // tabiwCustom_grp
+            // 
+            this.tabiwCustom_grp.Controls.Add(this.tabiwCustom_btn);
+            this.tabiwCustom_grp.Controls.Add(this.tabiwCustomGrad_grp);
+            this.tabiwCustom_grp.Controls.Add(this.tabiwCustom_cmb);
+            this.tabiwCustom_grp.Controls.Add(this.tabiwCustomMask_grp);
+            this.tabiwCustom_grp.Enabled = false;
+            this.tabiwCustom_grp.Location = new System.Drawing.Point(219, 11);
+            this.tabiwCustom_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCustom_grp.Name = "tabiwCustom_grp";
+            this.tabiwCustom_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCustom_grp.Size = new System.Drawing.Size(395, 338);
+            this.tabiwCustom_grp.TabIndex = 19;
+            this.tabiwCustom_grp.TabStop = false;
+            this.tabiwCustom_grp.Text = "自製圖";
+            // 
+            // tabiwCustom_btn
+            // 
+            this.tabiwCustom_btn.Location = new System.Drawing.Point(67, 10);
+            this.tabiwCustom_btn.Name = "tabiwCustom_btn";
+            this.tabiwCustom_btn.Size = new System.Drawing.Size(75, 23);
+            this.tabiwCustom_btn.TabIndex = 21;
+            this.tabiwCustom_btn.Text = "區塊生成";
+            this.tabiwCustom_btn.UseVisualStyleBackColor = true;
+            this.tabiwCustom_btn.Click += new System.EventHandler(this.Custom_btn_Click);
+            // 
+            // tabiwCustomGrad_grp
+            // 
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradOther_chk);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradFirstLevel_lbl);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradOther_grp);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradStep_lbl);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradStep_cmb);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradBaseColor_pnl);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradVWay_rdo);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradDivid_cmb);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradColorBar_rdo);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradHWay_rdo);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradFirstLevel_cmb);
+            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradLastLevel_cmb);
+            this.tabiwCustomGrad_grp.Location = new System.Drawing.Point(336, 48);
+            this.tabiwCustomGrad_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCustomGrad_grp.Name = "tabiwCustomGrad_grp";
+            this.tabiwCustomGrad_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCustomGrad_grp.Size = new System.Drawing.Size(405, 310);
+            this.tabiwCustomGrad_grp.TabIndex = 20;
+            this.tabiwCustomGrad_grp.TabStop = false;
+            this.tabiwCustomGrad_grp.Text = "Gradient";
+            this.tabiwCustomGrad_grp.Visible = false;
+            // 
+            // tabiwCGradFirstLevel_lbl
+            // 
+            this.tabiwCGradFirstLevel_lbl.AutoSize = true;
+            this.tabiwCGradFirstLevel_lbl.Location = new System.Drawing.Point(188, 35);
+            this.tabiwCGradFirstLevel_lbl.Name = "tabiwCGradFirstLevel_lbl";
+            this.tabiwCGradFirstLevel_lbl.Size = new System.Drawing.Size(51, 36);
+            this.tabiwCGradFirstLevel_lbl.TabIndex = 37;
+            this.tabiwCGradFirstLevel_lbl.Text = "FirstLevel\r\n\r\nLastLevel";
+            // 
+            // tabiwCGradOther_grp
+            // 
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherSplitLoc_lbl);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradEightColor_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherVSplit_rdo);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherSplit_pnl);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherHSplit_rdo);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradFourColor_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherSplit_nud);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColor_lbl);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherSplit_lbl);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorC_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorW_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorM_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorR_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorA_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorG_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorY_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorB_btn);
+            this.tabiwCGradOther_grp.Controls.Add(this.tabiwCGradOtherColorD_btn);
+            this.tabiwCGradOther_grp.Enabled = false;
+            this.tabiwCGradOther_grp.Location = new System.Drawing.Point(10, 110);
+            this.tabiwCGradOther_grp.Name = "tabiwCGradOther_grp";
+            this.tabiwCGradOther_grp.Size = new System.Drawing.Size(368, 189);
+            this.tabiwCGradOther_grp.TabIndex = 36;
+            this.tabiwCGradOther_grp.TabStop = false;
+            // 
+            // tabiwCGradEightColor_btn
+            // 
+            this.tabiwCGradEightColor_btn.Location = new System.Drawing.Point(301, 122);
+            this.tabiwCGradEightColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradEightColor_btn.Name = "tabiwCGradEightColor_btn";
+            this.tabiwCGradEightColor_btn.Size = new System.Drawing.Size(61, 21);
+            this.tabiwCGradEightColor_btn.TabIndex = 23;
+            this.tabiwCGradEightColor_btn.Text = "常規八色";
+            this.tabiwCGradEightColor_btn.UseVisualStyleBackColor = true;
+            this.tabiwCGradEightColor_btn.Click += new System.EventHandler(this.ColorBar_btn_Click);
+            // 
+            // tabiwCGradOtherVSplit_rdo
+            // 
+            this.tabiwCGradOtherVSplit_rdo.AutoSize = true;
+            this.tabiwCGradOtherVSplit_rdo.Checked = true;
+            this.tabiwCGradOtherVSplit_rdo.Location = new System.Drawing.Point(7, 18);
+            this.tabiwCGradOtherVSplit_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherVSplit_rdo.Name = "tabiwCGradOtherVSplit_rdo";
+            this.tabiwCGradOtherVSplit_rdo.Size = new System.Drawing.Size(55, 16);
+            this.tabiwCGradOtherVSplit_rdo.TabIndex = 0;
+            this.tabiwCGradOtherVSplit_rdo.TabStop = true;
+            this.tabiwCGradOtherVSplit_rdo.Text = "V分割";
+            this.tabiwCGradOtherVSplit_rdo.UseVisualStyleBackColor = true;
+            this.tabiwCGradOtherVSplit_rdo.Click += new System.EventHandler(this.SplitPanelCreat);
+            // 
+            // tabiwCGradOtherSplit_pnl
+            // 
+            this.tabiwCGradOtherSplit_pnl.Location = new System.Drawing.Point(8, 40);
+            this.tabiwCGradOtherSplit_pnl.Name = "tabiwCGradOtherSplit_pnl";
+            this.tabiwCGradOtherSplit_pnl.Size = new System.Drawing.Size(200, 140);
+            this.tabiwCGradOtherSplit_pnl.TabIndex = 22;
+            // 
+            // tabiwCGradOtherHSplit_rdo
+            // 
+            this.tabiwCGradOtherHSplit_rdo.AutoSize = true;
+            this.tabiwCGradOtherHSplit_rdo.Location = new System.Drawing.Point(91, 17);
+            this.tabiwCGradOtherHSplit_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherHSplit_rdo.Name = "tabiwCGradOtherHSplit_rdo";
+            this.tabiwCGradOtherHSplit_rdo.Size = new System.Drawing.Size(55, 16);
+            this.tabiwCGradOtherHSplit_rdo.TabIndex = 1;
+            this.tabiwCGradOtherHSplit_rdo.Text = "H分割";
+            this.tabiwCGradOtherHSplit_rdo.UseVisualStyleBackColor = true;
+            this.tabiwCGradOtherHSplit_rdo.Click += new System.EventHandler(this.SplitPanelCreat);
+            // 
+            // tabiwCGradFourColor_btn
+            // 
+            this.tabiwCGradFourColor_btn.Location = new System.Drawing.Point(234, 122);
+            this.tabiwCGradFourColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradFourColor_btn.Name = "tabiwCGradFourColor_btn";
+            this.tabiwCGradFourColor_btn.Size = new System.Drawing.Size(61, 21);
+            this.tabiwCGradFourColor_btn.TabIndex = 16;
+            this.tabiwCGradFourColor_btn.Text = "常規四色";
+            this.tabiwCGradFourColor_btn.UseVisualStyleBackColor = true;
+            this.tabiwCGradFourColor_btn.Click += new System.EventHandler(this.ColorBar_btn_Click);
+            // 
+            // tabiwCGradOtherSplit_nud
+            // 
+            this.tabiwCGradOtherSplit_nud.Location = new System.Drawing.Point(259, 15);
+            this.tabiwCGradOtherSplit_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherSplit_nud.Name = "tabiwCGradOtherSplit_nud";
+            this.tabiwCGradOtherSplit_nud.Size = new System.Drawing.Size(103, 22);
+            this.tabiwCGradOtherSplit_nud.TabIndex = 2;
+            this.tabiwCGradOtherSplit_nud.Value = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            this.tabiwCGradOtherSplit_nud.ValueChanged += new System.EventHandler(this.SplitPanelCreat);
+            // 
+            // tabiwCGradOtherColor_lbl
+            // 
+            this.tabiwCGradOtherColor_lbl.AutoSize = true;
+            this.tabiwCGradOtherColor_lbl.Location = new System.Drawing.Point(255, 98);
+            this.tabiwCGradOtherColor_lbl.Name = "tabiwCGradOtherColor_lbl";
+            this.tabiwCGradOtherColor_lbl.Size = new System.Drawing.Size(53, 12);
+            this.tabiwCGradOtherColor_lbl.TabIndex = 21;
+            this.tabiwCGradOtherColor_lbl.Text = "選取顏色";
+            // 
+            // tabiwCGradOtherSplit_lbl
+            // 
+            this.tabiwCGradOtherSplit_lbl.AutoSize = true;
+            this.tabiwCGradOtherSplit_lbl.Location = new System.Drawing.Point(208, 19);
+            this.tabiwCGradOtherSplit_lbl.Name = "tabiwCGradOtherSplit_lbl";
+            this.tabiwCGradOtherSplit_lbl.Size = new System.Drawing.Size(46, 12);
+            this.tabiwCGradOtherSplit_lbl.TabIndex = 3;
+            this.tabiwCGradOtherSplit_lbl.Text = "Bar格數";
+            // 
+            // tabiwCGradOtherColorC_btn
+            // 
+            this.tabiwCGradOtherColorC_btn.BackgroundImage = global::Thunder.Properties.Resources.custom;
+            this.tabiwCGradOtherColorC_btn.Location = new System.Drawing.Point(309, 92);
+            this.tabiwCGradOtherColorC_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorC_btn.Name = "tabiwCGradOtherColorC_btn";
+            this.tabiwCGradOtherColorC_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorC_btn.TabIndex = 18;
+            this.tabiwCGradOtherColorC_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorC_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradOtherColorW_btn
+            // 
+            this.tabiwCGradOtherColorW_btn.BackColor = System.Drawing.Color.White;
+            this.tabiwCGradOtherColorW_btn.Location = new System.Drawing.Point(253, 43);
+            this.tabiwCGradOtherColorW_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorW_btn.Name = "tabiwCGradOtherColorW_btn";
+            this.tabiwCGradOtherColorW_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorW_btn.TabIndex = 12;
+            this.tabiwCGradOtherColorW_btn.Text = "W";
+            this.tabiwCGradOtherColorW_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorW_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradOtherColorM_btn
+            // 
+            this.tabiwCGradOtherColorM_btn.BackColor = System.Drawing.Color.Magenta;
+            this.tabiwCGradOtherColorM_btn.ForeColor = System.Drawing.Color.Black;
+            this.tabiwCGradOtherColorM_btn.Location = new System.Drawing.Point(335, 68);
+            this.tabiwCGradOtherColorM_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorM_btn.Name = "tabiwCGradOtherColorM_btn";
+            this.tabiwCGradOtherColorM_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorM_btn.TabIndex = 20;
+            this.tabiwCGradOtherColorM_btn.Text = "M";
+            this.tabiwCGradOtherColorM_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorM_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradOtherColorR_btn
+            // 
+            this.tabiwCGradOtherColorR_btn.BackColor = System.Drawing.Color.Red;
+            this.tabiwCGradOtherColorR_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiwCGradOtherColorR_btn.Location = new System.Drawing.Point(280, 43);
+            this.tabiwCGradOtherColorR_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorR_btn.Name = "tabiwCGradOtherColorR_btn";
+            this.tabiwCGradOtherColorR_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorR_btn.TabIndex = 13;
+            this.tabiwCGradOtherColorR_btn.Text = "R";
+            this.tabiwCGradOtherColorR_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorR_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradOtherColorA_btn
+            // 
+            this.tabiwCGradOtherColorA_btn.BackColor = System.Drawing.Color.Aqua;
+            this.tabiwCGradOtherColorA_btn.ForeColor = System.Drawing.Color.Black;
+            this.tabiwCGradOtherColorA_btn.Location = new System.Drawing.Point(309, 68);
+            this.tabiwCGradOtherColorA_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorA_btn.Name = "tabiwCGradOtherColorA_btn";
+            this.tabiwCGradOtherColorA_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorA_btn.TabIndex = 19;
+            this.tabiwCGradOtherColorA_btn.Text = "A";
+            this.tabiwCGradOtherColorA_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorA_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradOtherColorG_btn
+            // 
+            this.tabiwCGradOtherColorG_btn.BackColor = System.Drawing.Color.Lime;
+            this.tabiwCGradOtherColorG_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiwCGradOtherColorG_btn.Location = new System.Drawing.Point(309, 44);
+            this.tabiwCGradOtherColorG_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorG_btn.Name = "tabiwCGradOtherColorG_btn";
+            this.tabiwCGradOtherColorG_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorG_btn.TabIndex = 14;
+            this.tabiwCGradOtherColorG_btn.Text = "G";
+            this.tabiwCGradOtherColorG_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorG_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradOtherColorY_btn
+            // 
+            this.tabiwCGradOtherColorY_btn.BackColor = System.Drawing.Color.Yellow;
+            this.tabiwCGradOtherColorY_btn.ForeColor = System.Drawing.Color.Black;
+            this.tabiwCGradOtherColorY_btn.Location = new System.Drawing.Point(280, 67);
+            this.tabiwCGradOtherColorY_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorY_btn.Name = "tabiwCGradOtherColorY_btn";
+            this.tabiwCGradOtherColorY_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorY_btn.TabIndex = 18;
+            this.tabiwCGradOtherColorY_btn.Text = "Y";
+            this.tabiwCGradOtherColorY_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorY_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradOtherColorB_btn
+            // 
+            this.tabiwCGradOtherColorB_btn.BackColor = System.Drawing.Color.Blue;
+            this.tabiwCGradOtherColorB_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiwCGradOtherColorB_btn.Location = new System.Drawing.Point(335, 44);
+            this.tabiwCGradOtherColorB_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorB_btn.Name = "tabiwCGradOtherColorB_btn";
+            this.tabiwCGradOtherColorB_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorB_btn.TabIndex = 15;
+            this.tabiwCGradOtherColorB_btn.Text = "B";
+            this.tabiwCGradOtherColorB_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorB_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradOtherColorD_btn
+            // 
+            this.tabiwCGradOtherColorD_btn.BackColor = System.Drawing.Color.Black;
+            this.tabiwCGradOtherColorD_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiwCGradOtherColorD_btn.Location = new System.Drawing.Point(253, 67);
+            this.tabiwCGradOtherColorD_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradOtherColorD_btn.Name = "tabiwCGradOtherColorD_btn";
+            this.tabiwCGradOtherColorD_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradOtherColorD_btn.TabIndex = 17;
+            this.tabiwCGradOtherColorD_btn.Text = "D";
+            this.tabiwCGradOtherColorD_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradOtherColorD_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradStep_lbl
+            // 
+            this.tabiwCGradStep_lbl.AutoSize = true;
+            this.tabiwCGradStep_lbl.Location = new System.Drawing.Point(22, 35);
+            this.tabiwCGradStep_lbl.Name = "tabiwCGradStep_lbl";
+            this.tabiwCGradStep_lbl.Size = new System.Drawing.Size(149, 12);
+            this.tabiwCGradStep_lbl.TabIndex = 33;
+            this.tabiwCGradStep_lbl.Text = "漸層分幾階        畫面幾等分";
+            // 
+            // tabiwCGradStep_cmb
+            // 
+            this.tabiwCGradStep_cmb.FormattingEnabled = true;
+            this.tabiwCGradStep_cmb.Items.AddRange(new object[] {
+            "16",
+            "32",
+            "64",
+            "128",
+            "256"});
+            this.tabiwCGradStep_cmb.Location = new System.Drawing.Point(25, 53);
+            this.tabiwCGradStep_cmb.Name = "tabiwCGradStep_cmb";
+            this.tabiwCGradStep_cmb.Size = new System.Drawing.Size(49, 20);
+            this.tabiwCGradStep_cmb.TabIndex = 34;
+            this.tabiwCGradStep_cmb.Text = "256";
+            // 
+            // tabiwCGradBaseColor_pnl
+            // 
+            this.tabiwCGradBaseColor_pnl.Controls.Add(this.tabiwCGradBaseColorCustom_btn);
+            this.tabiwCGradBaseColor_pnl.Controls.Add(this.tabiwCGradBaseColor_lbl);
+            this.tabiwCGradBaseColor_pnl.Controls.Add(this.tabiwCGradBaseColorB_btn);
+            this.tabiwCGradBaseColor_pnl.Controls.Add(this.tabiwCGradBaseColorW_btn);
+            this.tabiwCGradBaseColor_pnl.Controls.Add(this.tabiwCGradBaseColorG_btn);
+            this.tabiwCGradBaseColor_pnl.Controls.Add(this.tabiwCGradBaseColorR_btn);
+            this.tabiwCGradBaseColor_pnl.Location = new System.Drawing.Point(21, 75);
+            this.tabiwCGradBaseColor_pnl.Name = "tabiwCGradBaseColor_pnl";
+            this.tabiwCGradBaseColor_pnl.Size = new System.Drawing.Size(285, 45);
+            this.tabiwCGradBaseColor_pnl.TabIndex = 35;
+            // 
+            // tabiwCGradBaseColorCustom_btn
+            // 
+            this.tabiwCGradBaseColorCustom_btn.BackgroundImage = global::Thunder.Properties.Resources.custom;
+            this.tabiwCGradBaseColorCustom_btn.Location = new System.Drawing.Point(234, 14);
+            this.tabiwCGradBaseColorCustom_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradBaseColorCustom_btn.Name = "tabiwCGradBaseColorCustom_btn";
+            this.tabiwCGradBaseColorCustom_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradBaseColorCustom_btn.TabIndex = 15;
+            this.tabiwCGradBaseColorCustom_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradBaseColorCustom_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradBaseColor_lbl
+            // 
+            this.tabiwCGradBaseColor_lbl.AutoSize = true;
+            this.tabiwCGradBaseColor_lbl.BackColor = System.Drawing.Color.White;
+            this.tabiwCGradBaseColor_lbl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabiwCGradBaseColor_lbl.Font = new System.Drawing.Font("Microsoft JhengHei UI", 16F);
+            this.tabiwCGradBaseColor_lbl.Location = new System.Drawing.Point(14, 7);
+            this.tabiwCGradBaseColor_lbl.Name = "tabiwCGradBaseColor_lbl";
+            this.tabiwCGradBaseColor_lbl.Size = new System.Drawing.Size(102, 30);
+            this.tabiwCGradBaseColor_lbl.TabIndex = 10;
+            this.tabiwCGradBaseColor_lbl.Text = "基底色彩";
+            // 
+            // tabiwCGradBaseColorB_btn
+            // 
+            this.tabiwCGradBaseColorB_btn.BackColor = System.Drawing.Color.Blue;
+            this.tabiwCGradBaseColorB_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiwCGradBaseColorB_btn.Location = new System.Drawing.Point(208, 14);
+            this.tabiwCGradBaseColorB_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradBaseColorB_btn.Name = "tabiwCGradBaseColorB_btn";
+            this.tabiwCGradBaseColorB_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradBaseColorB_btn.TabIndex = 14;
+            this.tabiwCGradBaseColorB_btn.Text = "B";
+            this.tabiwCGradBaseColorB_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradBaseColorB_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradBaseColorW_btn
+            // 
+            this.tabiwCGradBaseColorW_btn.BackColor = System.Drawing.Color.White;
+            this.tabiwCGradBaseColorW_btn.Location = new System.Drawing.Point(131, 14);
+            this.tabiwCGradBaseColorW_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradBaseColorW_btn.Name = "tabiwCGradBaseColorW_btn";
+            this.tabiwCGradBaseColorW_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradBaseColorW_btn.TabIndex = 11;
+            this.tabiwCGradBaseColorW_btn.Text = "W";
+            this.tabiwCGradBaseColorW_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradBaseColorW_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradBaseColorG_btn
+            // 
+            this.tabiwCGradBaseColorG_btn.BackColor = System.Drawing.Color.Lime;
+            this.tabiwCGradBaseColorG_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiwCGradBaseColorG_btn.Location = new System.Drawing.Point(182, 14);
+            this.tabiwCGradBaseColorG_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradBaseColorG_btn.Name = "tabiwCGradBaseColorG_btn";
+            this.tabiwCGradBaseColorG_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradBaseColorG_btn.TabIndex = 13;
+            this.tabiwCGradBaseColorG_btn.Text = "G";
+            this.tabiwCGradBaseColorG_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradBaseColorG_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradBaseColorR_btn
+            // 
+            this.tabiwCGradBaseColorR_btn.BackColor = System.Drawing.Color.Red;
+            this.tabiwCGradBaseColorR_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiwCGradBaseColorR_btn.Location = new System.Drawing.Point(157, 14);
+            this.tabiwCGradBaseColorR_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradBaseColorR_btn.Name = "tabiwCGradBaseColorR_btn";
+            this.tabiwCGradBaseColorR_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiwCGradBaseColorR_btn.TabIndex = 12;
+            this.tabiwCGradBaseColorR_btn.Text = "R";
+            this.tabiwCGradBaseColorR_btn.UseVisualStyleBackColor = false;
+            this.tabiwCGradBaseColorR_btn.Click += new System.EventHandler(this.GradientColor_Click);
+            // 
+            // tabiwCGradVWay_rdo
+            // 
+            this.tabiwCGradVWay_rdo.AutoSize = true;
+            this.tabiwCGradVWay_rdo.Checked = true;
+            this.tabiwCGradVWay_rdo.Location = new System.Drawing.Point(13, 12);
+            this.tabiwCGradVWay_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradVWay_rdo.Name = "tabiwCGradVWay_rdo";
+            this.tabiwCGradVWay_rdo.Size = new System.Drawing.Size(86, 16);
+            this.tabiwCGradVWay_rdo.TabIndex = 24;
+            this.tabiwCGradVWay_rdo.TabStop = true;
+            this.tabiwCGradVWay_rdo.Text = "Vertical 漸層";
+            this.tabiwCGradVWay_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwCGradDivid_cmb
+            // 
+            this.tabiwCGradDivid_cmb.FormattingEnabled = true;
+            this.tabiwCGradDivid_cmb.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "4"});
+            this.tabiwCGradDivid_cmb.Location = new System.Drawing.Point(89, 54);
+            this.tabiwCGradDivid_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradDivid_cmb.Name = "tabiwCGradDivid_cmb";
+            this.tabiwCGradDivid_cmb.Size = new System.Drawing.Size(39, 20);
+            this.tabiwCGradDivid_cmb.TabIndex = 27;
+            this.tabiwCGradDivid_cmb.Text = "1";
+            // 
+            // tabiwCGradColorBar_rdo
+            // 
+            this.tabiwCGradColorBar_rdo.AutoSize = true;
+            this.tabiwCGradColorBar_rdo.Location = new System.Drawing.Point(196, 13);
+            this.tabiwCGradColorBar_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradColorBar_rdo.Name = "tabiwCGradColorBar_rdo";
+            this.tabiwCGradColorBar_rdo.Size = new System.Drawing.Size(91, 16);
+            this.tabiwCGradColorBar_rdo.TabIndex = 32;
+            this.tabiwCGradColorBar_rdo.TabStop = true;
+            this.tabiwCGradColorBar_rdo.Text = "ColorBar模式";
+            this.tabiwCGradColorBar_rdo.UseVisualStyleBackColor = true;
+            this.tabiwCGradColorBar_rdo.CheckedChanged += new System.EventHandler(this.otherColor_CheckedChanged);
+            // 
+            // tabiwCGradHWay_rdo
+            // 
+            this.tabiwCGradHWay_rdo.AutoSize = true;
+            this.tabiwCGradHWay_rdo.Location = new System.Drawing.Point(86, 15);
+            this.tabiwCGradHWay_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradHWay_rdo.Name = "tabiwCGradHWay_rdo";
+            this.tabiwCGradHWay_rdo.Size = new System.Drawing.Size(99, 16);
+            this.tabiwCGradHWay_rdo.TabIndex = 25;
+            this.tabiwCGradHWay_rdo.TabStop = true;
+            this.tabiwCGradHWay_rdo.Text = "Horizontal 漸層";
+            this.tabiwCGradHWay_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwCGradFirstLevel_cmb
+            // 
+            this.tabiwCGradFirstLevel_cmb.FormattingEnabled = true;
+            this.tabiwCGradFirstLevel_cmb.Items.AddRange(new object[] {
+            "0",
+            "31",
+            "63",
+            "95",
+            "127",
+            "159",
+            "191",
+            "223",
+            "255"});
+            this.tabiwCGradFirstLevel_cmb.Location = new System.Drawing.Point(244, 32);
+            this.tabiwCGradFirstLevel_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradFirstLevel_cmb.Name = "tabiwCGradFirstLevel_cmb";
+            this.tabiwCGradFirstLevel_cmb.Size = new System.Drawing.Size(104, 20);
+            this.tabiwCGradFirstLevel_cmb.TabIndex = 30;
+            this.tabiwCGradFirstLevel_cmb.Text = "0";
+            // 
+            // tabiwCGradLastLevel_cmb
+            // 
+            this.tabiwCGradLastLevel_cmb.FormattingEnabled = true;
+            this.tabiwCGradLastLevel_cmb.Items.AddRange(new object[] {
+            "0",
+            "31",
+            "63",
+            "95",
+            "127",
+            "159",
+            "191",
+            "223",
+            "255"});
+            this.tabiwCGradLastLevel_cmb.Location = new System.Drawing.Point(245, 52);
+            this.tabiwCGradLastLevel_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCGradLastLevel_cmb.Name = "tabiwCGradLastLevel_cmb";
+            this.tabiwCGradLastLevel_cmb.Size = new System.Drawing.Size(104, 20);
+            this.tabiwCGradLastLevel_cmb.TabIndex = 31;
+            this.tabiwCGradLastLevel_cmb.Text = "255";
+            // 
+            // tabiwCustom_cmb
+            // 
+            this.tabiwCustom_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tabiwCustom_cmb.FormattingEnabled = true;
+            this.tabiwCustom_cmb.Items.AddRange(new object[] {
+            "Mask",
+            "Gradient"});
+            this.tabiwCustom_cmb.Location = new System.Drawing.Point(172, 8);
+            this.tabiwCustom_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCustom_cmb.Name = "tabiwCustom_cmb";
+            this.tabiwCustom_cmb.Size = new System.Drawing.Size(104, 20);
+            this.tabiwCustom_cmb.TabIndex = 0;
+            this.tabiwCustom_cmb.SelectedIndexChanged += new System.EventHandler(this.tabiwCustom_cmb_SelectedIndexChanged);
+            // 
+            // tabiwCustomMask_grp
+            // 
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelGray_lbl);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskSubPixel_rdo);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixel_rdo);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelGray_vsc);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelColor_lbl);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelLoc_lbl);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelColor_btn);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelClear_btn);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelPanel_pnl);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskHNum_nud);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskWNum_nud);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskHNum_lbl);
+            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskWNum_lbl);
+            this.tabiwCustomMask_grp.Location = new System.Drawing.Point(13, 67);
+            this.tabiwCustomMask_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCustomMask_grp.Name = "tabiwCustomMask_grp";
+            this.tabiwCustomMask_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCustomMask_grp.Size = new System.Drawing.Size(257, 264);
+            this.tabiwCustomMask_grp.TabIndex = 2;
+            this.tabiwCustomMask_grp.TabStop = false;
+            this.tabiwCustomMask_grp.Text = "Mask";
+            this.tabiwCustomMask_grp.Visible = false;
+            // 
+            // tabiwCMaskPixelGray_lbl
+            // 
+            this.tabiwCMaskPixelGray_lbl.AutoSize = true;
+            this.tabiwCMaskPixelGray_lbl.Location = new System.Drawing.Point(189, 30);
+            this.tabiwCMaskPixelGray_lbl.Name = "tabiwCMaskPixelGray_lbl";
+            this.tabiwCMaskPixelGray_lbl.Size = new System.Drawing.Size(52, 12);
+            this.tabiwCMaskPixelGray_lbl.TabIndex = 27;
+            this.tabiwCMaskPixelGray_lbl.Text = "Gray: 255";
+            this.tabiwCMaskPixelGray_lbl.Visible = false;
+            // 
+            // tabiwCMaskSubPixel_rdo
+            // 
+            this.tabiwCMaskSubPixel_rdo.AutoSize = true;
+            this.tabiwCMaskSubPixel_rdo.Location = new System.Drawing.Point(85, 12);
+            this.tabiwCMaskSubPixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCMaskSubPixel_rdo.Name = "tabiwCMaskSubPixel_rdo";
+            this.tabiwCMaskSubPixel_rdo.Size = new System.Drawing.Size(92, 16);
+            this.tabiwCMaskSubPixel_rdo.TabIndex = 26;
+            this.tabiwCMaskSubPixel_rdo.Text = "Sub Pixel Base";
+            this.tabiwCMaskSubPixel_rdo.UseVisualStyleBackColor = true;
+            this.tabiwCMaskSubPixel_rdo.CheckedChanged += new System.EventHandler(this.Pixel_rdo_CheckedChanged);
+            // 
+            // tabiwCMaskPixel_rdo
+            // 
+            this.tabiwCMaskPixel_rdo.AutoSize = true;
+            this.tabiwCMaskPixel_rdo.Checked = true;
+            this.tabiwCMaskPixel_rdo.Location = new System.Drawing.Point(11, 13);
+            this.tabiwCMaskPixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCMaskPixel_rdo.Name = "tabiwCMaskPixel_rdo";
+            this.tabiwCMaskPixel_rdo.Size = new System.Drawing.Size(71, 16);
+            this.tabiwCMaskPixel_rdo.TabIndex = 25;
+            this.tabiwCMaskPixel_rdo.TabStop = true;
+            this.tabiwCMaskPixel_rdo.Text = "Pixel Base";
+            this.tabiwCMaskPixel_rdo.UseVisualStyleBackColor = true;
+            this.tabiwCMaskPixel_rdo.CheckedChanged += new System.EventHandler(this.Pixel_rdo_CheckedChanged);
+            // 
+            // tabiwCMaskPixelGray_vsc
+            // 
+            this.tabiwCMaskPixelGray_vsc.LargeChange = 1;
+            this.tabiwCMaskPixelGray_vsc.Location = new System.Drawing.Point(226, 51);
+            this.tabiwCMaskPixelGray_vsc.Maximum = 255;
+            this.tabiwCMaskPixelGray_vsc.Name = "tabiwCMaskPixelGray_vsc";
+            this.tabiwCMaskPixelGray_vsc.Size = new System.Drawing.Size(20, 192);
+            this.tabiwCMaskPixelGray_vsc.TabIndex = 24;
+            this.tabiwCMaskPixelGray_vsc.ValueChanged += new System.EventHandler(this.PixelGray_vsc_ValueChanged);
+            // 
+            // tabiwCMaskPixelColor_lbl
+            // 
+            this.tabiwCMaskPixelColor_lbl.AutoSize = true;
+            this.tabiwCMaskPixelColor_lbl.Location = new System.Drawing.Point(73, 247);
+            this.tabiwCMaskPixelColor_lbl.Name = "tabiwCMaskPixelColor_lbl";
+            this.tabiwCMaskPixelColor_lbl.Size = new System.Drawing.Size(53, 12);
+            this.tabiwCMaskPixelColor_lbl.TabIndex = 23;
+            this.tabiwCMaskPixelColor_lbl.Text = "選擇顏色";
+            // 
+            // tabiwCMaskPixelLoc_lbl
+            // 
+            this.tabiwCMaskPixelLoc_lbl.AutoSize = true;
+            this.tabiwCMaskPixelLoc_lbl.Location = new System.Drawing.Point(13, 246);
+            this.tabiwCMaskPixelLoc_lbl.Name = "tabiwCMaskPixelLoc_lbl";
+            this.tabiwCMaskPixelLoc_lbl.Size = new System.Drawing.Size(24, 12);
+            this.tabiwCMaskPixelLoc_lbl.TabIndex = 22;
+            this.tabiwCMaskPixelLoc_lbl.Text = "--,--";
+            // 
+            // tabiwCMaskPixelColor_btn
+            // 
+            this.tabiwCMaskPixelColor_btn.BackColor = System.Drawing.Color.White;
+            this.tabiwCMaskPixelColor_btn.Location = new System.Drawing.Point(125, 243);
+            this.tabiwCMaskPixelColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCMaskPixelColor_btn.Name = "tabiwCMaskPixelColor_btn";
+            this.tabiwCMaskPixelColor_btn.Size = new System.Drawing.Size(21, 19);
+            this.tabiwCMaskPixelColor_btn.TabIndex = 21;
+            this.tabiwCMaskPixelColor_btn.UseVisualStyleBackColor = false;
+            this.tabiwCMaskPixelColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
+            // 
+            // tabiwCMaskPixelClear_btn
+            // 
+            this.tabiwCMaskPixelClear_btn.Location = new System.Drawing.Point(175, 243);
+            this.tabiwCMaskPixelClear_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCMaskPixelClear_btn.Name = "tabiwCMaskPixelClear_btn";
+            this.tabiwCMaskPixelClear_btn.Size = new System.Drawing.Size(42, 18);
+            this.tabiwCMaskPixelClear_btn.TabIndex = 20;
+            this.tabiwCMaskPixelClear_btn.Text = "Clear";
+            this.tabiwCMaskPixelClear_btn.UseVisualStyleBackColor = true;
+            this.tabiwCMaskPixelClear_btn.Click += new System.EventHandler(this.MaskPanelCreat);
+            // 
+            // tabiwCMaskPixelPanel_pnl
+            // 
+            this.tabiwCMaskPixelPanel_pnl.BackgroundImage = global::Thunder.Properties.Resources.transparent;
+            this.tabiwCMaskPixelPanel_pnl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabiwCMaskPixelPanel_pnl.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.tabiwCMaskPixelPanel_pnl.Location = new System.Drawing.Point(11, 51);
+            this.tabiwCMaskPixelPanel_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCMaskPixelPanel_pnl.Name = "tabiwCMaskPixelPanel_pnl";
+            this.tabiwCMaskPixelPanel_pnl.Size = new System.Drawing.Size(206, 192);
+            this.tabiwCMaskPixelPanel_pnl.TabIndex = 19;
+            // 
+            // tabiwCMaskHNum_nud
+            // 
+            this.tabiwCMaskHNum_nud.Location = new System.Drawing.Point(144, 32);
+            this.tabiwCMaskHNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCMaskHNum_nud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.tabiwCMaskHNum_nud.Name = "tabiwCMaskHNum_nud";
+            this.tabiwCMaskHNum_nud.Size = new System.Drawing.Size(33, 22);
+            this.tabiwCMaskHNum_nud.TabIndex = 18;
+            this.tabiwCMaskHNum_nud.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.tabiwCMaskHNum_nud.ValueChanged += new System.EventHandler(this.MaskPanelCreat);
+            // 
+            // tabiwCMaskWNum_nud
+            // 
+            this.tabiwCMaskWNum_nud.Location = new System.Drawing.Point(52, 32);
+            this.tabiwCMaskWNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwCMaskWNum_nud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.tabiwCMaskWNum_nud.Name = "tabiwCMaskWNum_nud";
+            this.tabiwCMaskWNum_nud.Size = new System.Drawing.Size(34, 22);
+            this.tabiwCMaskWNum_nud.TabIndex = 17;
+            this.tabiwCMaskWNum_nud.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.tabiwCMaskWNum_nud.ValueChanged += new System.EventHandler(this.MaskPanelCreat);
+            // 
+            // tabiwCMaskHNum_lbl
+            // 
+            this.tabiwCMaskHNum_lbl.AutoSize = true;
+            this.tabiwCMaskHNum_lbl.Location = new System.Drawing.Point(104, 34);
+            this.tabiwCMaskHNum_lbl.Name = "tabiwCMaskHNum_lbl";
+            this.tabiwCMaskHNum_lbl.Size = new System.Drawing.Size(36, 12);
+            this.tabiwCMaskHNum_lbl.TabIndex = 16;
+            this.tabiwCMaskHNum_lbl.Text = "Height";
+            // 
+            // tabiwCMaskWNum_lbl
+            // 
+            this.tabiwCMaskWNum_lbl.AutoSize = true;
+            this.tabiwCMaskWNum_lbl.Location = new System.Drawing.Point(13, 34);
+            this.tabiwCMaskWNum_lbl.Name = "tabiwCMaskWNum_lbl";
+            this.tabiwCMaskWNum_lbl.Size = new System.Drawing.Size(34, 12);
+            this.tabiwCMaskWNum_lbl.TabIndex = 15;
+            this.tabiwCMaskWNum_lbl.Text = "Width";
+            // 
+            // tabiwWin_grp
+            // 
+            this.tabiwWin_grp.Controls.Add(this.tabiwWin_pic);
+            this.tabiwWin_grp.Controls.Add(this.tabiwWinColor_rdo);
+            this.tabiwWin_grp.Controls.Add(this.tabiwWinCustom_rdo);
+            this.tabiwWin_grp.Controls.Add(this.tabiwWinImg_rdo);
+            this.tabiwWin_grp.Location = new System.Drawing.Point(115, 13);
+            this.tabiwWin_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWin_grp.Name = "tabiwWin_grp";
+            this.tabiwWin_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWin_grp.Size = new System.Drawing.Size(98, 62);
+            this.tabiwWin_grp.TabIndex = 18;
+            this.tabiwWin_grp.TabStop = false;
+            this.tabiwWin_grp.Text = "方塊顏色";
+            // 
+            // tabiwWin_pic
+            // 
+            this.tabiwWin_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabiwWin_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabiwWin_pic.Image = global::Thunder.Properties.Resources.Img;
+            this.tabiwWin_pic.Location = new System.Drawing.Point(3, 17);
+            this.tabiwWin_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWin_pic.Name = "tabiwWin_pic";
+            this.tabiwWin_pic.Size = new System.Drawing.Size(35, 32);
+            this.tabiwWin_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.tabiwWin_pic.TabIndex = 8;
+            this.tabiwWin_pic.TabStop = false;
+            this.tabiwWin_pic.Click += new System.EventHandler(this.windowPictureBox_Click);
+            // 
+            // tabiwWinColor_rdo
+            // 
+            this.tabiwWinColor_rdo.AutoSize = true;
+            this.tabiwWinColor_rdo.Checked = true;
+            this.tabiwWinColor_rdo.Location = new System.Drawing.Point(43, 11);
+            this.tabiwWinColor_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinColor_rdo.Name = "tabiwWinColor_rdo";
+            this.tabiwWinColor_rdo.Size = new System.Drawing.Size(47, 16);
+            this.tabiwWinColor_rdo.TabIndex = 5;
+            this.tabiwWinColor_rdo.TabStop = true;
+            this.tabiwWinColor_rdo.Tag = "";
+            this.tabiwWinColor_rdo.Text = "純色";
+            this.tabiwWinColor_rdo.UseVisualStyleBackColor = true;
+            this.tabiwWinColor_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
+            // 
+            // tabiwWinCustom_rdo
+            // 
+            this.tabiwWinCustom_rdo.AutoSize = true;
+            this.tabiwWinCustom_rdo.Location = new System.Drawing.Point(43, 41);
+            this.tabiwWinCustom_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinCustom_rdo.Name = "tabiwWinCustom_rdo";
+            this.tabiwWinCustom_rdo.Size = new System.Drawing.Size(59, 16);
+            this.tabiwWinCustom_rdo.TabIndex = 7;
+            this.tabiwWinCustom_rdo.TabStop = true;
+            this.tabiwWinCustom_rdo.Tag = "";
+            this.tabiwWinCustom_rdo.Text = "自製圖";
+            this.tabiwWinCustom_rdo.UseVisualStyleBackColor = true;
+            this.tabiwWinCustom_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
+            // 
+            // tabiwWinImg_rdo
+            // 
+            this.tabiwWinImg_rdo.AutoSize = true;
+            this.tabiwWinImg_rdo.Location = new System.Drawing.Point(43, 26);
+            this.tabiwWinImg_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinImg_rdo.Name = "tabiwWinImg_rdo";
+            this.tabiwWinImg_rdo.Size = new System.Drawing.Size(47, 16);
+            this.tabiwWinImg_rdo.TabIndex = 6;
+            this.tabiwWinImg_rdo.TabStop = true;
+            this.tabiwWinImg_rdo.Tag = "";
+            this.tabiwWinImg_rdo.Text = "截圖";
+            this.tabiwWinImg_rdo.UseVisualStyleBackColor = true;
+            this.tabiwWinImg_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
+            // 
+            // tabiwBack_grp
+            // 
+            this.tabiwBack_grp.Controls.Add(this.tabiwBack_pic);
+            this.tabiwBack_grp.Controls.Add(this.tabiwBackColor_rdo);
+            this.tabiwBack_grp.Controls.Add(this.tabiwBackCustom_rdo);
+            this.tabiwBack_grp.Controls.Add(this.tabiwBackImg_rdo);
+            this.tabiwBack_grp.Location = new System.Drawing.Point(9, 13);
+            this.tabiwBack_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwBack_grp.Name = "tabiwBack_grp";
+            this.tabiwBack_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwBack_grp.Size = new System.Drawing.Size(101, 63);
+            this.tabiwBack_grp.TabIndex = 17;
+            this.tabiwBack_grp.TabStop = false;
+            this.tabiwBack_grp.Text = "背景顏色";
+            // 
+            // tabiwBack_pic
+            // 
+            this.tabiwBack_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabiwBack_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabiwBack_pic.Image = global::Thunder.Properties.Resources.Img;
+            this.tabiwBack_pic.InitialImage = null;
+            this.tabiwBack_pic.Location = new System.Drawing.Point(4, 18);
+            this.tabiwBack_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwBack_pic.Name = "tabiwBack_pic";
+            this.tabiwBack_pic.Size = new System.Drawing.Size(35, 32);
+            this.tabiwBack_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.tabiwBack_pic.TabIndex = 5;
+            this.tabiwBack_pic.TabStop = false;
+            this.tabiwBack_pic.Click += new System.EventHandler(this.windowPictureBox_Click);
+            // 
+            // tabiwBackColor_rdo
+            // 
+            this.tabiwBackColor_rdo.AutoSize = true;
+            this.tabiwBackColor_rdo.Checked = true;
+            this.tabiwBackColor_rdo.Location = new System.Drawing.Point(46, 13);
+            this.tabiwBackColor_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwBackColor_rdo.Name = "tabiwBackColor_rdo";
+            this.tabiwBackColor_rdo.Size = new System.Drawing.Size(47, 16);
+            this.tabiwBackColor_rdo.TabIndex = 2;
+            this.tabiwBackColor_rdo.TabStop = true;
+            this.tabiwBackColor_rdo.Tag = "";
+            this.tabiwBackColor_rdo.Text = "純色";
+            this.tabiwBackColor_rdo.UseVisualStyleBackColor = true;
+            this.tabiwBackColor_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
+            // 
+            // tabiwBackCustom_rdo
+            // 
+            this.tabiwBackCustom_rdo.AutoSize = true;
+            this.tabiwBackCustom_rdo.Location = new System.Drawing.Point(46, 42);
+            this.tabiwBackCustom_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwBackCustom_rdo.Name = "tabiwBackCustom_rdo";
+            this.tabiwBackCustom_rdo.Size = new System.Drawing.Size(59, 16);
+            this.tabiwBackCustom_rdo.TabIndex = 4;
+            this.tabiwBackCustom_rdo.TabStop = true;
+            this.tabiwBackCustom_rdo.Tag = "";
+            this.tabiwBackCustom_rdo.Text = "自製圖";
+            this.tabiwBackCustom_rdo.UseVisualStyleBackColor = true;
+            this.tabiwBackCustom_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
+            // 
+            // tabiwBackImg_rdo
+            // 
+            this.tabiwBackImg_rdo.AutoSize = true;
+            this.tabiwBackImg_rdo.Location = new System.Drawing.Point(46, 28);
+            this.tabiwBackImg_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwBackImg_rdo.Name = "tabiwBackImg_rdo";
+            this.tabiwBackImg_rdo.Size = new System.Drawing.Size(47, 16);
+            this.tabiwBackImg_rdo.TabIndex = 3;
+            this.tabiwBackImg_rdo.TabStop = true;
+            this.tabiwBackImg_rdo.Tag = "";
+            this.tabiwBackImg_rdo.Text = "截圖";
+            this.tabiwBackImg_rdo.UseVisualStyleBackColor = true;
+            this.tabiwBackImg_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
+            // 
+            // tabiwLineColor_lbl
+            // 
+            this.tabiwLineColor_lbl.AutoSize = true;
+            this.tabiwLineColor_lbl.Location = new System.Drawing.Point(159, 214);
+            this.tabiwLineColor_lbl.Name = "tabiwLineColor_lbl";
+            this.tabiwLineColor_lbl.Size = new System.Drawing.Size(41, 12);
+            this.tabiwLineColor_lbl.TabIndex = 13;
+            this.tabiwLineColor_lbl.Text = "線顏色";
+            // 
+            // tabiwLineColor_btn
+            // 
+            this.tabiwLineColor_btn.BackColor = System.Drawing.Color.White;
+            this.tabiwLineColor_btn.Location = new System.Drawing.Point(201, 212);
+            this.tabiwLineColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwLineColor_btn.Name = "tabiwLineColor_btn";
+            this.tabiwLineColor_btn.Size = new System.Drawing.Size(21, 19);
+            this.tabiwLineColor_btn.TabIndex = 12;
+            this.tabiwLineColor_btn.UseVisualStyleBackColor = false;
+            this.tabiwLineColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
+            // 
+            // tabiwLineCross_btn
+            // 
+            this.tabiwLineCross_btn.AutoSize = true;
+            this.tabiwLineCross_btn.Location = new System.Drawing.Point(161, 192);
+            this.tabiwLineCross_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwLineCross_btn.Name = "tabiwLineCross_btn";
+            this.tabiwLineCross_btn.Size = new System.Drawing.Size(48, 16);
+            this.tabiwLineCross_btn.TabIndex = 11;
+            this.tabiwLineCross_btn.Text = "十字";
+            this.tabiwLineCross_btn.UseVisualStyleBackColor = true;
+            // 
+            // tabiwLineOutside_btn
+            // 
+            this.tabiwLineOutside_btn.AutoSize = true;
+            this.tabiwLineOutside_btn.Location = new System.Drawing.Point(161, 173);
+            this.tabiwLineOutside_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwLineOutside_btn.Name = "tabiwLineOutside_btn";
+            this.tabiwLineOutside_btn.Size = new System.Drawing.Size(48, 16);
+            this.tabiwLineOutside_btn.TabIndex = 10;
+            this.tabiwLineOutside_btn.Text = "外框";
+            this.tabiwLineOutside_btn.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinLoc_grp
+            // 
+            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocPixcelY_nud);
+            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocTwo_rdo);
+            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocPixcelX_nud);
+            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocCenter_rdo);
+            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocPixcel_rdo);
+            this.tabiwWinLoc_grp.Location = new System.Drawing.Point(5, 165);
+            this.tabiwWinLoc_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinLoc_grp.Name = "tabiwWinLoc_grp";
+            this.tabiwWinLoc_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinLoc_grp.Size = new System.Drawing.Size(147, 78);
+            this.tabiwWinLoc_grp.TabIndex = 9;
+            this.tabiwWinLoc_grp.TabStop = false;
+            this.tabiwWinLoc_grp.Text = "視窗位置";
+            // 
+            // tabiwWinLocPixcelY_nud
+            // 
+            this.tabiwWinLocPixcelY_nud.Location = new System.Drawing.Point(93, 54);
+            this.tabiwWinLocPixcelY_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinLocPixcelY_nud.Name = "tabiwWinLocPixcelY_nud";
+            this.tabiwWinLocPixcelY_nud.Size = new System.Drawing.Size(51, 22);
+            this.tabiwWinLocPixcelY_nud.TabIndex = 7;
+            // 
+            // tabiwWinLocTwo_rdo
+            // 
+            this.tabiwWinLocTwo_rdo.AutoSize = true;
+            this.tabiwWinLocTwo_rdo.Location = new System.Drawing.Point(69, 13);
+            this.tabiwWinLocTwo_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinLocTwo_rdo.Name = "tabiwWinLocTwo_rdo";
+            this.tabiwWinLocTwo_rdo.Size = new System.Drawing.Size(47, 16);
+            this.tabiwWinLocTwo_rdo.TabIndex = 1;
+            this.tabiwWinLocTwo_rdo.Text = "兩組";
+            this.tabiwWinLocTwo_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinLocPixcelX_nud
+            // 
+            this.tabiwWinLocPixcelX_nud.Location = new System.Drawing.Point(93, 30);
+            this.tabiwWinLocPixcelX_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinLocPixcelX_nud.Name = "tabiwWinLocPixcelX_nud";
+            this.tabiwWinLocPixcelX_nud.Size = new System.Drawing.Size(51, 22);
+            this.tabiwWinLocPixcelX_nud.TabIndex = 6;
+            // 
+            // tabiwWinLocCenter_rdo
+            // 
+            this.tabiwWinLocCenter_rdo.AutoSize = true;
+            this.tabiwWinLocCenter_rdo.Checked = true;
+            this.tabiwWinLocCenter_rdo.Location = new System.Drawing.Point(9, 13);
+            this.tabiwWinLocCenter_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinLocCenter_rdo.Name = "tabiwWinLocCenter_rdo";
+            this.tabiwWinLocCenter_rdo.Size = new System.Drawing.Size(47, 16);
+            this.tabiwWinLocCenter_rdo.TabIndex = 0;
+            this.tabiwWinLocCenter_rdo.TabStop = true;
+            this.tabiwWinLocCenter_rdo.Text = "置中";
+            this.tabiwWinLocCenter_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinLocPixcel_rdo
+            // 
+            this.tabiwWinLocPixcel_rdo.AutoSize = true;
+            this.tabiwWinLocPixcel_rdo.Location = new System.Drawing.Point(9, 30);
+            this.tabiwWinLocPixcel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinLocPixcel_rdo.Name = "tabiwWinLocPixcel_rdo";
+            this.tabiwWinLocPixcel_rdo.Size = new System.Drawing.Size(88, 40);
+            this.tabiwWinLocPixcel_rdo.TabIndex = 5;
+            this.tabiwWinLocPixcel_rdo.Text = "                  X:\r\n指定Pixel  \r\n                  Y:";
+            this.tabiwWinLocPixcel_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinSize_grp
+            // 
+            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePixelH_nud);
+            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePixelW_nud);
+            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePixel_rdo);
+            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePercent_nud);
+            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePercent_rdo);
+            this.tabiwWinSize_grp.Location = new System.Drawing.Point(5, 83);
+            this.tabiwWinSize_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinSize_grp.Name = "tabiwWinSize_grp";
+            this.tabiwWinSize_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinSize_grp.Size = new System.Drawing.Size(156, 86);
+            this.tabiwWinSize_grp.TabIndex = 8;
+            this.tabiwWinSize_grp.TabStop = false;
+            this.tabiwWinSize_grp.Text = "視窗大小";
+            // 
+            // tabiwWinSizePixelH_nud
+            // 
+            this.tabiwWinSizePixelH_nud.Location = new System.Drawing.Point(96, 60);
+            this.tabiwWinSizePixelH_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinSizePixelH_nud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.tabiwWinSizePixelH_nud.Name = "tabiwWinSizePixelH_nud";
+            this.tabiwWinSizePixelH_nud.Size = new System.Drawing.Size(51, 22);
+            this.tabiwWinSizePixelH_nud.TabIndex = 4;
+            this.tabiwWinSizePixelH_nud.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // tabiwWinSizePixelW_nud
+            // 
+            this.tabiwWinSizePixelW_nud.Location = new System.Drawing.Point(96, 37);
+            this.tabiwWinSizePixelW_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinSizePixelW_nud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.tabiwWinSizePixelW_nud.Name = "tabiwWinSizePixelW_nud";
+            this.tabiwWinSizePixelW_nud.Size = new System.Drawing.Size(52, 22);
+            this.tabiwWinSizePixelW_nud.TabIndex = 3;
+            this.tabiwWinSizePixelW_nud.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // tabiwWinSizePixel_rdo
+            // 
+            this.tabiwWinSizePixel_rdo.AutoSize = true;
+            this.tabiwWinSizePixel_rdo.Location = new System.Drawing.Point(9, 38);
+            this.tabiwWinSizePixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinSizePixel_rdo.Name = "tabiwWinSizePixel_rdo";
+            this.tabiwWinSizePixel_rdo.Size = new System.Drawing.Size(89, 40);
+            this.tabiwWinSizePixel_rdo.TabIndex = 2;
+            this.tabiwWinSizePixel_rdo.Text = "                 寬:\r\n指定Pixel  \r\n                 高:";
+            this.tabiwWinSizePixel_rdo.UseVisualStyleBackColor = true;
+            // 
+            // tabiwWinSizePercent_nud
+            // 
+            this.tabiwWinSizePercent_nud.Location = new System.Drawing.Point(94, 13);
+            this.tabiwWinSizePercent_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinSizePercent_nud.Name = "tabiwWinSizePercent_nud";
+            this.tabiwWinSizePercent_nud.Size = new System.Drawing.Size(31, 22);
+            this.tabiwWinSizePercent_nud.TabIndex = 1;
+            this.tabiwWinSizePercent_nud.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            // 
+            // tabiwWinSizePercent_rdo
+            // 
+            this.tabiwWinSizePercent_rdo.AutoSize = true;
+            this.tabiwWinSizePercent_rdo.Checked = true;
+            this.tabiwWinSizePercent_rdo.Location = new System.Drawing.Point(9, 13);
+            this.tabiwWinSizePercent_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiwWinSizePercent_rdo.Name = "tabiwWinSizePercent_rdo";
+            this.tabiwWinSizePercent_rdo.Size = new System.Drawing.Size(76, 16);
+            this.tabiwWinSizePercent_rdo.TabIndex = 0;
+            this.tabiwWinSizePercent_rdo.TabStop = true;
+            this.tabiwWinSizePercent_rdo.Text = "百分比(%)";
+            this.tabiwWinSizePercent_rdo.UseVisualStyleBackColor = true;
             // 
             // tabimgeGradient
             // 
@@ -446,7 +1496,7 @@ namespace Thunder
             this.tabimgeGradient.Controls.Add(this.tabigOther_grp);
             this.tabimgeGradient.Controls.Add(this.tabigStep_lbl);
             this.tabimgeGradient.Controls.Add(this.tabigStep_cmb);
-            this.tabimgeGradient.Controls.Add(this.panel1);
+            this.tabimgeGradient.Controls.Add(this.tabigBaseColor_pnl);
             this.tabimgeGradient.Controls.Add(this.tabigVWay_rdo);
             this.tabimgeGradient.Controls.Add(this.tabigDivid_cmb);
             this.tabimgeGradient.Controls.Add(this.tabigColorBar_rdo);
@@ -454,11 +1504,11 @@ namespace Thunder
             this.tabimgeGradient.Controls.Add(this.tabigHWay_rdo);
             this.tabimgeGradient.Controls.Add(this.tabigFirstLevel_cmb);
             this.tabimgeGradient.Controls.Add(this.tabigLastLevel_cmb);
-            this.tabimgeGradient.Location = new System.Drawing.Point(276, 282);
+            this.tabimgeGradient.Location = new System.Drawing.Point(6, 313);
             this.tabimgeGradient.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeGradient.Name = "tabimgeGradient";
             this.tabimgeGradient.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeGradient.Size = new System.Drawing.Size(207, 140);
+            this.tabimgeGradient.Size = new System.Drawing.Size(144, 127);
             this.tabimgeGradient.TabIndex = 10;
             this.tabimgeGradient.TabStop = false;
             this.tabimgeGradient.Text = "Gradient";
@@ -477,6 +1527,7 @@ namespace Thunder
             // 
             // tabigOther_grp
             // 
+            this.tabigOther_grp.Controls.Add(this.tabigEightColor_btn);
             this.tabigOther_grp.Controls.Add(this.tabigOtherSplitLoc_lbl);
             this.tabigOther_grp.Controls.Add(this.tabigOtherVSplit_rdo);
             this.tabigOther_grp.Controls.Add(this.tabigOtherSplit_pnl);
@@ -500,6 +1551,17 @@ namespace Thunder
             this.tabigOther_grp.Size = new System.Drawing.Size(397, 199);
             this.tabigOther_grp.TabIndex = 23;
             this.tabigOther_grp.TabStop = false;
+            // 
+            // tabigEightColor_btn
+            // 
+            this.tabigEightColor_btn.Location = new System.Drawing.Point(299, 121);
+            this.tabigEightColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabigEightColor_btn.Name = "tabigEightColor_btn";
+            this.tabigEightColor_btn.Size = new System.Drawing.Size(61, 21);
+            this.tabigEightColor_btn.TabIndex = 24;
+            this.tabigEightColor_btn.Text = "常規八色";
+            this.tabigEightColor_btn.UseVisualStyleBackColor = true;
+            this.tabigEightColor_btn.Click += new System.EventHandler(this.ColorBar_btn_Click);
             // 
             // tabigOtherSplitLoc_lbl
             // 
@@ -545,7 +1607,7 @@ namespace Thunder
             // 
             // tabigFourColor_btn
             // 
-            this.tabigFourColor_btn.Location = new System.Drawing.Point(253, 123);
+            this.tabigFourColor_btn.Location = new System.Drawing.Point(232, 120);
             this.tabigFourColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabigFourColor_btn.Name = "tabigFourColor_btn";
             this.tabigFourColor_btn.Size = new System.Drawing.Size(61, 21);
@@ -724,18 +1786,18 @@ namespace Thunder
             this.tabigStep_cmb.TabIndex = 21;
             this.tabigStep_cmb.Text = "256";
             // 
-            // panel1
+            // tabigBaseColor_pnl
             // 
-            this.panel1.Controls.Add(this.tabigBaseColorCustom_btn);
-            this.panel1.Controls.Add(this.tabigBaseColor_lbl);
-            this.panel1.Controls.Add(this.tabigBaseColorB_btn);
-            this.panel1.Controls.Add(this.tabigBaseColorW_btn);
-            this.panel1.Controls.Add(this.tabigBaseColorG_btn);
-            this.panel1.Controls.Add(this.tabigBaseColorR_btn);
-            this.panel1.Location = new System.Drawing.Point(7, 86);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(285, 45);
-            this.panel1.TabIndex = 22;
+            this.tabigBaseColor_pnl.Controls.Add(this.tabigBaseColorCustom_btn);
+            this.tabigBaseColor_pnl.Controls.Add(this.tabigBaseColor_lbl);
+            this.tabigBaseColor_pnl.Controls.Add(this.tabigBaseColorB_btn);
+            this.tabigBaseColor_pnl.Controls.Add(this.tabigBaseColorW_btn);
+            this.tabigBaseColor_pnl.Controls.Add(this.tabigBaseColorG_btn);
+            this.tabigBaseColor_pnl.Controls.Add(this.tabigBaseColorR_btn);
+            this.tabigBaseColor_pnl.Location = new System.Drawing.Point(7, 86);
+            this.tabigBaseColor_pnl.Name = "tabigBaseColor_pnl";
+            this.tabigBaseColor_pnl.Size = new System.Drawing.Size(285, 45);
+            this.tabigBaseColor_pnl.TabIndex = 22;
             // 
             // tabigBaseColorCustom_btn
             // 
@@ -912,1005 +1974,6 @@ namespace Thunder
             this.tabigLastLevel_cmb.TabIndex = 9;
             this.tabigLastLevel_cmb.Text = "255";
             // 
-            // tabimgeWindow
-            // 
-            this.tabimgeWindow.Controls.Add(this.tabiwCustom_grp);
-            this.tabimgeWindow.Controls.Add(this.tabiwWin_grp);
-            this.tabimgeWindow.Controls.Add(this.tabiwBack_grp);
-            this.tabimgeWindow.Controls.Add(this.tabiwLineColor_lbl);
-            this.tabimgeWindow.Controls.Add(this.tabiwLineColor_btn);
-            this.tabimgeWindow.Controls.Add(this.tabiwLineCross_btn);
-            this.tabimgeWindow.Controls.Add(this.tabiwLineOutside_btn);
-            this.tabimgeWindow.Controls.Add(this.tabiwWinLoc_grp);
-            this.tabimgeWindow.Controls.Add(this.tabiwWinSize_grp);
-            this.tabimgeWindow.Location = new System.Drawing.Point(539, 250);
-            this.tabimgeWindow.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeWindow.Name = "tabimgeWindow";
-            this.tabimgeWindow.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeWindow.Size = new System.Drawing.Size(222, 90);
-            this.tabimgeWindow.TabIndex = 0;
-            this.tabimgeWindow.TabStop = false;
-            this.tabimgeWindow.Text = "Window";
-            // 
-            // tabiwCustom_grp
-            // 
-            this.tabiwCustom_grp.Controls.Add(this.tabiwCustomGrad_grp);
-            this.tabiwCustom_grp.Controls.Add(this.tabiwCustom_cmb);
-            this.tabiwCustom_grp.Controls.Add(this.tabiwCustomMask_grp);
-            this.tabiwCustom_grp.Location = new System.Drawing.Point(219, 11);
-            this.tabiwCustom_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCustom_grp.Name = "tabiwCustom_grp";
-            this.tabiwCustom_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCustom_grp.Size = new System.Drawing.Size(424, 315);
-            this.tabiwCustom_grp.TabIndex = 19;
-            this.tabiwCustom_grp.TabStop = false;
-            this.tabiwCustom_grp.Text = "自製圖";
-            // 
-            // tabiwCustomGrad_grp
-            // 
-            this.tabiwCustomGrad_grp.Controls.Add(this.label4);
-            this.tabiwCustomGrad_grp.Controls.Add(this.groupBox1);
-            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGrad0);
-            this.tabiwCustomGrad_grp.Controls.Add(this.comboBox1);
-            this.tabiwCustomGrad_grp.Controls.Add(this.panel3);
-            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradVWay_rdo);
-            this.tabiwCustomGrad_grp.Controls.Add(this.comboBox2);
-            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGrad);
-            this.tabiwCustomGrad_grp.Controls.Add(this.tabiwCGradHWay_rdo);
-            this.tabiwCustomGrad_grp.Controls.Add(this.comboBox3);
-            this.tabiwCustomGrad_grp.Controls.Add(this.comboBox4);
-            this.tabiwCustomGrad_grp.Location = new System.Drawing.Point(9, 28);
-            this.tabiwCustomGrad_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCustomGrad_grp.Name = "tabiwCustomGrad_grp";
-            this.tabiwCustomGrad_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCustomGrad_grp.Size = new System.Drawing.Size(405, 310);
-            this.tabiwCustomGrad_grp.TabIndex = 20;
-            this.tabiwCustomGrad_grp.TabStop = false;
-            this.tabiwCustomGrad_grp.Text = "Gradient";
-            this.tabiwCustomGrad_grp.Visible = false;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(188, 35);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(51, 36);
-            this.label4.TabIndex = 37;
-            this.label4.Text = "FirstLevel\r\n\r\nLastLevel";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.radioButton1);
-            this.groupBox1.Controls.Add(this.tabiwCGradOtherSplit_pnl);
-            this.groupBox1.Controls.Add(this.radioButton2);
-            this.groupBox1.Controls.Add(this.button1);
-            this.groupBox1.Controls.Add(this.numericUpDown1);
-            this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.button2);
-            this.groupBox1.Controls.Add(this.button3);
-            this.groupBox1.Controls.Add(this.button4);
-            this.groupBox1.Controls.Add(this.button5);
-            this.groupBox1.Controls.Add(this.button6);
-            this.groupBox1.Controls.Add(this.button7);
-            this.groupBox1.Controls.Add(this.button8);
-            this.groupBox1.Controls.Add(this.button9);
-            this.groupBox1.Controls.Add(this.button10);
-            this.groupBox1.Location = new System.Drawing.Point(10, 110);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(368, 189);
-            this.groupBox1.TabIndex = 36;
-            this.groupBox1.TabStop = false;
-            // 
-            // radioButton1
-            // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Checked = true;
-            this.radioButton1.Location = new System.Drawing.Point(7, 18);
-            this.radioButton1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(55, 16);
-            this.radioButton1.TabIndex = 0;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "V分割";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            // 
-            // tabiwCGradOtherSplit_pnl
-            // 
-            this.tabiwCGradOtherSplit_pnl.Location = new System.Drawing.Point(8, 40);
-            this.tabiwCGradOtherSplit_pnl.Name = "tabiwCGradOtherSplit_pnl";
-            this.tabiwCGradOtherSplit_pnl.Size = new System.Drawing.Size(200, 140);
-            this.tabiwCGradOtherSplit_pnl.TabIndex = 22;
-            // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(91, 17);
-            this.radioButton2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(55, 16);
-            this.radioButton2.TabIndex = 1;
-            this.radioButton2.Text = "H分割";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(253, 123);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(61, 21);
-            this.button1.TabIndex = 16;
-            this.button1.Text = "常規四色";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Location = new System.Drawing.Point(259, 15);
-            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(103, 22);
-            this.numericUpDown1.TabIndex = 2;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(255, 98);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 12);
-            this.label2.TabIndex = 21;
-            this.label2.Text = "選取顏色";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(208, 19);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(46, 12);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "Bar格數";
-            // 
-            // button2
-            // 
-            this.button2.BackgroundImage = global::Thunder.Properties.Resources.custom;
-            this.button2.Location = new System.Drawing.Point(309, 92);
-            this.button2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(24, 24);
-            this.button2.TabIndex = 18;
-            this.button2.UseVisualStyleBackColor = false;
-            // 
-            // button3
-            // 
-            this.button3.BackColor = System.Drawing.Color.White;
-            this.button3.Location = new System.Drawing.Point(253, 43);
-            this.button3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(24, 24);
-            this.button3.TabIndex = 12;
-            this.button3.Text = "W";
-            this.button3.UseVisualStyleBackColor = false;
-            // 
-            // button4
-            // 
-            this.button4.BackColor = System.Drawing.Color.Magenta;
-            this.button4.ForeColor = System.Drawing.Color.Black;
-            this.button4.Location = new System.Drawing.Point(335, 68);
-            this.button4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(24, 24);
-            this.button4.TabIndex = 20;
-            this.button4.Text = "M";
-            this.button4.UseVisualStyleBackColor = false;
-            // 
-            // button5
-            // 
-            this.button5.BackColor = System.Drawing.Color.Red;
-            this.button5.ForeColor = System.Drawing.Color.White;
-            this.button5.Location = new System.Drawing.Point(280, 43);
-            this.button5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(24, 24);
-            this.button5.TabIndex = 13;
-            this.button5.Text = "R";
-            this.button5.UseVisualStyleBackColor = false;
-            // 
-            // button6
-            // 
-            this.button6.BackColor = System.Drawing.Color.Aqua;
-            this.button6.ForeColor = System.Drawing.Color.Black;
-            this.button6.Location = new System.Drawing.Point(309, 68);
-            this.button6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(24, 24);
-            this.button6.TabIndex = 19;
-            this.button6.Text = "A";
-            this.button6.UseVisualStyleBackColor = false;
-            // 
-            // button7
-            // 
-            this.button7.BackColor = System.Drawing.Color.Lime;
-            this.button7.ForeColor = System.Drawing.Color.White;
-            this.button7.Location = new System.Drawing.Point(309, 44);
-            this.button7.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(24, 24);
-            this.button7.TabIndex = 14;
-            this.button7.Text = "G";
-            this.button7.UseVisualStyleBackColor = false;
-            // 
-            // button8
-            // 
-            this.button8.BackColor = System.Drawing.Color.Yellow;
-            this.button8.ForeColor = System.Drawing.Color.Black;
-            this.button8.Location = new System.Drawing.Point(280, 67);
-            this.button8.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(24, 24);
-            this.button8.TabIndex = 18;
-            this.button8.Text = "Y";
-            this.button8.UseVisualStyleBackColor = false;
-            // 
-            // button9
-            // 
-            this.button9.BackColor = System.Drawing.Color.Blue;
-            this.button9.ForeColor = System.Drawing.Color.White;
-            this.button9.Location = new System.Drawing.Point(335, 44);
-            this.button9.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(24, 24);
-            this.button9.TabIndex = 15;
-            this.button9.Text = "B";
-            this.button9.UseVisualStyleBackColor = false;
-            // 
-            // button10
-            // 
-            this.button10.BackColor = System.Drawing.Color.Black;
-            this.button10.ForeColor = System.Drawing.Color.White;
-            this.button10.Location = new System.Drawing.Point(253, 67);
-            this.button10.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(24, 24);
-            this.button10.TabIndex = 17;
-            this.button10.Text = "D";
-            this.button10.UseVisualStyleBackColor = false;
-            // 
-            // tabiwCGrad0
-            // 
-            this.tabiwCGrad0.AutoSize = true;
-            this.tabiwCGrad0.Location = new System.Drawing.Point(22, 35);
-            this.tabiwCGrad0.Name = "tabiwCGrad0";
-            this.tabiwCGrad0.Size = new System.Drawing.Size(149, 12);
-            this.tabiwCGrad0.TabIndex = 33;
-            this.tabiwCGrad0.Text = "漸層分幾階        畫面幾等分";
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "16",
-            "32",
-            "64",
-            "128",
-            "256"});
-            this.comboBox1.Location = new System.Drawing.Point(25, 53);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(49, 20);
-            this.comboBox1.TabIndex = 34;
-            this.comboBox1.Text = "256";
-            // 
-            // panel3
-            // 
-            this.panel3.Controls.Add(this.button11);
-            this.panel3.Controls.Add(this.label5);
-            this.panel3.Controls.Add(this.button12);
-            this.panel3.Controls.Add(this.button13);
-            this.panel3.Controls.Add(this.button14);
-            this.panel3.Controls.Add(this.button15);
-            this.panel3.Location = new System.Drawing.Point(21, 75);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(285, 45);
-            this.panel3.TabIndex = 35;
-            // 
-            // button11
-            // 
-            this.button11.BackgroundImage = global::Thunder.Properties.Resources.custom;
-            this.button11.Location = new System.Drawing.Point(234, 14);
-            this.button11.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button11.Name = "button11";
-            this.button11.Size = new System.Drawing.Size(24, 24);
-            this.button11.TabIndex = 15;
-            this.button11.UseVisualStyleBackColor = false;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label5.Font = new System.Drawing.Font("Microsoft JhengHei UI", 16F);
-            this.label5.Location = new System.Drawing.Point(14, 7);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(102, 30);
-            this.label5.TabIndex = 10;
-            this.label5.Text = "基底色彩";
-            // 
-            // button12
-            // 
-            this.button12.BackColor = System.Drawing.Color.Blue;
-            this.button12.ForeColor = System.Drawing.Color.White;
-            this.button12.Location = new System.Drawing.Point(208, 14);
-            this.button12.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button12.Name = "button12";
-            this.button12.Size = new System.Drawing.Size(24, 24);
-            this.button12.TabIndex = 14;
-            this.button12.Text = "B";
-            this.button12.UseVisualStyleBackColor = false;
-            // 
-            // button13
-            // 
-            this.button13.BackColor = System.Drawing.Color.White;
-            this.button13.Location = new System.Drawing.Point(131, 14);
-            this.button13.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button13.Name = "button13";
-            this.button13.Size = new System.Drawing.Size(24, 24);
-            this.button13.TabIndex = 11;
-            this.button13.Text = "W";
-            this.button13.UseVisualStyleBackColor = false;
-            // 
-            // button14
-            // 
-            this.button14.BackColor = System.Drawing.Color.Lime;
-            this.button14.ForeColor = System.Drawing.Color.White;
-            this.button14.Location = new System.Drawing.Point(182, 14);
-            this.button14.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button14.Name = "button14";
-            this.button14.Size = new System.Drawing.Size(24, 24);
-            this.button14.TabIndex = 13;
-            this.button14.Text = "G";
-            this.button14.UseVisualStyleBackColor = false;
-            // 
-            // button15
-            // 
-            this.button15.BackColor = System.Drawing.Color.Red;
-            this.button15.ForeColor = System.Drawing.Color.White;
-            this.button15.Location = new System.Drawing.Point(157, 14);
-            this.button15.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.button15.Name = "button15";
-            this.button15.Size = new System.Drawing.Size(24, 24);
-            this.button15.TabIndex = 12;
-            this.button15.Text = "R";
-            this.button15.UseVisualStyleBackColor = false;
-            // 
-            // tabiwCGradVWay_rdo
-            // 
-            this.tabiwCGradVWay_rdo.AutoSize = true;
-            this.tabiwCGradVWay_rdo.Checked = true;
-            this.tabiwCGradVWay_rdo.Location = new System.Drawing.Point(13, 12);
-            this.tabiwCGradVWay_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCGradVWay_rdo.Name = "tabiwCGradVWay_rdo";
-            this.tabiwCGradVWay_rdo.Size = new System.Drawing.Size(86, 16);
-            this.tabiwCGradVWay_rdo.TabIndex = 24;
-            this.tabiwCGradVWay_rdo.TabStop = true;
-            this.tabiwCGradVWay_rdo.Text = "Vertical 漸層";
-            this.tabiwCGradVWay_rdo.UseVisualStyleBackColor = true;
-            // 
-            // comboBox2
-            // 
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "4"});
-            this.comboBox2.Location = new System.Drawing.Point(89, 54);
-            this.comboBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(39, 20);
-            this.comboBox2.TabIndex = 27;
-            this.comboBox2.Text = "1";
-            // 
-            // tabiwCGrad
-            // 
-            this.tabiwCGrad.AutoSize = true;
-            this.tabiwCGrad.Location = new System.Drawing.Point(196, 13);
-            this.tabiwCGrad.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCGrad.Name = "tabiwCGrad";
-            this.tabiwCGrad.Size = new System.Drawing.Size(91, 16);
-            this.tabiwCGrad.TabIndex = 32;
-            this.tabiwCGrad.TabStop = true;
-            this.tabiwCGrad.Text = "ColorBar模式";
-            this.tabiwCGrad.UseVisualStyleBackColor = true;
-            // 
-            // tabiwCGradHWay_rdo
-            // 
-            this.tabiwCGradHWay_rdo.AutoSize = true;
-            this.tabiwCGradHWay_rdo.Location = new System.Drawing.Point(86, 15);
-            this.tabiwCGradHWay_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCGradHWay_rdo.Name = "tabiwCGradHWay_rdo";
-            this.tabiwCGradHWay_rdo.Size = new System.Drawing.Size(99, 16);
-            this.tabiwCGradHWay_rdo.TabIndex = 25;
-            this.tabiwCGradHWay_rdo.TabStop = true;
-            this.tabiwCGradHWay_rdo.Text = "Horizontal 漸層";
-            this.tabiwCGradHWay_rdo.UseVisualStyleBackColor = true;
-            // 
-            // comboBox3
-            // 
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Items.AddRange(new object[] {
-            "0",
-            "31",
-            "63",
-            "95",
-            "127",
-            "159",
-            "191",
-            "223",
-            "255"});
-            this.comboBox3.Location = new System.Drawing.Point(244, 32);
-            this.comboBox3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(104, 20);
-            this.comboBox3.TabIndex = 30;
-            this.comboBox3.Text = "0";
-            // 
-            // comboBox4
-            // 
-            this.comboBox4.FormattingEnabled = true;
-            this.comboBox4.Items.AddRange(new object[] {
-            "0",
-            "31",
-            "63",
-            "95",
-            "127",
-            "159",
-            "191",
-            "223",
-            "255"});
-            this.comboBox4.Location = new System.Drawing.Point(245, 52);
-            this.comboBox4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.comboBox4.Name = "comboBox4";
-            this.comboBox4.Size = new System.Drawing.Size(104, 20);
-            this.comboBox4.TabIndex = 31;
-            this.comboBox4.Text = "255";
-            // 
-            // tabiwCustom_cmb
-            // 
-            this.tabiwCustom_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tabiwCustom_cmb.FormattingEnabled = true;
-            this.tabiwCustom_cmb.Items.AddRange(new object[] {
-            "Mask",
-            "Gradient"});
-            this.tabiwCustom_cmb.Location = new System.Drawing.Point(172, 8);
-            this.tabiwCustom_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCustom_cmb.Name = "tabiwCustom_cmb";
-            this.tabiwCustom_cmb.Size = new System.Drawing.Size(104, 20);
-            this.tabiwCustom_cmb.TabIndex = 0;
-            this.tabiwCustom_cmb.SelectedIndexChanged += new System.EventHandler(this.tabiwCustom_cmb_SelectedIndexChanged);
-            // 
-            // tabiwCustomMask_grp
-            // 
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelGray_lbl);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskSubPixel_rdo);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixel_rdo);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelGray_vsc);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelColor_lbl);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelLoc_lbl);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelColor_btn);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelClear_btn);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskPixelPanel_pnl);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskHNum_nud);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskWNum_nud);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskHNum_lbl);
-            this.tabiwCustomMask_grp.Controls.Add(this.tabiwCMaskWNum_lbl);
-            this.tabiwCustomMask_grp.Location = new System.Drawing.Point(11, 31);
-            this.tabiwCustomMask_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCustomMask_grp.Name = "tabiwCustomMask_grp";
-            this.tabiwCustomMask_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCustomMask_grp.Size = new System.Drawing.Size(257, 264);
-            this.tabiwCustomMask_grp.TabIndex = 2;
-            this.tabiwCustomMask_grp.TabStop = false;
-            this.tabiwCustomMask_grp.Text = "Mask";
-            this.tabiwCustomMask_grp.Visible = false;
-            // 
-            // tabiwCMaskPixelGray_lbl
-            // 
-            this.tabiwCMaskPixelGray_lbl.AutoSize = true;
-            this.tabiwCMaskPixelGray_lbl.Location = new System.Drawing.Point(226, 32);
-            this.tabiwCMaskPixelGray_lbl.Name = "tabiwCMaskPixelGray_lbl";
-            this.tabiwCMaskPixelGray_lbl.Size = new System.Drawing.Size(52, 12);
-            this.tabiwCMaskPixelGray_lbl.TabIndex = 27;
-            this.tabiwCMaskPixelGray_lbl.Text = "Gray: 255";
-            this.tabiwCMaskPixelGray_lbl.Visible = false;
-            // 
-            // tabiwCMaskSubPixel_rdo
-            // 
-            this.tabiwCMaskSubPixel_rdo.AutoSize = true;
-            this.tabiwCMaskSubPixel_rdo.Location = new System.Drawing.Point(85, 12);
-            this.tabiwCMaskSubPixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCMaskSubPixel_rdo.Name = "tabiwCMaskSubPixel_rdo";
-            this.tabiwCMaskSubPixel_rdo.Size = new System.Drawing.Size(92, 16);
-            this.tabiwCMaskSubPixel_rdo.TabIndex = 26;
-            this.tabiwCMaskSubPixel_rdo.Text = "Sub Pixel Base";
-            this.tabiwCMaskSubPixel_rdo.UseVisualStyleBackColor = true;
-            this.tabiwCMaskSubPixel_rdo.CheckedChanged += new System.EventHandler(this.Pixel_rdo_CheckedChanged);
-            // 
-            // tabiwCMaskPixel_rdo
-            // 
-            this.tabiwCMaskPixel_rdo.AutoSize = true;
-            this.tabiwCMaskPixel_rdo.Checked = true;
-            this.tabiwCMaskPixel_rdo.Location = new System.Drawing.Point(11, 13);
-            this.tabiwCMaskPixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCMaskPixel_rdo.Name = "tabiwCMaskPixel_rdo";
-            this.tabiwCMaskPixel_rdo.Size = new System.Drawing.Size(71, 16);
-            this.tabiwCMaskPixel_rdo.TabIndex = 25;
-            this.tabiwCMaskPixel_rdo.TabStop = true;
-            this.tabiwCMaskPixel_rdo.Text = "Pixel Base";
-            this.tabiwCMaskPixel_rdo.UseVisualStyleBackColor = true;
-            this.tabiwCMaskPixel_rdo.CheckedChanged += new System.EventHandler(this.Pixel_rdo_CheckedChanged);
-            // 
-            // tabiwCMaskPixelGray_vsc
-            // 
-            this.tabiwCMaskPixelGray_vsc.LargeChange = 1;
-            this.tabiwCMaskPixelGray_vsc.Location = new System.Drawing.Point(226, 51);
-            this.tabiwCMaskPixelGray_vsc.Maximum = 255;
-            this.tabiwCMaskPixelGray_vsc.Name = "tabiwCMaskPixelGray_vsc";
-            this.tabiwCMaskPixelGray_vsc.Size = new System.Drawing.Size(20, 192);
-            this.tabiwCMaskPixelGray_vsc.TabIndex = 24;
-            this.tabiwCMaskPixelGray_vsc.ValueChanged += new System.EventHandler(this.PixelGray_vsc_ValueChanged);
-            // 
-            // tabiwCMaskPixelColor_lbl
-            // 
-            this.tabiwCMaskPixelColor_lbl.AutoSize = true;
-            this.tabiwCMaskPixelColor_lbl.Location = new System.Drawing.Point(73, 247);
-            this.tabiwCMaskPixelColor_lbl.Name = "tabiwCMaskPixelColor_lbl";
-            this.tabiwCMaskPixelColor_lbl.Size = new System.Drawing.Size(53, 12);
-            this.tabiwCMaskPixelColor_lbl.TabIndex = 23;
-            this.tabiwCMaskPixelColor_lbl.Text = "選擇顏色";
-            // 
-            // tabiwCMaskPixelLoc_lbl
-            // 
-            this.tabiwCMaskPixelLoc_lbl.AutoSize = true;
-            this.tabiwCMaskPixelLoc_lbl.Location = new System.Drawing.Point(13, 246);
-            this.tabiwCMaskPixelLoc_lbl.Name = "tabiwCMaskPixelLoc_lbl";
-            this.tabiwCMaskPixelLoc_lbl.Size = new System.Drawing.Size(24, 12);
-            this.tabiwCMaskPixelLoc_lbl.TabIndex = 22;
-            this.tabiwCMaskPixelLoc_lbl.Text = "--,--";
-            // 
-            // tabiwCMaskPixelColor_btn
-            // 
-            this.tabiwCMaskPixelColor_btn.Location = new System.Drawing.Point(125, 243);
-            this.tabiwCMaskPixelColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCMaskPixelColor_btn.Name = "tabiwCMaskPixelColor_btn";
-            this.tabiwCMaskPixelColor_btn.Size = new System.Drawing.Size(21, 19);
-            this.tabiwCMaskPixelColor_btn.TabIndex = 21;
-            this.tabiwCMaskPixelColor_btn.UseVisualStyleBackColor = true;
-            this.tabiwCMaskPixelColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
-            // 
-            // tabiwCMaskPixelClear_btn
-            // 
-            this.tabiwCMaskPixelClear_btn.Location = new System.Drawing.Point(175, 243);
-            this.tabiwCMaskPixelClear_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCMaskPixelClear_btn.Name = "tabiwCMaskPixelClear_btn";
-            this.tabiwCMaskPixelClear_btn.Size = new System.Drawing.Size(42, 18);
-            this.tabiwCMaskPixelClear_btn.TabIndex = 20;
-            this.tabiwCMaskPixelClear_btn.Text = "Clear";
-            this.tabiwCMaskPixelClear_btn.UseVisualStyleBackColor = true;
-            this.tabiwCMaskPixelClear_btn.Click += new System.EventHandler(this.MaskPanelCreat);
-            // 
-            // tabiwCMaskPixelPanel_pnl
-            // 
-            this.tabiwCMaskPixelPanel_pnl.BackgroundImage = global::Thunder.Properties.Resources.transparent;
-            this.tabiwCMaskPixelPanel_pnl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabiwCMaskPixelPanel_pnl.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.tabiwCMaskPixelPanel_pnl.Location = new System.Drawing.Point(11, 51);
-            this.tabiwCMaskPixelPanel_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCMaskPixelPanel_pnl.Name = "tabiwCMaskPixelPanel_pnl";
-            this.tabiwCMaskPixelPanel_pnl.Size = new System.Drawing.Size(206, 192);
-            this.tabiwCMaskPixelPanel_pnl.TabIndex = 19;
-            // 
-            // tabiwCMaskHNum_nud
-            // 
-            this.tabiwCMaskHNum_nud.Location = new System.Drawing.Point(144, 32);
-            this.tabiwCMaskHNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCMaskHNum_nud.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.tabiwCMaskHNum_nud.Name = "tabiwCMaskHNum_nud";
-            this.tabiwCMaskHNum_nud.Size = new System.Drawing.Size(33, 22);
-            this.tabiwCMaskHNum_nud.TabIndex = 18;
-            this.tabiwCMaskHNum_nud.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.tabiwCMaskHNum_nud.ValueChanged += new System.EventHandler(this.MaskPanelCreat);
-            // 
-            // tabiwCMaskWNum_nud
-            // 
-            this.tabiwCMaskWNum_nud.Location = new System.Drawing.Point(52, 32);
-            this.tabiwCMaskWNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwCMaskWNum_nud.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.tabiwCMaskWNum_nud.Name = "tabiwCMaskWNum_nud";
-            this.tabiwCMaskWNum_nud.Size = new System.Drawing.Size(34, 22);
-            this.tabiwCMaskWNum_nud.TabIndex = 17;
-            this.tabiwCMaskWNum_nud.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.tabiwCMaskWNum_nud.ValueChanged += new System.EventHandler(this.MaskPanelCreat);
-            // 
-            // tabiwCMaskHNum_lbl
-            // 
-            this.tabiwCMaskHNum_lbl.AutoSize = true;
-            this.tabiwCMaskHNum_lbl.Location = new System.Drawing.Point(104, 34);
-            this.tabiwCMaskHNum_lbl.Name = "tabiwCMaskHNum_lbl";
-            this.tabiwCMaskHNum_lbl.Size = new System.Drawing.Size(36, 12);
-            this.tabiwCMaskHNum_lbl.TabIndex = 16;
-            this.tabiwCMaskHNum_lbl.Text = "Height";
-            // 
-            // tabiwCMaskWNum_lbl
-            // 
-            this.tabiwCMaskWNum_lbl.AutoSize = true;
-            this.tabiwCMaskWNum_lbl.Location = new System.Drawing.Point(13, 34);
-            this.tabiwCMaskWNum_lbl.Name = "tabiwCMaskWNum_lbl";
-            this.tabiwCMaskWNum_lbl.Size = new System.Drawing.Size(34, 12);
-            this.tabiwCMaskWNum_lbl.TabIndex = 15;
-            this.tabiwCMaskWNum_lbl.Text = "Width";
-            // 
-            // tabiwWin_grp
-            // 
-            this.tabiwWin_grp.Controls.Add(this.tabiwWin_pic);
-            this.tabiwWin_grp.Controls.Add(this.tabiwWinColor_rdo);
-            this.tabiwWin_grp.Controls.Add(this.tabiwWinCustom_rdo);
-            this.tabiwWin_grp.Controls.Add(this.tabiwWinImg_rdo);
-            this.tabiwWin_grp.Location = new System.Drawing.Point(115, 13);
-            this.tabiwWin_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWin_grp.Name = "tabiwWin_grp";
-            this.tabiwWin_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWin_grp.Size = new System.Drawing.Size(98, 62);
-            this.tabiwWin_grp.TabIndex = 18;
-            this.tabiwWin_grp.TabStop = false;
-            this.tabiwWin_grp.Text = "方塊顏色";
-            // 
-            // tabiwWin_pic
-            // 
-            this.tabiwWin_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabiwWin_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabiwWin_pic.Image = global::Thunder.Properties.Resources.Img;
-            this.tabiwWin_pic.Location = new System.Drawing.Point(3, 17);
-            this.tabiwWin_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWin_pic.Name = "tabiwWin_pic";
-            this.tabiwWin_pic.Size = new System.Drawing.Size(35, 32);
-            this.tabiwWin_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.tabiwWin_pic.TabIndex = 8;
-            this.tabiwWin_pic.TabStop = false;
-            this.tabiwWin_pic.Click += new System.EventHandler(this.windowPictureBox_Click);
-            // 
-            // tabiwWinColor_rdo
-            // 
-            this.tabiwWinColor_rdo.AutoSize = true;
-            this.tabiwWinColor_rdo.Checked = true;
-            this.tabiwWinColor_rdo.Location = new System.Drawing.Point(43, 11);
-            this.tabiwWinColor_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinColor_rdo.Name = "tabiwWinColor_rdo";
-            this.tabiwWinColor_rdo.Size = new System.Drawing.Size(47, 16);
-            this.tabiwWinColor_rdo.TabIndex = 5;
-            this.tabiwWinColor_rdo.TabStop = true;
-            this.tabiwWinColor_rdo.Tag = "";
-            this.tabiwWinColor_rdo.Text = "純色";
-            this.tabiwWinColor_rdo.UseVisualStyleBackColor = true;
-            this.tabiwWinColor_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
-            // 
-            // tabiwWinCustom_rdo
-            // 
-            this.tabiwWinCustom_rdo.AutoSize = true;
-            this.tabiwWinCustom_rdo.Enabled = false;
-            this.tabiwWinCustom_rdo.Location = new System.Drawing.Point(43, 41);
-            this.tabiwWinCustom_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinCustom_rdo.Name = "tabiwWinCustom_rdo";
-            this.tabiwWinCustom_rdo.Size = new System.Drawing.Size(59, 16);
-            this.tabiwWinCustom_rdo.TabIndex = 7;
-            this.tabiwWinCustom_rdo.TabStop = true;
-            this.tabiwWinCustom_rdo.Tag = "";
-            this.tabiwWinCustom_rdo.Text = "自製圖";
-            this.tabiwWinCustom_rdo.UseVisualStyleBackColor = true;
-            this.tabiwWinCustom_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
-            // 
-            // tabiwWinImg_rdo
-            // 
-            this.tabiwWinImg_rdo.AutoSize = true;
-            this.tabiwWinImg_rdo.Location = new System.Drawing.Point(43, 26);
-            this.tabiwWinImg_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinImg_rdo.Name = "tabiwWinImg_rdo";
-            this.tabiwWinImg_rdo.Size = new System.Drawing.Size(47, 16);
-            this.tabiwWinImg_rdo.TabIndex = 6;
-            this.tabiwWinImg_rdo.TabStop = true;
-            this.tabiwWinImg_rdo.Tag = "";
-            this.tabiwWinImg_rdo.Text = "截圖";
-            this.tabiwWinImg_rdo.UseVisualStyleBackColor = true;
-            this.tabiwWinImg_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
-            // 
-            // tabiwBack_grp
-            // 
-            this.tabiwBack_grp.Controls.Add(this.tabiwBack_pic);
-            this.tabiwBack_grp.Controls.Add(this.tabiwBackColor_rdo);
-            this.tabiwBack_grp.Controls.Add(this.tabiwBackCustom_rdo);
-            this.tabiwBack_grp.Controls.Add(this.tabiwBackImg_rdo);
-            this.tabiwBack_grp.Location = new System.Drawing.Point(9, 13);
-            this.tabiwBack_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwBack_grp.Name = "tabiwBack_grp";
-            this.tabiwBack_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwBack_grp.Size = new System.Drawing.Size(101, 63);
-            this.tabiwBack_grp.TabIndex = 17;
-            this.tabiwBack_grp.TabStop = false;
-            this.tabiwBack_grp.Text = "背景顏色";
-            // 
-            // tabiwBack_pic
-            // 
-            this.tabiwBack_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabiwBack_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabiwBack_pic.Image = global::Thunder.Properties.Resources.Img;
-            this.tabiwBack_pic.InitialImage = null;
-            this.tabiwBack_pic.Location = new System.Drawing.Point(4, 18);
-            this.tabiwBack_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwBack_pic.Name = "tabiwBack_pic";
-            this.tabiwBack_pic.Size = new System.Drawing.Size(35, 32);
-            this.tabiwBack_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.tabiwBack_pic.TabIndex = 5;
-            this.tabiwBack_pic.TabStop = false;
-            this.tabiwBack_pic.Click += new System.EventHandler(this.windowPictureBox_Click);
-            // 
-            // tabiwBackColor_rdo
-            // 
-            this.tabiwBackColor_rdo.AutoSize = true;
-            this.tabiwBackColor_rdo.Checked = true;
-            this.tabiwBackColor_rdo.Location = new System.Drawing.Point(46, 13);
-            this.tabiwBackColor_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwBackColor_rdo.Name = "tabiwBackColor_rdo";
-            this.tabiwBackColor_rdo.Size = new System.Drawing.Size(47, 16);
-            this.tabiwBackColor_rdo.TabIndex = 2;
-            this.tabiwBackColor_rdo.TabStop = true;
-            this.tabiwBackColor_rdo.Tag = "";
-            this.tabiwBackColor_rdo.Text = "純色";
-            this.tabiwBackColor_rdo.UseVisualStyleBackColor = true;
-            this.tabiwBackColor_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
-            // 
-            // tabiwBackCustom_rdo
-            // 
-            this.tabiwBackCustom_rdo.AutoSize = true;
-            this.tabiwBackCustom_rdo.Enabled = false;
-            this.tabiwBackCustom_rdo.Location = new System.Drawing.Point(46, 42);
-            this.tabiwBackCustom_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwBackCustom_rdo.Name = "tabiwBackCustom_rdo";
-            this.tabiwBackCustom_rdo.Size = new System.Drawing.Size(59, 16);
-            this.tabiwBackCustom_rdo.TabIndex = 4;
-            this.tabiwBackCustom_rdo.TabStop = true;
-            this.tabiwBackCustom_rdo.Tag = "";
-            this.tabiwBackCustom_rdo.Text = "自製圖";
-            this.tabiwBackCustom_rdo.UseVisualStyleBackColor = true;
-            this.tabiwBackCustom_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
-            // 
-            // tabiwBackImg_rdo
-            // 
-            this.tabiwBackImg_rdo.AutoSize = true;
-            this.tabiwBackImg_rdo.Location = new System.Drawing.Point(46, 28);
-            this.tabiwBackImg_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwBackImg_rdo.Name = "tabiwBackImg_rdo";
-            this.tabiwBackImg_rdo.Size = new System.Drawing.Size(47, 16);
-            this.tabiwBackImg_rdo.TabIndex = 3;
-            this.tabiwBackImg_rdo.TabStop = true;
-            this.tabiwBackImg_rdo.Tag = "";
-            this.tabiwBackImg_rdo.Text = "截圖";
-            this.tabiwBackImg_rdo.UseVisualStyleBackColor = true;
-            this.tabiwBackImg_rdo.Click += new System.EventHandler(this.windowPictureBox_Click);
-            // 
-            // tabiwLineColor_lbl
-            // 
-            this.tabiwLineColor_lbl.AutoSize = true;
-            this.tabiwLineColor_lbl.Location = new System.Drawing.Point(159, 214);
-            this.tabiwLineColor_lbl.Name = "tabiwLineColor_lbl";
-            this.tabiwLineColor_lbl.Size = new System.Drawing.Size(41, 12);
-            this.tabiwLineColor_lbl.TabIndex = 13;
-            this.tabiwLineColor_lbl.Text = "線顏色";
-            // 
-            // tabiwLineColor_btn
-            // 
-            this.tabiwLineColor_btn.BackColor = System.Drawing.Color.White;
-            this.tabiwLineColor_btn.Location = new System.Drawing.Point(201, 212);
-            this.tabiwLineColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwLineColor_btn.Name = "tabiwLineColor_btn";
-            this.tabiwLineColor_btn.Size = new System.Drawing.Size(21, 19);
-            this.tabiwLineColor_btn.TabIndex = 12;
-            this.tabiwLineColor_btn.UseVisualStyleBackColor = false;
-            this.tabiwLineColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
-            // 
-            // tabiwLineCross_btn
-            // 
-            this.tabiwLineCross_btn.AutoSize = true;
-            this.tabiwLineCross_btn.Location = new System.Drawing.Point(161, 192);
-            this.tabiwLineCross_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwLineCross_btn.Name = "tabiwLineCross_btn";
-            this.tabiwLineCross_btn.Size = new System.Drawing.Size(48, 16);
-            this.tabiwLineCross_btn.TabIndex = 11;
-            this.tabiwLineCross_btn.Text = "十字";
-            this.tabiwLineCross_btn.UseVisualStyleBackColor = true;
-            // 
-            // tabiwLineOutside_btn
-            // 
-            this.tabiwLineOutside_btn.AutoSize = true;
-            this.tabiwLineOutside_btn.Location = new System.Drawing.Point(161, 173);
-            this.tabiwLineOutside_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwLineOutside_btn.Name = "tabiwLineOutside_btn";
-            this.tabiwLineOutside_btn.Size = new System.Drawing.Size(48, 16);
-            this.tabiwLineOutside_btn.TabIndex = 10;
-            this.tabiwLineOutside_btn.Text = "外框";
-            this.tabiwLineOutside_btn.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinLoc_grp
-            // 
-            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocPixcelY_nud);
-            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocTwo_rdo);
-            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocPixcelX_nud);
-            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocCenter_rdo);
-            this.tabiwWinLoc_grp.Controls.Add(this.tabiwWinLocPixcel_rdo);
-            this.tabiwWinLoc_grp.Location = new System.Drawing.Point(5, 165);
-            this.tabiwWinLoc_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinLoc_grp.Name = "tabiwWinLoc_grp";
-            this.tabiwWinLoc_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinLoc_grp.Size = new System.Drawing.Size(147, 78);
-            this.tabiwWinLoc_grp.TabIndex = 9;
-            this.tabiwWinLoc_grp.TabStop = false;
-            this.tabiwWinLoc_grp.Text = "視窗位置";
-            // 
-            // tabiwWinLocPixcelY_nud
-            // 
-            this.tabiwWinLocPixcelY_nud.Location = new System.Drawing.Point(91, 54);
-            this.tabiwWinLocPixcelY_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinLocPixcelY_nud.Name = "tabiwWinLocPixcelY_nud";
-            this.tabiwWinLocPixcelY_nud.Size = new System.Drawing.Size(51, 22);
-            this.tabiwWinLocPixcelY_nud.TabIndex = 7;
-            // 
-            // tabiwWinLocTwo_rdo
-            // 
-            this.tabiwWinLocTwo_rdo.AutoSize = true;
-            this.tabiwWinLocTwo_rdo.Location = new System.Drawing.Point(69, 13);
-            this.tabiwWinLocTwo_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinLocTwo_rdo.Name = "tabiwWinLocTwo_rdo";
-            this.tabiwWinLocTwo_rdo.Size = new System.Drawing.Size(47, 16);
-            this.tabiwWinLocTwo_rdo.TabIndex = 1;
-            this.tabiwWinLocTwo_rdo.Text = "兩組";
-            this.tabiwWinLocTwo_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinLocPixcelX_nud
-            // 
-            this.tabiwWinLocPixcelX_nud.Location = new System.Drawing.Point(91, 30);
-            this.tabiwWinLocPixcelX_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinLocPixcelX_nud.Name = "tabiwWinLocPixcelX_nud";
-            this.tabiwWinLocPixcelX_nud.Size = new System.Drawing.Size(51, 22);
-            this.tabiwWinLocPixcelX_nud.TabIndex = 6;
-            // 
-            // tabiwWinLocCenter_rdo
-            // 
-            this.tabiwWinLocCenter_rdo.AutoSize = true;
-            this.tabiwWinLocCenter_rdo.Checked = true;
-            this.tabiwWinLocCenter_rdo.Location = new System.Drawing.Point(9, 13);
-            this.tabiwWinLocCenter_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinLocCenter_rdo.Name = "tabiwWinLocCenter_rdo";
-            this.tabiwWinLocCenter_rdo.Size = new System.Drawing.Size(47, 16);
-            this.tabiwWinLocCenter_rdo.TabIndex = 0;
-            this.tabiwWinLocCenter_rdo.TabStop = true;
-            this.tabiwWinLocCenter_rdo.Text = "置中";
-            this.tabiwWinLocCenter_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinLocPixcel_rdo
-            // 
-            this.tabiwWinLocPixcel_rdo.AutoSize = true;
-            this.tabiwWinLocPixcel_rdo.Location = new System.Drawing.Point(9, 30);
-            this.tabiwWinLocPixcel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinLocPixcel_rdo.Name = "tabiwWinLocPixcel_rdo";
-            this.tabiwWinLocPixcel_rdo.Size = new System.Drawing.Size(91, 40);
-            this.tabiwWinLocPixcel_rdo.TabIndex = 5;
-            this.tabiwWinLocPixcel_rdo.Text = "                   X:\r\n指定Pixel  \r\n                   Y:";
-            this.tabiwWinLocPixcel_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinSize_grp
-            // 
-            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePixelH_nud);
-            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePixelW_nud);
-            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePixel_rdo);
-            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePercent_nud);
-            this.tabiwWinSize_grp.Controls.Add(this.tabiwWinSizePercent_rdo);
-            this.tabiwWinSize_grp.Location = new System.Drawing.Point(5, 83);
-            this.tabiwWinSize_grp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinSize_grp.Name = "tabiwWinSize_grp";
-            this.tabiwWinSize_grp.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinSize_grp.Size = new System.Drawing.Size(147, 81);
-            this.tabiwWinSize_grp.TabIndex = 8;
-            this.tabiwWinSize_grp.TabStop = false;
-            this.tabiwWinSize_grp.Text = "視窗大小";
-            // 
-            // tabiwWinSizePixelH_nud
-            // 
-            this.tabiwWinSizePixelH_nud.Location = new System.Drawing.Point(90, 60);
-            this.tabiwWinSizePixelH_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinSizePixelH_nud.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.tabiwWinSizePixelH_nud.Name = "tabiwWinSizePixelH_nud";
-            this.tabiwWinSizePixelH_nud.Size = new System.Drawing.Size(51, 22);
-            this.tabiwWinSizePixelH_nud.TabIndex = 4;
-            this.tabiwWinSizePixelH_nud.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // tabiwWinSizePixelW_nud
-            // 
-            this.tabiwWinSizePixelW_nud.Location = new System.Drawing.Point(89, 37);
-            this.tabiwWinSizePixelW_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinSizePixelW_nud.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.tabiwWinSizePixelW_nud.Name = "tabiwWinSizePixelW_nud";
-            this.tabiwWinSizePixelW_nud.Size = new System.Drawing.Size(52, 22);
-            this.tabiwWinSizePixelW_nud.TabIndex = 3;
-            this.tabiwWinSizePixelW_nud.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // tabiwWinSizePixel_rdo
-            // 
-            this.tabiwWinSizePixel_rdo.AutoSize = true;
-            this.tabiwWinSizePixel_rdo.Location = new System.Drawing.Point(9, 38);
-            this.tabiwWinSizePixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinSizePixel_rdo.Name = "tabiwWinSizePixel_rdo";
-            this.tabiwWinSizePixel_rdo.Size = new System.Drawing.Size(92, 40);
-            this.tabiwWinSizePixel_rdo.TabIndex = 2;
-            this.tabiwWinSizePixel_rdo.Text = "                  寬:\r\n指定Pixel  \r\n                  高:";
-            this.tabiwWinSizePixel_rdo.UseVisualStyleBackColor = true;
-            // 
-            // tabiwWinSizePercent_nud
-            // 
-            this.tabiwWinSizePercent_nud.Location = new System.Drawing.Point(77, 13);
-            this.tabiwWinSizePercent_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinSizePercent_nud.Name = "tabiwWinSizePercent_nud";
-            this.tabiwWinSizePercent_nud.Size = new System.Drawing.Size(31, 22);
-            this.tabiwWinSizePercent_nud.TabIndex = 1;
-            this.tabiwWinSizePercent_nud.Value = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            // 
-            // tabiwWinSizePercent_rdo
-            // 
-            this.tabiwWinSizePercent_rdo.AutoSize = true;
-            this.tabiwWinSizePercent_rdo.Checked = true;
-            this.tabiwWinSizePercent_rdo.Location = new System.Drawing.Point(9, 13);
-            this.tabiwWinSizePercent_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiwWinSizePercent_rdo.Name = "tabiwWinSizePercent_rdo";
-            this.tabiwWinSizePercent_rdo.Size = new System.Drawing.Size(76, 16);
-            this.tabiwWinSizePercent_rdo.TabIndex = 0;
-            this.tabiwWinSizePercent_rdo.TabStop = true;
-            this.tabiwWinSizePercent_rdo.Text = "百分比(%)";
-            this.tabiwWinSizePercent_rdo.UseVisualStyleBackColor = true;
-            // 
             // tabimgeMask
             // 
             this.tabimgeMask.Controls.Add(this.tabiemPixelGray_lbl);
@@ -1926,11 +1989,11 @@ namespace Thunder
             this.tabimgeMask.Controls.Add(this.tabiemWNum_lbl);
             this.tabimgeMask.Controls.Add(this.tabiemSubPixel_rdo);
             this.tabimgeMask.Controls.Add(this.tabiemPixel_rdo);
-            this.tabimgeMask.Location = new System.Drawing.Point(23, 269);
+            this.tabimgeMask.Location = new System.Drawing.Point(327, 125);
             this.tabimgeMask.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeMask.Name = "tabimgeMask";
             this.tabimgeMask.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeMask.Size = new System.Drawing.Size(149, 170);
+            this.tabimgeMask.Size = new System.Drawing.Size(141, 120);
             this.tabimgeMask.TabIndex = 0;
             this.tabimgeMask.TabStop = false;
             this.tabimgeMask.Text = "Mask(FlickerPattern)";
@@ -2107,11 +2170,11 @@ namespace Thunder
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorG_btn);
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorW_btn);
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorR_btn);
-            this.tabimgeChess.Location = new System.Drawing.Point(518, 18);
+            this.tabimgeChess.Location = new System.Drawing.Point(331, 18);
             this.tabimgeChess.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeChess.Name = "tabimgeChess";
             this.tabimgeChess.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeChess.Size = new System.Drawing.Size(215, 160);
+            this.tabimgeChess.Size = new System.Drawing.Size(103, 95);
             this.tabimgeChess.TabIndex = 0;
             this.tabimgeChess.TabStop = false;
             this.tabimgeChess.Text = "Chess";
@@ -2330,11 +2393,11 @@ namespace Thunder
             this.tabimgeFrame.Controls.Add(this.tabiefLineColor_btn);
             this.tabimgeFrame.Controls.Add(this.tabiefBack_lbl);
             this.tabimgeFrame.ImeMode = System.Windows.Forms.ImeMode.On;
-            this.tabimgeFrame.Location = new System.Drawing.Point(33, 111);
+            this.tabimgeFrame.Location = new System.Drawing.Point(14, 6);
             this.tabimgeFrame.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeFrame.Name = "tabimgeFrame";
             this.tabimgeFrame.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeFrame.Size = new System.Drawing.Size(129, 76);
+            this.tabimgeFrame.Size = new System.Drawing.Size(108, 88);
             this.tabimgeFrame.TabIndex = 10;
             this.tabimgeFrame.TabStop = false;
             this.tabimgeFrame.Text = "Frame&&CrossLine&&Border";
@@ -2590,11 +2653,11 @@ namespace Thunder
             this.tabimgeAdjust.Controls.Add(this.tabieaRotate90_rdo);
             this.tabimgeAdjust.Controls.Add(this.tabieaLeftRight_rdo);
             this.tabimgeAdjust.Controls.Add(this.tabieaUpDown_rdo);
-            this.tabimgeAdjust.Location = new System.Drawing.Point(338, 40);
+            this.tabimgeAdjust.Location = new System.Drawing.Point(23, 239);
             this.tabimgeAdjust.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeAdjust.Name = "tabimgeAdjust";
             this.tabimgeAdjust.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeAdjust.Size = new System.Drawing.Size(145, 62);
+            this.tabimgeAdjust.Size = new System.Drawing.Size(91, 70);
             this.tabimgeAdjust.TabIndex = 0;
             this.tabimgeAdjust.TabStop = false;
             this.tabimgeAdjust.Text = "  ImgAdjus";
@@ -2833,8 +2896,8 @@ namespace Thunder
             // 
             // tabimgeMass
             // 
-            this.tabimgeMass.Controls.Add(this.label1);
-            this.tabimgeMass.Location = new System.Drawing.Point(221, 42);
+            this.tabimgeMass.Controls.Add(this.tabiema);
+            this.tabimgeMass.Location = new System.Drawing.Point(142, 236);
             this.tabimgeMass.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeMass.Name = "tabimgeMass";
             this.tabimgeMass.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -2843,14 +2906,14 @@ namespace Thunder
             this.tabimgeMass.TabStop = false;
             this.tabimgeMass.Text = "MassImage";
             // 
-            // label1
+            // tabiema
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(19, 28);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(80, 12);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "ToBeContinued";
+            this.tabiema.AutoSize = true;
+            this.tabiema.Location = new System.Drawing.Point(19, 28);
+            this.tabiema.Name = "tabiema";
+            this.tabiema.Size = new System.Drawing.Size(80, 12);
+            this.tabiema.TabIndex = 0;
+            this.tabiema.Text = "ToBeContinued";
             // 
             // tabimgeFuncList
             // 
@@ -2878,7 +2941,7 @@ namespace Thunder
             this.tabDirList.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabDirList.Name = "tabDirList";
             this.tabDirList.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabDirList.Size = new System.Drawing.Size(799, 490);
+            this.tabDirList.Size = new System.Drawing.Size(799, 458);
             this.tabDirList.TabIndex = 1;
             this.tabDirList.Text = "DirList";
             this.tabDirList.UseVisualStyleBackColor = true;
@@ -2890,7 +2953,7 @@ namespace Thunder
             this.tabdlPatternList_lvw.Location = new System.Drawing.Point(3, 2);
             this.tabdlPatternList_lvw.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabdlPatternList_lvw.Name = "tabdlPatternList_lvw";
-            this.tabdlPatternList_lvw.Size = new System.Drawing.Size(793, 486);
+            this.tabdlPatternList_lvw.Size = new System.Drawing.Size(793, 454);
             this.tabdlPatternList_lvw.TabIndex = 11;
             this.tabdlPatternList_lvw.UseCompatibleStateImageBehavior = false;
             this.tabdlPatternList_lvw.SelectedIndexChanged += new System.EventHandler(this.listView_SelectedIndexChanged);
@@ -2902,7 +2965,7 @@ namespace Thunder
             this.tabImgList.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabImgList.Name = "tabImgList";
             this.tabImgList.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabImgList.Size = new System.Drawing.Size(799, 490);
+            this.tabImgList.Size = new System.Drawing.Size(799, 458);
             this.tabImgList.TabIndex = 2;
             this.tabImgList.Text = "ImgList";
             this.tabImgList.UseVisualStyleBackColor = true;
@@ -2921,7 +2984,7 @@ namespace Thunder
             this.tabilPatternList_lst.Location = new System.Drawing.Point(3, 2);
             this.tabilPatternList_lst.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabilPatternList_lst.Name = "tabilPatternList_lst";
-            this.tabilPatternList_lst.Size = new System.Drawing.Size(793, 486);
+            this.tabilPatternList_lst.Size = new System.Drawing.Size(793, 454);
             this.tabilPatternList_lst.TabIndex = 0;
             // 
             // Showimage_flp
@@ -2933,17 +2996,17 @@ namespace Thunder
             this.Showimage_flp.Controls.Add(this.showimgSize_btn);
             this.Showimage_flp.Dock = System.Windows.Forms.DockStyle.Right;
             this.Showimage_flp.FlowDirection = System.Windows.Forms.FlowDirection.BottomUp;
-            this.Showimage_flp.Location = new System.Drawing.Point(1129, 27);
+            this.Showimage_flp.Location = new System.Drawing.Point(685, 27);
             this.Showimage_flp.Margin = new System.Windows.Forms.Padding(0);
             this.Showimage_flp.Name = "Showimage_flp";
-            this.Showimage_flp.Size = new System.Drawing.Size(263, 516);
+            this.Showimage_flp.Size = new System.Drawing.Size(263, 484);
             this.Showimage_flp.TabIndex = 8;
             this.Showimage_flp.WrapContents = false;
             // 
             // showimgSave_btn
             // 
             this.showimgSave_btn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.showimgSave_btn.Location = new System.Drawing.Point(196, 496);
+            this.showimgSave_btn.Location = new System.Drawing.Point(196, 464);
             this.showimgSave_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.showimgSave_btn.Name = "showimgSave_btn";
             this.showimgSave_btn.Size = new System.Drawing.Size(64, 18);
@@ -2954,7 +3017,7 @@ namespace Thunder
             // 
             // showimgGenerate_btn
             // 
-            this.showimgGenerate_btn.Location = new System.Drawing.Point(3, 474);
+            this.showimgGenerate_btn.Location = new System.Drawing.Point(3, 442);
             this.showimgGenerate_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.showimgGenerate_btn.Name = "showimgGenerate_btn";
             this.showimgGenerate_btn.Size = new System.Drawing.Size(96, 18);
@@ -2969,7 +3032,7 @@ namespace Thunder
             this.showimgPicture_pic.BackColor = System.Drawing.Color.Black;
             this.showimgPicture_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.showimgPicture_pic.ContextMenuStrip = this.contextMenuStrip;
-            this.showimgPicture_pic.Location = new System.Drawing.Point(3, 336);
+            this.showimgPicture_pic.Location = new System.Drawing.Point(3, 304);
             this.showimgPicture_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.showimgPicture_pic.MinimumSize = new System.Drawing.Size(171, 0);
             this.showimgPicture_pic.Name = "showimgPicture_pic";
@@ -3074,7 +3137,7 @@ namespace Thunder
             // showimgSize_btn
             // 
             this.showimgSize_btn.AutoSize = true;
-            this.showimgSize_btn.Location = new System.Drawing.Point(3, 322);
+            this.showimgSize_btn.Location = new System.Drawing.Point(3, 290);
             this.showimgSize_btn.Name = "showimgSize_btn";
             this.showimgSize_btn.Size = new System.Drawing.Size(0, 12);
             this.showimgSize_btn.TabIndex = 8;
@@ -3085,11 +3148,11 @@ namespace Thunder
             this.ssrStatus_lbl,
             this.ssrProgressbar_prg});
             this.statusStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
-            this.statusStrip.Location = new System.Drawing.Point(0, 543);
+            this.statusStrip.Location = new System.Drawing.Point(0, 511);
             this.statusStrip.MinimumSize = new System.Drawing.Size(257, 0);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Padding = new System.Windows.Forms.Padding(1, 0, 12, 0);
-            this.statusStrip.Size = new System.Drawing.Size(1392, 20);
+            this.statusStrip.Size = new System.Drawing.Size(948, 20);
             this.statusStrip.TabIndex = 14;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -3113,11 +3176,31 @@ namespace Thunder
             this.toolTip.ReshowDelay = 1000;
             this.toolTip.ShowAlways = true;
             // 
+            // tabiwCGradOther_chk
+            // 
+            this.tabiwCGradOther_chk.AutoSize = true;
+            this.tabiwCGradOther_chk.Location = new System.Drawing.Point(311, 86);
+            this.tabiwCGradOther_chk.Name = "tabiwCGradOther_chk";
+            this.tabiwCGradOther_chk.Size = new System.Drawing.Size(72, 16);
+            this.tabiwCGradOther_chk.TabIndex = 38;
+            this.tabiwCGradOther_chk.Text = "其他顏色";
+            this.tabiwCGradOther_chk.UseVisualStyleBackColor = true;
+            this.tabiwCGradOther_chk.CheckedChanged += new System.EventHandler(this.otherColor_CheckedChanged);
+            // 
+            // tabiwCGradOtherSplitLoc_lbl
+            // 
+            this.tabiwCGradOtherSplitLoc_lbl.AutoSize = true;
+            this.tabiwCGradOtherSplitLoc_lbl.Location = new System.Drawing.Point(221, 154);
+            this.tabiwCGradOtherSplitLoc_lbl.Name = "tabiwCGradOtherSplitLoc_lbl";
+            this.tabiwCGradOtherSplitLoc_lbl.Size = new System.Drawing.Size(24, 12);
+            this.tabiwCGradOtherSplitLoc_lbl.TabIndex = 24;
+            this.tabiwCGradOtherSplitLoc_lbl.Text = "--,--";
+            // 
             // Mainwindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1392, 563);
+            this.ClientSize = new System.Drawing.Size(948, 531);
             this.Controls.Add(this.Showimage_flp);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.statusStrip);
@@ -3132,23 +3215,16 @@ namespace Thunder
             this.tabControl.ResumeLayout(false);
             this.tabImgEditor.ResumeLayout(false);
             this.tabimgePanel.ResumeLayout(false);
-            this.tabimgeGradient.ResumeLayout(false);
-            this.tabimgeGradient.PerformLayout();
-            this.tabigOther_grp.ResumeLayout(false);
-            this.tabigOther_grp.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabigOtherSplit_nud)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.tabimgeWindow.ResumeLayout(false);
             this.tabimgeWindow.PerformLayout();
             this.tabiwCustom_grp.ResumeLayout(false);
             this.tabiwCustomGrad_grp.ResumeLayout(false);
             this.tabiwCustomGrad_grp.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
+            this.tabiwCGradOther_grp.ResumeLayout(false);
+            this.tabiwCGradOther_grp.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiwCGradOtherSplit_nud)).EndInit();
+            this.tabiwCGradBaseColor_pnl.ResumeLayout(false);
+            this.tabiwCGradBaseColor_pnl.PerformLayout();
             this.tabiwCustomMask_grp.ResumeLayout(false);
             this.tabiwCustomMask_grp.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwCMaskHNum_nud)).EndInit();
@@ -3168,6 +3244,13 @@ namespace Thunder
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePixelH_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePixelW_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePercent_nud)).EndInit();
+            this.tabimgeGradient.ResumeLayout(false);
+            this.tabimgeGradient.PerformLayout();
+            this.tabigOther_grp.ResumeLayout(false);
+            this.tabigOther_grp.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabigOtherSplit_nud)).EndInit();
+            this.tabigBaseColor_pnl.ResumeLayout(false);
+            this.tabigBaseColor_pnl.PerformLayout();
             this.tabimgeMask.ResumeLayout(false);
             this.tabimgeMask.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabiemHNum_nud)).EndInit();
@@ -3385,7 +3468,7 @@ namespace Thunder
         private ToolStripTextBox cms;
         private ToolStripSeparator toolStripSeparator1;
         private Panel tabiefOther_pnl;
-        private Label label1;
+        private Label tabiema;
         private ToolStripMenuItem 旋轉ToolStripMenuItem;
         private ToolStripMenuItem 旋轉180ToolStripMenuItem;
         private ToolStripMenuItem 旋轉270ToolStripMenuItem;
@@ -3394,44 +3477,49 @@ namespace Thunder
         private ToolStripComboBox toolStripComboBox1;
         private Label tabigStep_lbl;
         private ComboBox tabigStep_cmb;
-        private Panel panel1;
+        private Panel tabigBaseColor_pnl;
         private Panel tabigOtherSplit_pnl;
         private GroupBox tabigOther_grp;
-        private GroupBox groupBox1;
-        private RadioButton radioButton1;
+        private GroupBox tabiwCGradOther_grp;
+        private RadioButton tabiwCGradOtherVSplit_rdo;
         private Panel tabiwCGradOtherSplit_pnl;
-        private RadioButton radioButton2;
-        private Button button1;
-        private NumericUpDown numericUpDown1;
-        private Label label2;
-        private Label label3;
-        private Button button2;
-        private Button button3;
-        private Button button4;
-        private Button button5;
-        private Button button6;
-        private Button button7;
-        private Button button8;
-        private Button button9;
-        private Button button10;
-        private Label tabiwCGrad0;
-        private ComboBox comboBox1;
-        private Panel panel3;
-        private Button button11;
-        private Label label5;
-        private Button button12;
-        private Button button13;
-        private Button button14;
-        private Button button15;
+        private RadioButton tabiwCGradOtherHSplit_rdo;
+        private Button tabiwCGradFourColor_btn;
+        private NumericUpDown tabiwCGradOtherSplit_nud;
+        private Label tabiwCGradOtherColor_lbl;
+        private Label tabiwCGradOtherSplit_lbl;
+        private Button tabiwCGradOtherColorC_btn;
+        private Button tabiwCGradOtherColorW_btn;
+        private Button tabiwCGradOtherColorM_btn;
+        private Button tabiwCGradOtherColorR_btn;
+        private Button tabiwCGradOtherColorA_btn;
+        private Button tabiwCGradOtherColorG_btn;
+        private Button tabiwCGradOtherColorY_btn;
+        private Button tabiwCGradOtherColorB_btn;
+        private Button tabiwCGradOtherColorD_btn;
+        private Label tabiwCGradStep_lbl;
+        private ComboBox tabiwCGradStep_cmb;
+        private Panel tabiwCGradBaseColor_pnl;
+        private Button tabiwCGradBaseColorCustom_btn;
+        private Label tabiwCGradBaseColor_lbl;
+        private Button tabiwCGradBaseColorB_btn;
+        private Button tabiwCGradBaseColorW_btn;
+        private Button tabiwCGradBaseColorG_btn;
+        private Button tabiwCGradBaseColorR_btn;
         private RadioButton tabiwCGradVWay_rdo;
-        private ComboBox comboBox2;
-        private RadioButton tabiwCGrad;
+        private ComboBox tabiwCGradDivid_cmb;
+        private RadioButton tabiwCGradColorBar_rdo;
         private RadioButton tabiwCGradHWay_rdo;
-        private ComboBox comboBox3;
-        private ComboBox comboBox4;
-        private Label label4;
+        private ComboBox tabiwCGradFirstLevel_cmb;
+        private ComboBox tabiwCGradLastLevel_cmb;
+        private Label tabiwCGradFirstLevel_lbl;
         private Label tabigOtherSplitLoc_lbl;
         private ToolStripMenuItem mnsGenerate_btn;
         private CheckBox tabigOther_chk;
+        private Button tabigEightColor_btn;
+        private Button tabiwCGradEightColor_btn;
+        private Button tabiwCustom_btn;
+        private CheckBox tabiwCGradOther_chk;
+        private Label tabiwCGradOtherSplitLoc_lbl;
     }
 }
