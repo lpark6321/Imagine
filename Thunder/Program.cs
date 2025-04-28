@@ -17,7 +17,7 @@ namespace Thunder
             Application.SetCompatibleTextRenderingDefault(false);
 
             // 啟動主視窗
-            Application.Run(new Mainwindow());
+            Application.Run(new mainWindow());
         }
     }
 }

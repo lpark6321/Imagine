@@ -14,14 +14,20 @@ using String = System.String;
 
 namespace Thunder
 {
-    public partial class Mainwindow : Form
+    public partial class mainWindow : Form
     {
         private bool _isMouseDown = false;
-        public Mainwindow()
+        // 確保有一個全局的 pictureWindow 實例
+        private pictureWindow _pictureWindow;
+        public static mainWindow Instance { get; private set; }
+        public TabControl MainTabControl => tabControl; // 提供 TabControl 的訪問
+
+        public mainWindow()
         {
             InitializeComponent();
             Mainwindow_Load(this, EventArgs.Empty);
             mypicture = new MyPicture(this);
+            Instance = this; // 初始化 Singleton 實例
         }
         private void Mainwindow_Load(object sender, EventArgs e)
         {
@@ -42,10 +48,14 @@ namespace Thunder
             {
                 mnsScreenlist_cmb.SelectedIndex = 0;
             }
-            tabimgeFuncList.SelectedIndex = 3; // 功能預設選擇第一個項目
+            tabimgeFuncList.SelectedIndex = 0; // 功能預設選擇第一個項目
             tabieaResize_rdo.Select(); //圖片館例預設選取RESIZE
             MaskPanelCreat(tabiemPixelClear_btn, e); //先產生MaskPanel
+            MaskPanelCreat(tabiwCMaskPixelClear_btn, e); //先產生MaskPanel
             SplitPanelCreat(tabigOtherSplit_nud, e);//先產生GradSplitPanel
+            SplitPanelCreat(tabiwCGradOtherSplit_nud, e);//先產生GradSplitPanel
+            tabControl.SelectedIndex = 1;
+            tabControl_SelectedIndexChanged(sender, e);
         }
         public MyPicture mypicture { get; private set; }
         public class MyPicture
@@ -55,8 +65,8 @@ namespace Thunder
             private int _width;
             private int _height;
 
-            private Mainwindow m1 { get; }
-            public MyPicture(Mainwindow m0)
+            private mainWindow m1 { get; }
+            public MyPicture(mainWindow m0)
             {
                 m1 = m0 ?? throw new ArgumentNullException(nameof(m0));
                 _width = m1.mnsW_txt.Text != "" ? int.Parse(m1.mnsW_txt.Text) : 1920;
@@ -140,6 +150,7 @@ namespace Thunder
                         {
                             // 使用 Image.FromFile 載入圖片
                             _currentBitmap = (Bitmap)Image.FromFile(openFileDialog.FileName);
+                            tag = "image";
                             return _currentBitmap; // 回傳圖片
                         }
                         catch (OutOfMemoryException)
@@ -304,58 +315,60 @@ namespace Thunder
         }
 
 
-        private void FullScreen(object sender, EventArgs e)
+        public void FullScreen(object sender, EventArgs e)
         {
             // 獲取選擇的螢幕  
-            string selectedScreen = mnsScreenlist_cmb.SelectedText == "" ? Screen.AllScreens[0].DeviceName : mnsScreenlist_cmb.SelectedText ;
-            Screen secondScreen = Screen.AllScreens.FirstOrDefault(screen => screen.DeviceName == selectedScreen);
+            string selectedScreen = mnsScreenlist_cmb.SelectedItem?.ToString() ?? Screen.AllScreens[0].DeviceName;
+            Screen secondScreen = Screen.AllScreens.FirstOrDefault(screen => screen.DeviceName == selectedScreen) ?? Screen.AllScreens[0];
 
-            // 創建全螢幕表單  
-            Form fullScreenForm = new Form
+            if (_pictureWindow == null || _pictureWindow.IsDisposed)
             {
-                FormBorderStyle = FormBorderStyle.None, // 無邊框  
-                WindowState = FormWindowState.Maximized, // 最大化  
-                StartPosition = FormStartPosition.Manual, // 手動設置位置  
-                Location = secondScreen.Bounds.Location, // 設置到選擇的螢幕  
-                Size = secondScreen.Bounds.Size, // 設置大小為選擇螢幕大小  
-                BackColor = Color.Black, // 背景設置為黑色  
-                KeyPreview = true // 啟用按鍵事件預覽  
-            };
-
-            // 創建一個 PictureBox 並設置圖片  
-            PictureBox fullScreenPictureBox = new PictureBox
-            {
-                Dock = DockStyle.Fill, // 填充整個表單  
-                Image = showimgPicture_pic.Image, // 使用原始 PictureBox 的圖片  
-                SizeMode = PictureBoxSizeMode.Zoom, // 縮放圖片以適應螢幕  
-            };
-            // 將 PictureBox 添加到表單  
-            fullScreenForm.Controls.Add(fullScreenPictureBox);
-            // 雙擊退出全螢幕  
-            fullScreenPictureBox.DoubleClick += (s, args) => fullScreenForm.Close();
-
-            // 按下 ESC 鍵退出全螢幕  
-            fullScreenForm.KeyDown += (s, args) =>
-            {
-                if (args.KeyCode == Keys.Escape)
-                {
-                    fullScreenForm.Close();
-                }
-            };
-            // 綁定右鍵
-            fullScreenPictureBox.ContextMenuStrip = contextMenuStrip;
-            // 顯示全螢幕表單  
-            fullScreenForm.ShowDialog();
-        }
-
-        private void PictureBox_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (sender is PictureBox targerBox)
-            {
-                // 更新 ToolTip 的內容為滑鼠座標
-                toolTip.SetToolTip(targerBox, $"{e.Location}");
+                // 如果 _pictureWindow 尚未初始化或已被釋放，則創建新的實例  
+                _pictureWindow = new pictureWindow((Bitmap)showimgPicture_pic.Image);
             }
+
+            _pictureWindow.setBitmap((Bitmap)showimgPicture_pic.Image);
+            // 獲取 _pictureWindow 的子控件 pictureBox1  
+            //PictureBox pictureBox = _pictureWindow.Controls.OfType<PictureBox>().FirstOrDefault();
+            //if (pictureBox != null)
+            //{
+            //    // 將 showimgPicture_pic 的圖片設定到 pictureBox1  
+            //    pictureBox.Image = showimgPicture_pic.Image;
+            //    pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+            //}
+            if (_pictureWindow != null && !_pictureWindow.IsDisposed)
+            {
+                if (_pictureWindow.Visible)
+                {
+                    _pictureWindow.WindowState = FormWindowState.Maximized;
+                    _pictureWindow.FormBorderStyle = FormBorderStyle.None;
+                    _pictureWindow.BringToFront();
+                    //MessageBox.Show("Form 正在顯示！");
+                }
+                else
+                {
+                    // 設置窗口位置和大小  
+                    _pictureWindow.StartPosition = FormStartPosition.Manual;
+                    _pictureWindow.Location = secondScreen.Bounds.Location;
+                    _pictureWindow.Size = secondScreen.Bounds.Size;
+
+                    // 顯示窗口  
+                    _pictureWindow.Show();
+                    _pictureWindow.BringToFront();
+                    //MessageBox.Show("Form 未顯示！");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Form 尚未初始化或已被釋放！");
+            }
+
+
+
+
+
         }
+
 
         private void Screenlist(object sender, EventArgs e)
         {
@@ -368,8 +381,6 @@ namespace Thunder
             {
                 mnsScreenlist_cmb.Items.Add(screen.DeviceName);
             }
-
-
         }
         private void menuToolStripCmb_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -401,6 +412,10 @@ namespace Thunder
                     showimgPicture_pic.Image = Image.FromFile(imagePath);
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
                     showimgSize_btn.Text = $"當前圖片大小：{selectedItem.SubItems[2].Text} x {selectedItem.SubItems[3].Text}"; // 更新狀態列顯示當前圖片大小  
+                    if (_pictureWindow != null && !_pictureWindow.IsDisposed)
+                    {
+                        FullScreen(sender, e);
+                    }
                 }
                 else
                 {
@@ -624,29 +639,49 @@ namespace Thunder
                         break;
                     case "gradient":
                         Bitmap backBitmap = new Bitmap(width, height);
+                        int divisions = int.Parse(tabigDivid_cmb.Text); // 獲取畫面等分數  
+                        int divisionSize = tabigHWay_rdo.Checked ? width / divisions : height / divisions; // 計算每個分區的寬度或高度
                         using (Graphics g2 = Graphics.FromImage(backBitmap))
                         {
                             if (tabigOther_chk.Checked) // 如果選擇了colorbar  
                             {
-                                foreach (Control control in tabigOtherSplit_pnl.Controls)
+                                for (int i = 0; i < divisions; i++)
                                 {
-                                    if (control is Panel panel && panel.BackColor != Color.Transparent)
+                                    foreach (Control control in tabigOtherSplit_pnl.Controls)
                                     {
-                                        string[] tagParts = panel.Tag.ToString().Split(',');
-                                        if (tagParts.Length == 2)
+                                        if (control is Panel panel && panel.BackColor != Color.Transparent)
                                         {
-                                            string direction = tagParts[0];
-                                            int index = int.Parse(tagParts[1]);
+                                            string[] tagParts = panel.Tag.ToString().Split(',');
+                                            if (tagParts.Length == 2)
+                                            {
+                                                string direction = tagParts[0];
+                                                int index = int.Parse(tagParts[1]);
 
-                                            if (direction == "H") // 水平分割  
-                                            {
-                                                int blockHeight = height / tabigOtherSplit_pnl.Controls.Count;
-                                                g2.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight, width, blockHeight);
-                                            }
-                                            else if (direction == "V") // 垂直分割  
-                                            {
-                                                int blockWidth = width / tabigOtherSplit_pnl.Controls.Count;
-                                                g2.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth, 0, blockWidth, height);
+                                                if (direction == "H") // 水平分割  
+                                                {
+                                                    int blockHeight = height / tabigOtherSplit_pnl.Controls.Count;
+                                                    if (tabigHWay_rdo.Checked)
+                                                    {
+                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight / divisions + i * blockHeight, width, blockHeight / divisions);
+                                                    }
+                                                    else
+                                                    {
+                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight, width, blockHeight);
+                                                    }
+                                                }
+                                                else if (direction == "V") // 垂直分割  
+                                                {
+                                                    int blockWidth = width / tabigOtherSplit_pnl.Controls.Count;
+                                                    if (tabigVWay_rdo.Checked)
+                                                    {
+                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth / divisions + i * blockWidth, 0, blockWidth / divisions, height);
+                                                    }
+                                                    else
+                                                    {
+                                                        //MessageBox.Show("123");
+                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth, 0, blockWidth, height);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -660,12 +695,9 @@ namespace Thunder
 
                         if (!tabigColorBar_rdo.Checked)
                         {
-                            int divisions = int.Parse(tabigDivid_cmb.Text); // 獲取畫面等分數  
-                            int divisionSize = tabigHWay_rdo.Checked ? width / divisions : height / divisions; // 計算每個分區的寬度或高度
                             int stepNum = Math.Min(int.Parse(tabigStep_cmb.Text), divisionSize); // 獲取漸層階數
                             int startColorValue = int.Parse(tabigFirstLevel_cmb.Text); // 開始顏色值  
                             int endColorValue = int.Parse(tabigLastLevel_cmb.Text); // 結束顏色值  
-
                             backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions);
                             CurrentBitmap = ConvertARGBToRGB(backBitmap);
                         }
@@ -1879,38 +1911,7 @@ namespace Thunder
             }
         }
 
-        private void contextMenuStrip_Opened(object sender, EventArgs e)
-        {
-            if (sender is ContextMenuStrip cms && cms.SourceControl is Control sourceControl)
-            {
-                Point mousePosition = sourceControl.PointToClient(Cursor.Position);
-                cmsShowLoc.Text = $"切換顯示座標_X: {mousePosition.X}, Y: {mousePosition.Y}";
-            }
-            else
-            {
-                cmsShowLoc.Text = "顯示座標(無法取得座標)";
-            }
-        }
 
-        private void cmsShowLoc_Click(object sender, EventArgs e)
-        {
-            if (sender is ToolStripMenuItem menuItem && menuItem.Owner is ContextMenuStrip contextMenu && contextMenu.SourceControl is PictureBox targetPictureBox)
-            {
-                if (cmsShowLoc.ForeColor != Color.Red)
-                {
-                    // 取消訂閱 PictureBox 的 MouseMove 事件  
-                    targetPictureBox.MouseMove -= PictureBox_MouseMove;
-                    cmsShowLoc.ForeColor = Color.Red;
-                }
-                else
-                {
-                    // 訂閱 PictureBox 的 MouseMove 事件  
-                    targetPictureBox.MouseMove += PictureBox_MouseMove;
-                    cmsShowLoc.ForeColor = Color.Black;
-                }
-            }
-
-        }
         private bool IsMouseMoveBound(Object targetObject, String targerString)
         {
             var fieldInfo = typeof(Control).GetField(targerString, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
