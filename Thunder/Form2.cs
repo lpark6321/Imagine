@@ -16,7 +16,7 @@ namespace Thunder
         {
             InitializeComponent();
             _bitmap = bitMap; // 將接收到的 Bitmap 儲存到類別屬性中
-            this.Paint += Form2_show; // 綁定 Paint 事件  
+            //this.Paint += Form2_show; // 綁定 Paint 事件  
         }
 
         private void pictureWindow_Load(object sender, EventArgs e)
@@ -214,7 +214,7 @@ namespace Thunder
 
         private void cmsAdjust_Click(object sender, EventArgs e)
         {
-            if (sender is ToolStripMenuItem menuItem )
+            if (sender is ToolStripMenuItem menuItem)
             {
                 if (menuItem.Name == "cmsAdjustRotate90")
                 {
@@ -239,6 +239,46 @@ namespace Thunder
 
                 Invalidate(); // 重新繪製窗口以顯示更新的圖片
                 picwinPicture_pic.Image = _bitmap; // 更新 PictureBox 的圖片
+            }
+        }
+        private void Slideshow(object sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem menuItem)
+            {
+                if (menuItem.Name == "cmsSlideshowStop")
+                {
+                    // 停止幻燈片放映  
+                    timer.Stop();
+                }
+                else
+                {
+                    int interval;
+                    if (menuItem.Name == "cmsSlideshowTextButton" && int.TryParse(cmsSlideshowText.Text, out interval))
+                    {
+                        // 開始幻燈片放映  
+                        timer.Interval = interval; // 設定間隔時間為 interval毫秒  
+                    }
+                    else if (int.TryParse(menuItem.Name.Substring(12), out interval))
+                    {
+                        // 開始幻燈片放映  
+                        timer.Interval = interval * 1000; // 設定間隔時間秒  
+                    }
+                    timer.Tag = "KeyRight";
+                    timer.Start();
+                }
+            }
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            if (sender is Timer t && t.Tag is string st)
+            {
+                if (st == "KeyRight")
+                {
+                    // 模擬按下向右鍵  
+                    // With the corrected line:  
+                    pictureWindow_KeyDown(this, new KeyEventArgs(Keys.Right));
+                }
             }
         }
     }
