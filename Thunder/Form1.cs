@@ -54,8 +54,8 @@ namespace Thunder
             MaskPanelCreat(tabiwCMaskPixelClear_btn, e); //先產生MaskPanel
             SplitPanelCreat(tabigOtherSplit_nud, e);//先產生GradSplitPanel
             SplitPanelCreat(tabiwCGradOtherSplit_nud, e);//先產生GradSplitPanel
-            tabControl.SelectedIndex = 1;
-            tabControl_SelectedIndexChanged(sender, e);
+            //tabControl.SelectedIndex = 1;
+            //tabControl_SelectedIndexChanged(sender, e);
         }
         public MyPicture mypicture { get; private set; }
         public class MyPicture
@@ -177,26 +177,30 @@ namespace Thunder
 
                 return null; // 如果用戶取消或載入失敗，回傳 null
             }
-            public Bitmap Getpicture()
-            {
-                return _currentBitmap;
-            }
-
             public string Getsize()
             {
                 _width = _currentBitmap.Width;
                 _height = _currentBitmap.Height;
                 return $"{_width} x {_height}"; // 更新圖片大小
             }
-
-            public Image Setpicture(Image image)
+            public Bitmap Getpicture()
             {
-                _currentBitmap = image as Bitmap;
                 if (_currentBitmap == null)
                 {
-                    throw new InvalidCastException("無法將 Image 轉換為 Bitmap。請確保提供的圖片是 Bitmap 類型。");
+                    MessageBox.Show("圖片尚未初始化！");
+                    return null;
                 }
-                tag = "image";
+                return _currentBitmap;
+            }
+            public Image Setpicture(Image image, String stringtag = "")
+            {
+                if (_currentBitmap != null)
+                {
+                    _currentBitmap.Dispose(); // 釋放舊的 Bitmap
+                }
+
+                _currentBitmap = new Bitmap(image); // 複製新的 Bitmap
+                tag = stringtag;
                 return _currentBitmap; // 回傳圖片
             }
         }
@@ -304,6 +308,11 @@ namespace Thunder
             try
             {
                 GenerateImage(type, width, height);
+                if (showimgPicture_pic.Image != null)
+                {
+                    showimgPicture_pic.Image.Dispose();
+                    showimgPicture_pic.Image = null;
+                }
                 showimgPicture_pic.Image = mypicture.Getpicture();
                 showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
                 showimgSize_btn.Text = $"當前圖片大小：{mnsW_txt.Text} x {mnsH_txt.Text}"; // 更新狀態列顯示當前圖片大小  
@@ -328,14 +337,6 @@ namespace Thunder
             }
 
             _pictureWindow.setBitmap((Bitmap)showimgPicture_pic.Image);
-            // 獲取 _pictureWindow 的子控件 pictureBox1  
-            //PictureBox pictureBox = _pictureWindow.Controls.OfType<PictureBox>().FirstOrDefault();
-            //if (pictureBox != null)
-            //{
-            //    // 將 showimgPicture_pic 的圖片設定到 pictureBox1  
-            //    pictureBox.Image = showimgPicture_pic.Image;
-            //    pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-            //}
             if (_pictureWindow != null && !_pictureWindow.IsDisposed)
             {
                 if (_pictureWindow.Visible)
@@ -362,14 +363,7 @@ namespace Thunder
             {
                 MessageBox.Show("Form 尚未初始化或已被釋放！");
             }
-
-
-
-
-
         }
-
-
         private void Screenlist(object sender, EventArgs e)
         {
             // 獲取所有螢幕
@@ -408,13 +402,43 @@ namespace Thunder
 
                 if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
                 {
-                    // 載入原始圖片到 PictureBox  
-                    showimgPicture_pic.Image = Image.FromFile(imagePath);
-                    showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
-                    showimgSize_btn.Text = $"當前圖片大小：{selectedItem.SubItems[2].Text} x {selectedItem.SubItems[3].Text}"; // 更新狀態列顯示當前圖片大小  
-                    if (_pictureWindow != null && !_pictureWindow.IsDisposed)
+                    try
                     {
-                        FullScreen(sender, e);
+                        // 釋放舊圖片
+                        if (showimgPicture_pic.Image != null)
+                        {
+                            showimgPicture_pic.Image.Dispose();
+                            showimgPicture_pic.Image = null;
+                        }
+
+                        // 使用 FileStream 加載圖片，並生成縮圖
+                        using (FileStream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                        {
+                            using (Image originalImage = Image.FromStream(fs))
+                            {
+                                //// 生成縮圖
+                                //int thumbnailWidth = 800; // 設定縮圖寬度
+                                //int thumbnailHeight = 600; // 設定縮圖高度
+                                //Image thumbnail = originalImage.GetThumbnailImage(thumbnailWidth, thumbnailHeight, null, IntPtr.Zero);
+
+                                // 設定縮圖到 PictureBox
+                                showimgPicture_pic.Image = originalImage;
+                                showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
+
+                                // 更新圖片大小顯示
+                                showimgSize_btn.Text = $"當前圖片大小：{originalImage.Width} x {originalImage.Height}";
+                            }
+                        }
+
+                        // 如果需要全屏顯示，更新 _pictureWindow
+                        if (_pictureWindow != null && !_pictureWindow.IsDisposed)
+                        {
+                            FullScreen(sender, e);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"無法載入圖片：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 else
@@ -422,6 +446,41 @@ namespace Thunder
                     MessageBox.Show($"找不到圖片：{imagePath}");
                 }
             }
+            //if (tabdlPatternList_lvw.SelectedItems.Count > 0)
+            //{
+            //    ListViewItem selectedItem = tabdlPatternList_lvw.SelectedItems[0]; // 獲取選中的 ListViewItem  
+            //    string imagePath = selectedItem.Tag as string; // 從 Tag 中取出圖片路徑  
+
+            //    if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
+            //    {
+            //        using (Image img = Image.FromFile(imagePath))
+            //        {
+            //            // 載入原始圖片到 PictureBox  
+            //            if (img == null)
+            //            {
+            //                MessageBox.Show("無法載入圖片！");
+            //                return;
+            //            }
+            //            if (showimgPicture_pic.Image != null)
+            //            {
+            //                showimgPicture_pic.Image.Dispose();
+            //                showimgPicture_pic.Image = null;
+            //            }
+            //            showimgPicture_pic.Image = mypicture.Setpicture(new Bitmap(img), "image"); // 複製圖片
+
+            //            showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
+            //            showimgSize_btn.Text = $"當前圖片大小：{selectedItem.SubItems[2].Text} x {selectedItem.SubItems[3].Text}"; // 更新狀態列顯示當前圖片大小  
+            //            if (_pictureWindow != null && !_pictureWindow.IsDisposed)
+            //            {
+            //                FullScreen(sender, e);
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        MessageBox.Show($"找不到圖片：{imagePath}");
+            //    }
+            //}
         }
 
         private void PopulateListView()
@@ -465,9 +524,10 @@ namespace Thunder
                         string extension = Path.GetExtension(imagePath).ToLower();
                         int width = img.Width;
                         int height = img.Height;
-
+                        // 生成縮圖
+                        Image thumbnail = img.GetThumbnailImage(56, 56, null, IntPtr.Zero);
                         // 添加到 ImageList
-                        tabdlPatternList_lvw.LargeImageList.Images.Add(fileName, new Bitmap(img));
+                        tabdlPatternList_lvw.LargeImageList.Images.Add(fileName, thumbnail);
 
                         // 創建 ListViewItem
                         ListViewItem item = new ListViewItem(fileName)
@@ -518,6 +578,10 @@ namespace Thunder
             else if (tabControl.SelectedTab == tabImgEditor)
             {
                 // 當選擇 ImgEditor 標籤時，執行其他邏輯
+                if (showimgPicture_pic.Image != null)
+                {
+
+                }
             }
         }
 
@@ -699,13 +763,9 @@ namespace Thunder
                             int startColorValue = int.Parse(tabigFirstLevel_cmb.Text); // 開始顏色值  
                             int endColorValue = int.Parse(tabigLastLevel_cmb.Text); // 結束顏色值  
                             backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions);
-                            CurrentBitmap = ConvertARGBToRGB(backBitmap);
+                            backBitmap = ConvertARGBToRGB(backBitmap);
                         }
-                        else
-                        {
-                            CurrentBitmap = backBitmap;
-                        }
-
+                        CurrentBitmap = backBitmap;
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "chess":
@@ -913,6 +973,8 @@ namespace Thunder
                         throw new NotSupportedException("不支援的圖片類型！");
                 }
             }
+            // 釋放資源
+            CurrentBitmap.Dispose();
         }
         public Bitmap ApplyTransparency(Bitmap originalBitmap, int startAlpha, int endAlpha, bool isVertical, int steps, int segments)
         {
@@ -1281,11 +1343,18 @@ namespace Thunder
                         }
                     }
                 }
-                else
+                else if (sender is PictureBox pictureBox )
                 {
+                    if (showimgPicture_pic.Image != null)
+                    {
+                        showimgPicture_pic.Image.Dispose();
+                        showimgPicture_pic.Image = null;
+                    }
                     // 將載入的圖片設置到 PictureBox
                     showimgPicture_pic.Image = mypicture.OpenImage();
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
+                    pictureBox.Image = showimgPicture_pic.Image;
+                    pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
                     showimgSize_btn.Text = $"圖片大小：{mypicture.Getsize()}"; // 更新狀態列顯示圖片大小
                 }
             }
@@ -1330,6 +1399,11 @@ namespace Thunder
                 string filePath = files[0];
                 try
                 {
+                    if (showimgPicture_pic.Image != null)
+                    {
+                        showimgPicture_pic.Image.Dispose();
+                        showimgPicture_pic.Image = null;
+                    }
                     // 載入圖片並顯示在 PictureBox 中
                     showimgPicture_pic.Image = mypicture.Setpicture(Image.FromFile(filePath));
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
@@ -1639,6 +1713,11 @@ namespace Thunder
         {
             if (sender is CheckedListBox targetcheck && targetcheck.Text != "")
             {
+                if (showimgPicture_pic.Image != null)
+                {
+                    //showimgPicture_pic.Image.Dispose();
+                    showimgPicture_pic.Image = null;
+                }
                 showimgPicture_pic.Image = Image.FromFile(targetcheck.Text);
                 showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
             }
