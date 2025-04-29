@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Thunder
 {
@@ -40,7 +37,6 @@ namespace Thunder
         }
         private void pictureWindow_DoubleClick(object sender, EventArgs e)
         {
-            //if (FormBorderStyle == FormBorderStyle.None)
             if (WindowState == FormWindowState.Maximized)
             {
                 // 退出全螢幕，並將尺寸設為所在螢幕的 1/4 大小
@@ -61,11 +57,11 @@ namespace Thunder
             }
             else
             {
-                // 進入全螢幕
+                // 進入全螢幕，保留邊框
                 WindowState = FormWindowState.Maximized;
-                FormBorderStyle = FormBorderStyle.None;
+                FormBorderStyle = FormBorderStyle.None; // 保留邊框
+                Size = new Size(Screen.FromControl(this).WorkingArea.Width, Screen.FromControl(this).WorkingArea.Height);
             }
-
         }
 
         private void contextMenuStrip_Opened(object sender, EventArgs e)
@@ -88,20 +84,23 @@ namespace Thunder
                 if (cmsShowLoc.ForeColor != Color.Red)
                 {
                     // 取消訂閱 PictureBox 的 MouseMove 事件  
-                    MouseMove += PictureBox_MouseMove;
+                    picwinPicture_pic.MouseMove += PictureBox_MouseMove;
                     cmsShowLoc.ForeColor = Color.Red;
+                    Cursor = Cursors.Cross; // 將游標設為 Cross
                 }
                 else
                 {
                     // 訂閱 PictureBox 的 MouseMove 事件  
-                    MouseMove -= PictureBox_MouseMove;
+                    picwinPicture_pic.MouseMove -= PictureBox_MouseMove;
                     cmsShowLoc.ForeColor = Color.Black;
+                    Cursor = Cursors.Default; // 恢復游標為預設
                 }
             }
         }
 
         private void PictureBox_MouseMove(object sender, MouseEventArgs e)
         {
+                //MessageBox.Show("");
             if (sender is PictureBox targerBox)
             {
                 // 更新 ToolTip 的內容為滑鼠座標
@@ -116,7 +115,8 @@ namespace Thunder
                 // 按下 ESC 鍵退出全螢幕  
                 if (e.KeyCode == Keys.Escape)
                 {
-                    Close();
+                    //Close();
+                    pictureWindow_DoubleClick(sender, e);
                 }
                 else if (e.KeyCode == Keys.Right)
                 {
@@ -145,8 +145,25 @@ namespace Thunder
                                 listView.Items[nextIndex].Focused = true;
                                 mainWindow.Instance.FullScreen(sender, e);
                             }
-                        }
 
+                        }
+                        else if (tabControl.SelectedIndex == 2) //切換到 ImgList 分頁 (index = 2)
+                        {
+                            // 確保 ImgList 分頁下有 ListBox 並切換選項  
+                            if (tabControl.TabPages[2].Controls["tabilPatternList_lst"] is ListBox
+                                    listBox && listBox.Items.Count > 0)
+                            {
+                                int currentIndex = listBox.SelectedIndex;
+                                if (currentIndex != -1)
+                                {
+                                    listBox.SelectedIndex = -1; // 取消目前選擇
+                                }
+
+                                int nextIndex = (currentIndex + 1) % listBox.Items.Count;
+                                listBox.SelectedIndex = nextIndex; // 選擇下一個項目
+                                //mainWindow.Instance.FullScreen(sender, e);
+                            }
+                        }
                     }
                 }
                 else if (e.KeyCode == Keys.Left)
@@ -174,6 +191,23 @@ namespace Thunder
                                 listView.Items[prevIndex].Selected = true;
                                 listView.Items[prevIndex].Focused = true;
                                 mainWindow.Instance.FullScreen(sender, e);
+                            }
+                        }
+                        else if (tabControl.SelectedIndex == 2) //切換到 ImgList 分頁 (index = 2)
+                        {
+                            // 確保 ImgList 分頁下有 ListBox 並切換選項  
+                            if (tabControl.TabPages[2].Controls["tabilPatternList_lst"] is ListBox
+                                    listBox && listBox.Items.Count > 0)
+                            {
+                                int currentIndex = listBox.SelectedIndex;
+                                if (currentIndex != -1)
+                                {
+                                    listBox.SelectedIndex = -1; // 取消目前選擇
+                                }
+
+                                int nextIndex = (currentIndex - 1 + listBox.Items.Count) % listBox.Items.Count % listBox.Items.Count;
+                                listBox.SelectedIndex = nextIndex; // 選擇下一個項目
+                                //mainWindow.Instance.FullScreen(sender, e);
                             }
                         }
 
