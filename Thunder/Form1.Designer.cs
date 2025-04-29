@@ -251,6 +251,7 @@ namespace Thunder
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.ssrStatus_lbl = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssrProgressbar_prg = new System.Windows.Forms.ToolStripProgressBar();
+            this.aAAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabImgEditor.SuspendLayout();
@@ -317,7 +318,8 @@ namespace Thunder
             this.mnsW_txt,
             this.mnsScreenlist_cmb,
             this.mnsGenerate_btn,
-            this.mnsPattername_txt});
+            this.mnsPattername_txt,
+            this.aAAToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
@@ -335,6 +337,7 @@ namespace Thunder
             // mnsFullscreen_btn
             // 
             this.mnsFullscreen_btn.Name = "mnsFullscreen_btn";
+            this.mnsFullscreen_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Z)));
             this.mnsFullscreen_btn.Size = new System.Drawing.Size(76, 23);
             this.mnsFullscreen_btn.Text = "FullScreen";
             this.mnsFullscreen_btn.Click += new System.EventHandler(this.FullScreen);
@@ -444,11 +447,11 @@ namespace Thunder
             this.tabimgeWindow.Controls.Add(this.tabiwLineOutside_btn);
             this.tabimgeWindow.Controls.Add(this.tabiwWinLoc_grp);
             this.tabimgeWindow.Controls.Add(this.tabiwWinSize_grp);
-            this.tabimgeWindow.Location = new System.Drawing.Point(297, 4);
+            this.tabimgeWindow.Location = new System.Drawing.Point(212, 8);
             this.tabimgeWindow.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeWindow.Name = "tabimgeWindow";
             this.tabimgeWindow.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeWindow.Size = new System.Drawing.Size(94, 91);
+            this.tabimgeWindow.Size = new System.Drawing.Size(81, 78);
             this.tabimgeWindow.TabIndex = 0;
             this.tabimgeWindow.TabStop = false;
             this.tabimgeWindow.Text = "Window";
@@ -885,6 +888,7 @@ namespace Thunder
             // 
             // tabiwCGradOtherSplit_pnl
             // 
+            this.tabiwCGradOtherSplit_pnl.Cursor = System.Windows.Forms.Cursors.Cross;
             this.tabiwCGradOtherSplit_pnl.Location = new System.Drawing.Point(10, 30);
             this.tabiwCGradOtherSplit_pnl.Name = "tabiwCGradOtherSplit_pnl";
             this.tabiwCGradOtherSplit_pnl.Size = new System.Drawing.Size(200, 140);
@@ -1534,11 +1538,11 @@ namespace Thunder
             this.tabimgeGradient.Controls.Add(this.tabigHWay_rdo);
             this.tabimgeGradient.Controls.Add(this.tabigFirstLevel_cmb);
             this.tabimgeGradient.Controls.Add(this.tabigLastLevel_cmb);
-            this.tabimgeGradient.Location = new System.Drawing.Point(106, 4);
+            this.tabimgeGradient.Location = new System.Drawing.Point(9, 8);
             this.tabimgeGradient.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeGradient.Name = "tabimgeGradient";
             this.tabimgeGradient.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeGradient.Size = new System.Drawing.Size(96, 84);
+            this.tabimgeGradient.Size = new System.Drawing.Size(80, 82);
             this.tabimgeGradient.TabIndex = 10;
             this.tabimgeGradient.TabStop = false;
             this.tabimgeGradient.Text = "Gradient";
@@ -1716,6 +1720,7 @@ namespace Thunder
             // 
             // tabigOtherSplit_pnl
             // 
+            this.tabigOtherSplit_pnl.Cursor = System.Windows.Forms.Cursors.Cross;
             this.tabigOtherSplit_pnl.Location = new System.Drawing.Point(10, 36);
             this.tabigOtherSplit_pnl.Name = "tabigOtherSplit_pnl";
             this.tabigOtherSplit_pnl.Size = new System.Drawing.Size(200, 160);
@@ -2276,7 +2281,7 @@ namespace Thunder
             this.tabimgeMask.Controls.Add(this.tabiemWNum_lbl);
             this.tabimgeMask.Controls.Add(this.tabiemSubPixel_rdo);
             this.tabimgeMask.Controls.Add(this.tabiemPixel_rdo);
-            this.tabimgeMask.Location = new System.Drawing.Point(209, 4);
+            this.tabimgeMask.Location = new System.Drawing.Point(112, 8);
             this.tabimgeMask.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeMask.Name = "tabimgeMask";
             this.tabimgeMask.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -2455,11 +2460,11 @@ namespace Thunder
             this.tabimgeFrame.Controls.Add(this.tabiefLineColor_btn);
             this.tabimgeFrame.Controls.Add(this.tabiefBack_lbl);
             this.tabimgeFrame.ImeMode = System.Windows.Forms.ImeMode.On;
-            this.tabimgeFrame.Location = new System.Drawing.Point(102, 95);
+            this.tabimgeFrame.Location = new System.Drawing.Point(13, 99);
             this.tabimgeFrame.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeFrame.Name = "tabimgeFrame";
             this.tabimgeFrame.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeFrame.Size = new System.Drawing.Size(288, 78);
+            this.tabimgeFrame.Size = new System.Drawing.Size(79, 71);
             this.tabimgeFrame.TabIndex = 10;
             this.tabimgeFrame.TabStop = false;
             this.tabimgeFrame.Text = "Frame&&CrossLine&&Border";
@@ -2722,7 +2727,7 @@ namespace Thunder
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorG_btn);
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorW_btn);
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorR_btn);
-            this.tabimgeChess.Location = new System.Drawing.Point(6, 89);
+            this.tabimgeChess.Location = new System.Drawing.Point(120, 99);
             this.tabimgeChess.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeChess.Name = "tabimgeChess";
             this.tabimgeChess.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -3009,20 +3014,25 @@ namespace Thunder
             // 
             // tabilPatternList_lst
             // 
+            this.tabilPatternList_lst.AllowDrop = true;
             this.tabilPatternList_lst.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabilPatternList_lst.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.tabilPatternList_lst.FormattingEnabled = true;
-            this.tabilPatternList_lst.ItemHeight = 12;
+            this.tabilPatternList_lst.ItemHeight = 16;
             this.tabilPatternList_lst.Items.AddRange(new object[] {
-            "White",
-            "Black",
-            "Red",
-            "Green",
-            "Blue"});
+            "Solid,Black,255",
+            "Solid,White,255",
+            "Solid,Red,255",
+            "Solid,Green,255",
+            "Solid,Blue,255"});
             this.tabilPatternList_lst.Location = new System.Drawing.Point(3, 2);
             this.tabilPatternList_lst.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabilPatternList_lst.Name = "tabilPatternList_lst";
             this.tabilPatternList_lst.Size = new System.Drawing.Size(650, 454);
             this.tabilPatternList_lst.TabIndex = 0;
+            this.tabilPatternList_lst.SelectedIndexChanged += new System.EventHandler(this.tabilPatternList_lst_SelectedIndexChanged);
+            this.tabilPatternList_lst.DragDrop += new System.Windows.Forms.DragEventHandler(this.tabilPatternList_lst_DragDrop);
+            this.tabilPatternList_lst.DragEnter += new System.Windows.Forms.DragEventHandler(this.tabilPatternList_lst_DragEnter);
             // 
             // Showimage_flp
             // 
@@ -3043,10 +3053,11 @@ namespace Thunder
             // showimgSave_btn
             // 
             this.showimgSave_btn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.showimgSave_btn.Location = new System.Drawing.Point(196, 464);
+            this.showimgSave_btn.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.showimgSave_btn.Location = new System.Drawing.Point(200, 458);
             this.showimgSave_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.showimgSave_btn.Name = "showimgSave_btn";
-            this.showimgSave_btn.Size = new System.Drawing.Size(64, 18);
+            this.showimgSave_btn.Size = new System.Drawing.Size(60, 24);
             this.showimgSave_btn.TabIndex = 0;
             this.showimgSave_btn.Text = "Save";
             this.showimgSave_btn.UseVisualStyleBackColor = true;
@@ -3054,10 +3065,11 @@ namespace Thunder
             // 
             // showimgGenerate_btn
             // 
-            this.showimgGenerate_btn.Location = new System.Drawing.Point(3, 442);
+            this.showimgGenerate_btn.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.showimgGenerate_btn.Location = new System.Drawing.Point(3, 430);
             this.showimgGenerate_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.showimgGenerate_btn.Name = "showimgGenerate_btn";
-            this.showimgGenerate_btn.Size = new System.Drawing.Size(96, 18);
+            this.showimgGenerate_btn.Size = new System.Drawing.Size(100, 24);
             this.showimgGenerate_btn.TabIndex = 1;
             this.showimgGenerate_btn.Text = "Generate";
             this.showimgGenerate_btn.UseVisualStyleBackColor = true;
@@ -3068,7 +3080,7 @@ namespace Thunder
             this.showimgPicture_pic.AllowDrop = true;
             this.showimgPicture_pic.BackColor = System.Drawing.Color.Black;
             this.showimgPicture_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.showimgPicture_pic.Location = new System.Drawing.Point(3, 304);
+            this.showimgPicture_pic.Location = new System.Drawing.Point(3, 292);
             this.showimgPicture_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.showimgPicture_pic.MinimumSize = new System.Drawing.Size(171, 0);
             this.showimgPicture_pic.Name = "showimgPicture_pic";
@@ -3082,7 +3094,7 @@ namespace Thunder
             // showimgSize_btn
             // 
             this.showimgSize_btn.AutoSize = true;
-            this.showimgSize_btn.Location = new System.Drawing.Point(3, 290);
+            this.showimgSize_btn.Location = new System.Drawing.Point(3, 278);
             this.showimgSize_btn.Name = "showimgSize_btn";
             this.showimgSize_btn.Size = new System.Drawing.Size(0, 12);
             this.showimgSize_btn.TabIndex = 8;
@@ -3114,20 +3126,33 @@ namespace Thunder
             this.ssrProgressbar_prg.Size = new System.Drawing.Size(171, 13);
             this.ssrProgressbar_prg.Visible = false;
             // 
+            // aAAToolStripMenuItem
+            // 
+            this.aAAToolStripMenuItem.Name = "aAAToolStripMenuItem";
+            this.aAAToolStripMenuItem.Size = new System.Drawing.Size(43, 23);
+            this.aAAToolStripMenuItem.Text = "AAA";
+            this.aAAToolStripMenuItem.Click += new System.EventHandler(this.button1_Click);
+            // 
             // mainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(948, 531);
             this.Controls.Add(this.Showimage_flp);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuStrip);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.MinimumSize = new System.Drawing.Size(763, 452);
             this.Name = "mainWindow";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "PatternMagic";
+            this.Load += new System.EventHandler(this.Mainwindow_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.mainWindow_KeyDown);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.tabControl.ResumeLayout(false);
@@ -3428,5 +3453,6 @@ namespace Thunder
         private Panel tabimgePanel;
         private Panel tabiwCustomFunc_pnl;
         private FlowLayoutPanel tabiwCLayout_flp;
+        private ToolStripMenuItem aAAToolStripMenuItem;
     }
 }

@@ -33,6 +33,8 @@
             this.cmsShowLoc = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.cmsSlideshow = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmsSlideshow1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmsSlideshow3 = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsSlideshow5 = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsSlideshow10 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -52,8 +54,6 @@
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.picwinPicture_pic = new System.Windows.Forms.PictureBox();
             this.timer = new System.Windows.Forms.Timer(this.components);
-            this.cmsSlideshow1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmsSlideshow3 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picwinPicture_pic)).BeginInit();
             this.SuspendLayout();
@@ -72,7 +72,7 @@
             this.toolStripSeparator2,
             this.cmsClose});
             this.contextMenuStrip.Name = "contextMenuStrip1";
-            this.contextMenuStrip.Size = new System.Drawing.Size(182, 181);
+            this.contextMenuStrip.Size = new System.Drawing.Size(182, 159);
             this.contextMenuStrip.Opened += new System.EventHandler(this.contextMenuStrip_Opened);
             // 
             // cmsShowLoc
@@ -100,6 +100,20 @@
             this.cmsSlideshow.Name = "cmsSlideshow";
             this.cmsSlideshow.Size = new System.Drawing.Size(181, 22);
             this.cmsSlideshow.Text = "幻燈片";
+            // 
+            // cmsSlideshow1
+            // 
+            this.cmsSlideshow1.Name = "cmsSlideshow1";
+            this.cmsSlideshow1.Size = new System.Drawing.Size(204, 22);
+            this.cmsSlideshow1.Text = "每1秒";
+            this.cmsSlideshow1.Click += new System.EventHandler(this.Slideshow);
+            // 
+            // cmsSlideshow3
+            // 
+            this.cmsSlideshow3.Name = "cmsSlideshow3";
+            this.cmsSlideshow3.Size = new System.Drawing.Size(204, 22);
+            this.cmsSlideshow3.Text = "每3秒";
+            this.cmsSlideshow3.Click += new System.EventHandler(this.Slideshow);
             // 
             // cmsSlideshow5
             // 
@@ -195,7 +209,6 @@
             // cmsScreenlist
             // 
             this.cmsScreenlist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmsScreenlist.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.cmsScreenlist.Name = "cmsScreenlist";
             this.cmsScreenlist.Size = new System.Drawing.Size(121, 23);
             this.cmsScreenlist.SelectedIndexChanged += new System.EventHandler(this.cmsScreenlist_cmb_SelectedIndexChanged);
@@ -224,6 +237,7 @@
             // 
             this.picwinPicture_pic.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picwinPicture_pic.Location = new System.Drawing.Point(0, 0);
+            this.picwinPicture_pic.Margin = new System.Windows.Forms.Padding(0);
             this.picwinPicture_pic.Name = "picwinPicture_pic";
             this.picwinPicture_pic.Size = new System.Drawing.Size(800, 450);
             this.picwinPicture_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -234,20 +248,6 @@
             // timer
             // 
             this.timer.Tick += new System.EventHandler(this.timer_Tick);
-            // 
-            // cmsSlideshow1
-            // 
-            this.cmsSlideshow1.Name = "cmsSlideshow1";
-            this.cmsSlideshow1.Size = new System.Drawing.Size(204, 22);
-            this.cmsSlideshow1.Text = "每1秒";
-            this.cmsSlideshow1.Click += new System.EventHandler(this.Slideshow);
-            // 
-            // cmsSlideshow3
-            // 
-            this.cmsSlideshow3.Name = "cmsSlideshow3";
-            this.cmsSlideshow3.Size = new System.Drawing.Size(204, 22);
-            this.cmsSlideshow3.Text = "每3秒";
-            this.cmsSlideshow3.Click += new System.EventHandler(this.Slideshow);
             // 
             // pictureWindow
             // 

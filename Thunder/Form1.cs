@@ -25,7 +25,7 @@ namespace Thunder
         public mainWindow()
         {
             InitializeComponent();
-            Mainwindow_Load(this, EventArgs.Empty);
+            //Mainwindow_Load(this, EventArgs.Empty);
             mypicture = new MyPicture(this);
             Instance = this; // 初始化 Singleton 實例
         }
@@ -416,13 +416,14 @@ namespace Thunder
                         {
                             using (Image originalImage = Image.FromStream(fs))
                             {
-                                //// 生成縮圖
+                                ////// 生成縮圖
                                 //int thumbnailWidth = 800; // 設定縮圖寬度
                                 //int thumbnailHeight = 600; // 設定縮圖高度
                                 //Image thumbnail = originalImage.GetThumbnailImage(thumbnailWidth, thumbnailHeight, null, IntPtr.Zero);
 
-                                // 設定縮圖到 PictureBox
-                                showimgPicture_pic.Image = originalImage;
+                                //// 設定縮圖到 PictureBox
+                                //showimgPicture_pic.Image = thumbnail;
+                                showimgPicture_pic.Image = mypicture.Setpicture(originalImage, "image");
                                 showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
 
                                 // 更新圖片大小顯示
@@ -446,41 +447,6 @@ namespace Thunder
                     MessageBox.Show($"找不到圖片：{imagePath}");
                 }
             }
-            //if (tabdlPatternList_lvw.SelectedItems.Count > 0)
-            //{
-            //    ListViewItem selectedItem = tabdlPatternList_lvw.SelectedItems[0]; // 獲取選中的 ListViewItem  
-            //    string imagePath = selectedItem.Tag as string; // 從 Tag 中取出圖片路徑  
-
-            //    if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
-            //    {
-            //        using (Image img = Image.FromFile(imagePath))
-            //        {
-            //            // 載入原始圖片到 PictureBox  
-            //            if (img == null)
-            //            {
-            //                MessageBox.Show("無法載入圖片！");
-            //                return;
-            //            }
-            //            if (showimgPicture_pic.Image != null)
-            //            {
-            //                showimgPicture_pic.Image.Dispose();
-            //                showimgPicture_pic.Image = null;
-            //            }
-            //            showimgPicture_pic.Image = mypicture.Setpicture(new Bitmap(img), "image"); // 複製圖片
-
-            //            showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
-            //            showimgSize_btn.Text = $"當前圖片大小：{selectedItem.SubItems[2].Text} x {selectedItem.SubItems[3].Text}"; // 更新狀態列顯示當前圖片大小  
-            //            if (_pictureWindow != null && !_pictureWindow.IsDisposed)
-            //            {
-            //                FullScreen(sender, e);
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show($"找不到圖片：{imagePath}");
-            //    }
-            //}
         }
 
         private void PopulateListView()
@@ -709,6 +675,9 @@ namespace Thunder
                         {
                             if (tabigOther_chk.Checked) // 如果選擇了colorbar  
                             {
+                                int blockHeight = height / divisions;
+                                int blockWidth = width / divisions;
+                                int split = (int)tabigOtherSplit_nud.Value;
                                 for (int i = 0; i < divisions; i++)
                                 {
                                     foreach (Control control in tabigOtherSplit_pnl.Controls)
@@ -720,30 +689,27 @@ namespace Thunder
                                             {
                                                 string direction = tagParts[0];
                                                 int index = int.Parse(tagParts[1]);
-
                                                 if (direction == "H") // 水平分割  
                                                 {
-                                                    int blockHeight = height / tabigOtherSplit_pnl.Controls.Count;
                                                     if (tabigHWay_rdo.Checked)
                                                     {
-                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight / divisions + i * blockHeight, width, blockHeight / divisions);
+                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight / split + i * blockHeight, width, blockHeight / split);
                                                     }
                                                     else
                                                     {
-                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight, width, blockHeight);
+                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), 0, index * height / split, width, height / split);
                                                     }
                                                 }
                                                 else if (direction == "V") // 垂直分割  
                                                 {
-                                                    int blockWidth = width / tabigOtherSplit_pnl.Controls.Count;
                                                     if (tabigVWay_rdo.Checked)
                                                     {
-                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth / divisions + i * blockWidth, 0, blockWidth / divisions, height);
+                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth / split + i * blockWidth, 0, blockWidth / split, height);
                                                     }
                                                     else
                                                     {
                                                         //MessageBox.Show("123");
-                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth, 0, blockWidth, height);
+                                                        g2.FillRectangle(new SolidBrush(panel.BackColor), index * width / split, 0, width / split, height);
                                                     }
                                                 }
                                             }
@@ -2284,27 +2250,47 @@ namespace Thunder
                 }
                 else if (tabiwCustom_cmb.Text == "Gradient")
                 {
+                    int divisions = int.Parse(tabiwCGradDivid_cmb.Text); // 獲取畫面等分數  
+                    int divisionSize = tabiwCGradHWay_rdo.Checked ? width / divisions : height / divisions; // 計算每個分區的寬度或高度
                     if (tabiwCGradOther_chk.Checked) // 如果選擇了colorbar  
                     {
-                        foreach (Control control in tabiwCGradOtherSplit_pnl.Controls)
+                        int blockHeight = height / divisions;
+                        int blockWidth = width / divisions;
+                        int split = (int)tabiwCGradOtherSplit_nud.Value;
+                        for (int i = 0; i < divisions; i++)
                         {
-                            if (control is Panel panel && panel.BackColor != Color.Transparent)
+                            foreach (Control control in tabiwCGradOtherSplit_pnl.Controls)
                             {
-                                string[] tagParts = panel.Tag.ToString().Split(',');
-                                if (tagParts.Length == 2)
+                                if (control is Panel panel && panel.BackColor != Color.Transparent)
                                 {
-                                    string direction = tagParts[0];
-                                    int index = int.Parse(tagParts[1]);
-
-                                    if (direction == "H") // 水平分割  
+                                    string[] tagParts = panel.Tag.ToString().Split(',');
+                                    if (tagParts.Length == 2)
                                     {
-                                        int blockHeight = height / tabiwCGradOtherSplit_pnl.Controls.Count;
-                                        g.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight, width, blockHeight);
-                                    }
-                                    else if (direction == "V") // 垂直分割  
-                                    {
-                                        int blockWidth = width / tabiwCGradOtherSplit_pnl.Controls.Count;
-                                        g.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth, 0, blockWidth, height);
+                                        string direction = tagParts[0];
+                                        int index = int.Parse(tagParts[1]);
+                                        if (direction == "H") // 水平分割  
+                                        {
+                                            if (tabiwCGradHWay_rdo.Checked)
+                                            {
+                                                g.FillRectangle(new SolidBrush(panel.BackColor), 0, index * blockHeight / split + i * blockHeight, width, blockHeight / split);
+                                            }
+                                            else
+                                            {
+                                                g.FillRectangle(new SolidBrush(panel.BackColor), 0, index * height / split, width, height / split);
+                                            }
+                                        }
+                                        else if (direction == "V") // 垂直分割  
+                                        {
+                                            if (tabiwCGradVWay_rdo.Checked)
+                                            {
+                                                g.FillRectangle(new SolidBrush(panel.BackColor), index * blockWidth / split + i * blockWidth, 0, blockWidth / split, height);
+                                            }
+                                            else
+                                            {
+                                                //MessageBox.Show("123");
+                                                g.FillRectangle(new SolidBrush(panel.BackColor), index * width / split, 0, width / split, height);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -2314,20 +2300,15 @@ namespace Thunder
                     {
                         g.Clear(tabiwCGradBaseColor_lbl.BackColor); // 填滿整個backBitmap  
                     }
-                    
-
                     if (!tabiwCGradColorBar_rdo.Checked)
                     {
-                        //MessageBox.Show("123");
-                        int divisions = int.Parse(tabiwCGradDivid_cmb.Text); // 獲取畫面等分數  
-                        int divisionSize = tabiwCGradHWay_rdo.Checked ? width / divisions : height / divisions; // 計算每個分區的寬度或高度
                         int stepNum = Math.Min(int.Parse(tabiwCGradStep_cmb.Text), divisionSize); // 獲取漸層階數
                         int startColorValue = int.Parse(tabiwCGradFirstLevel_cmb.Text); // 開始顏色值  
                         int endColorValue = int.Parse(tabiwCGradLastLevel_cmb.Text); // 結束顏色值  
-
                         bitmap = ApplyTransparency(bitmap, startColorValue, endColorValue, tabiwCGradHWay_rdo.Checked, stepNum, divisions);
                         bitmap = ConvertARGBToRGB(bitmap);
                     }
+                    
                     // 使用漸層顏色
                 }
             }
@@ -2338,6 +2319,105 @@ namespace Thunder
             else
             {
                 tabiwWin_pic.Image = bitmap;
+            }
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // 調用 CodeFile1 的函式，並傳遞 Form1 的實例
+            //CodeFile1.func1(this);
+            CodeFile1.func2(showimgGenerate_btn, "123");
+        }
+
+        private void tabilPatternList_lst_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (sender is ListBox targetList)
+            {
+                if (targetList.SelectedItem != null)
+                {
+                    string selectedItem = targetList.SelectedItem.ToString();
+                    // 在這裡處理選中的項目，例如顯示在其他控件中
+                    //MessageBox.Show($"選中的項目: {selectedItem}");
+                    //showimgPicture_pic.Image = Image.FromFile(selectedItem);
+                    //showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
+                }
+            }
+        }
+
+        private void mainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                FullScreen(sender, e);
+                //// 切換全螢幕模式
+                //if (this.FormBorderStyle == FormBorderStyle.None)
+                //{
+                //    this.FormBorderStyle = FormBorderStyle.Sizable;
+                //    this.WindowState = FormWindowState.Normal;
+                //}
+                //else
+                //{
+                //    this.FormBorderStyle = FormBorderStyle.None;
+                //    this.WindowState = FormWindowState.Maximized;
+                //}
+            }
+        }
+
+        private void tabilPatternList_lst_DragDrop(object sender, DragEventArgs e)
+        {
+            // 獲取拖入的檔案  
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length > 0)
+            {
+                // 過濾只允許檔名為 config.txt 的檔案  
+                var configFiles = files.Where(file => Path.GetFileName(file).ToLower() == "config.txt").ToArray();
+
+                if (configFiles.Length > 0)
+                {
+                    foreach (var filePath in configFiles)
+                    {
+                        try
+                        {
+                            MessageBox.Show(filePath);
+                            // 在這裡處理 config.txt 檔案的邏輯  
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"無法載入文件：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("只允許拖入檔名為 config.txt 的檔案！", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        private void tabilPatternList_lst_DragEnter(object sender, DragEventArgs e)
+        {
+            // 檢查檔案是否為支援的 config.txt  
+            bool IsSupportedFile(string filePath)
+            {
+                string filename = Path.GetFileName(filePath).ToLower();
+                return filename == "config.txt" || filename.EndsWith(".json") || filename.EndsWith(".xml");
+            }
+
+            // 檢查拖入的資料是否包含檔案，並且是支援的 config.txt  
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (files.Any(file => IsSupportedFile(file)))
+                {
+                    e.Effect = DragDropEffects.Copy; // 設置拖放效果為複製  
+                }
+                else
+                {
+                    e.Effect = DragDropEffects.None; // 不允許拖放  
+                }
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None; // 不允許拖放  
             }
         }
     }
