@@ -209,6 +209,7 @@
             // cmsScreenlist
             // 
             this.cmsScreenlist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmsScreenlist.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.cmsScreenlist.Name = "cmsScreenlist";
             this.cmsScreenlist.Size = new System.Drawing.Size(121, 23);
             this.cmsScreenlist.SelectedIndexChanged += new System.EventHandler(this.cmsScreenlist_cmb_SelectedIndexChanged);
@@ -259,7 +260,8 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.ContextMenuStrip = this.contextMenuStrip;
             this.Controls.Add(this.picwinPicture_pic);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.KeyPreview = true;
             this.Name = "pictureWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;

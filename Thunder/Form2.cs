@@ -7,20 +7,19 @@ namespace Thunder
 {
     public partial class pictureWindow : Form
     {
+        //全局變數-----------------------------------------------------------------------------------------------------
         private Bitmap _bitmap;
-
+        //pictureWindow類別--------------------------------------------------------------------------------------------
         public pictureWindow(Bitmap bitMap)
         {
             InitializeComponent();
             _bitmap = bitMap; // 將接收到的 Bitmap 儲存到類別屬性中
             //this.Paint += Form2_show; // 綁定 Paint 事件  
         }
-
         private void pictureWindow_Load(object sender, EventArgs e)
         {
             Screenlist(sender, e);
         }
-
         private void Form2_show(object sender, PaintEventArgs e)
         {
             if (_bitmap != null)
@@ -28,19 +27,19 @@ namespace Thunder
                 e.Graphics.DrawImage(_bitmap, 0, 0); // 將 Bitmap 繪製到 Form2 上
             }
         }
-
         public void setBitmap(Bitmap bitmap)
         {
             _bitmap = bitmap;
             picwinPicture_pic.Image = _bitmap;
 
-        }
+        }  //設定_bitmap
+        //pictureWindow操控--------------------------------------------------------------------------------------------
         private void pictureWindow_DoubleClick(object sender, EventArgs e)
         {
             if (WindowState == FormWindowState.Maximized)
             {
                 // 退出全螢幕，並將尺寸設為所在螢幕的 1/4 大小
-                FormBorderStyle = FormBorderStyle.Sizable;
+                FormBorderStyle = FormBorderStyle.SizableToolWindow;
                 WindowState = FormWindowState.Normal;
 
                 // 計算所在螢幕的尺寸
@@ -58,25 +57,11 @@ namespace Thunder
             else
             {
                 // 進入全螢幕，保留邊框
+                FormBorderStyle = FormBorderStyle.None;
                 WindowState = FormWindowState.Maximized;
-                FormBorderStyle = FormBorderStyle.None; // 保留邊框
                 Size = new Size(Screen.FromControl(this).WorkingArea.Width, Screen.FromControl(this).WorkingArea.Height);
             }
-        }
-
-        private void contextMenuStrip_Opened(object sender, EventArgs e)
-        {
-            if (sender is ContextMenuStrip cms && cms.SourceControl is Control sourceControl)
-            {
-                Point mousePosition = sourceControl.PointToClient(Cursor.Position);
-                cmsShowLoc.Text = $"切換顯示座標_X: {mousePosition.X}, Y: {mousePosition.Y}";
-            }
-            else
-            {
-                cmsShowLoc.Text = "顯示座標(無法取得座標)";
-            }
-        }
-
+        }  //雙擊全螢幕
         private void cmsShowLoc_Click(object sender, EventArgs e)
         {
             if (sender is ToolStripMenuItem menuItem && menuItem.Owner is ContextMenuStrip contextMenu)
@@ -93,11 +78,10 @@ namespace Thunder
                     // 訂閱 PictureBox 的 MouseMove 事件  
                     picwinPicture_pic.MouseMove -= PictureBox_MouseMove;
                     cmsShowLoc.ForeColor = Color.Black;
-                    Cursor = Cursors.Default; // 恢復游標為預設
+                    Cursor = Cursors.Hand; // 恢復游標為預設
                 }
             }
-        }
-
+        }  //顯示座標
         private void PictureBox_MouseMove(object sender, MouseEventArgs e)
         {
                 //MessageBox.Show("");
@@ -106,8 +90,7 @@ namespace Thunder
                 // 更新 ToolTip 的內容為滑鼠座標
                 toolTip.SetToolTip(targerBox, $"{e.Location}");
             }
-        }
-
+        }  //滑鼠移動顯示座標 tooltip
         private void pictureWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (sender is Form targetform)
@@ -161,7 +144,7 @@ namespace Thunder
 
                                 int nextIndex = (currentIndex + 1) % listBox.Items.Count;
                                 listBox.SelectedIndex = nextIndex; // 選擇下一個項目
-                                //mainWindow.Instance.FullScreen(sender, e);
+                                mainWindow.Instance.FullScreen(sender, e);
                             }
                         }
                     }
@@ -207,15 +190,31 @@ namespace Thunder
 
                                 int nextIndex = (currentIndex - 1 + listBox.Items.Count) % listBox.Items.Count % listBox.Items.Count;
                                 listBox.SelectedIndex = nextIndex; // 選擇下一個項目
-                                //mainWindow.Instance.FullScreen(sender, e);
+                                mainWindow.Instance.FullScreen(sender, e);
                             }
                         }
 
                     }
                 }
+                else if (e.KeyCode == Keys.Up)
+                {
+                    //this.FormBorderStyle = FormBorderStyle.None;
+                }
             }
-        }
-
+        }  //鍵盤事件
+        //右鍵選單-----------------------------------------------------------------------------------------------------
+        private void contextMenuStrip_Opened(object sender, EventArgs e)
+        {
+            if (sender is ContextMenuStrip cms && cms.SourceControl is Control sourceControl)
+            {
+                Point mousePosition = sourceControl.PointToClient(Cursor.Position);
+                cmsShowLoc.Text = $"切換顯示座標_X: {mousePosition.X}, Y: {mousePosition.Y}";
+            }
+            else
+            {
+                cmsShowLoc.Text = "顯示座標(無法取得座標)";
+            }
+        }  //右鍵選單顯示座標
         private void Screenlist(object sender, EventArgs e)
         {
             // 獲取所有螢幕
@@ -227,15 +226,11 @@ namespace Thunder
             {
                 cmsScreenlist.Items.Add(screen.DeviceName);
             }
-        }
-
-        private void cmsToBeContinued_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
+        }    //獲取所有螢幕
         private void cmsScreenlist_cmb_SelectedIndexChanged(object sender, EventArgs e)
         {
+            mainWindow.Instance.mnsScreenlist_cmb.SelectedText = cmsScreenlist.SelectedItem?.ToString();
+            //cmsScreenlist.
             // 獲取選擇的螢幕  
             string selectedScreen = cmsScreenlist.SelectedItem?.ToString() ?? Screen.AllScreens[0].DeviceName;
             Screen secondScreen = Screen.AllScreens.FirstOrDefault(screen => screen.DeviceName == selectedScreen) ??
@@ -244,8 +239,7 @@ namespace Thunder
             StartPosition = FormStartPosition.Manual;
             Location = secondScreen.Bounds.Location;
             Size = secondScreen.Bounds.Size;
-        }
-
+        }  //選擇螢幕
         private void cmsAdjust_Click(object sender, EventArgs e)
         {
             if (sender is ToolStripMenuItem menuItem)
@@ -274,7 +268,12 @@ namespace Thunder
                 Invalidate(); // 重新繪製窗口以顯示更新的圖片
                 picwinPicture_pic.Image = _bitmap; // 更新 PictureBox 的圖片
             }
-        }
+        }  //調整圖片
+        private void cmsToBeContinued_Click(object sender, EventArgs e)
+        {
+            Close();
+        }  //關閉視窗
+        //開始幻燈片放映-----------------------------------------------------------------------------------------------
         private void Slideshow(object sender, EventArgs e)
         {
             if (sender is ToolStripMenuItem menuItem)
@@ -301,8 +300,7 @@ namespace Thunder
                     timer.Start();
                 }
             }
-        }
-
+        }  //開始幻燈片放映
         private void timer_Tick(object sender, EventArgs e)
         {
             if (sender is Timer t && t.Tag is string st)
@@ -314,6 +312,6 @@ namespace Thunder
                     pictureWindow_KeyDown(this, new KeyEventArgs(Keys.Right));
                 }
             }
-        }
+        } //定時器事件
     }
 }
