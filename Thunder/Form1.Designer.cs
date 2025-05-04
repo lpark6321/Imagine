@@ -34,7 +34,6 @@ namespace Thunder
         {
             this.components = new System.ComponentModel.Container();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
-            this.mnsImport_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsFullscreen_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsH_txt = new System.Windows.Forms.ToolStripTextBox();
             this.mnsX_lbl = new System.Windows.Forms.ToolStripMenuItem();
@@ -42,31 +41,10 @@ namespace Thunder
             this.mnsScreenlist_cmb = new System.Windows.Forms.ToolStripComboBox();
             this.mnsGenerate_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsPattername_txt = new System.Windows.Forms.ToolStripTextBox();
-            this.aAAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnsAAA_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabImgEditor = new System.Windows.Forms.TabPage();
             this.tabimgePanel = new System.Windows.Forms.Panel();
-            this.tabimgeFrame = new System.Windows.Forms.GroupBox();
-            this.tabiefOther_pnl = new System.Windows.Forms.Panel();
-            this.tabiefOther_cmb = new System.Windows.Forms.ComboBox();
-            this.tabiefOtherLoc_hsc = new System.Windows.Forms.HScrollBar();
-            this.tabiefOther_lst = new System.Windows.Forms.ListBox();
-            this.tabiefOtherAdd_btn = new System.Windows.Forms.Button();
-            this.tabiefOtherClear_btn = new System.Windows.Forms.Button();
-            this.tabiefOtherColor_btn = new System.Windows.Forms.Button();
-            this.tabiefOtherColor_lbl = new System.Windows.Forms.Label();
-            this.tabiefOtherLoc_lbl = new System.Windows.Forms.Label();
-            this.tabiefBack_btn = new System.Windows.Forms.Button();
-            this.tabiefLineColor_lbl = new System.Windows.Forms.Label();
-            this.tabiefBack_pic = new System.Windows.Forms.PictureBox();
-            this.tabiefMassNum_nud = new System.Windows.Forms.NumericUpDown();
-            this.tabiefMass_chk = new System.Windows.Forms.CheckBox();
-            this.tabiefOther_chk = new System.Windows.Forms.CheckBox();
-            this.tabiefNine_chk = new System.Windows.Forms.CheckBox();
-            this.tabiefOutside_chk = new System.Windows.Forms.CheckBox();
-            this.tabiefCenter_chk = new System.Windows.Forms.CheckBox();
-            this.tabiefLineColor_btn = new System.Windows.Forms.Button();
-            this.tabiefBack_lbl = new System.Windows.Forms.Label();
             this.tabimgeWindow = new System.Windows.Forms.GroupBox();
             this.tabiwCustom_grp = new System.Windows.Forms.GroupBox();
             this.tabiwCLayout_flp = new System.Windows.Forms.FlowLayoutPanel();
@@ -150,7 +128,22 @@ namespace Thunder
             this.tabiwWinSizePixel_rdo = new System.Windows.Forms.RadioButton();
             this.tabiwWinSizePercent_nud = new System.Windows.Forms.NumericUpDown();
             this.tabiwWinSizePercent_rdo = new System.Windows.Forms.RadioButton();
+            this.tabimgeMask = new System.Windows.Forms.GroupBox();
+            this.tabiemPixelGray_lbl = new System.Windows.Forms.Label();
+            this.tabiemPixelGray_vsc = new System.Windows.Forms.VScrollBar();
+            this.tabiemPixelColor_lbl = new System.Windows.Forms.Label();
+            this.tabiemPixelLoc_lbl = new System.Windows.Forms.Label();
+            this.tabiemPixelColor_btn = new System.Windows.Forms.Button();
+            this.tabiemPixelClear_btn = new System.Windows.Forms.Button();
+            this.tabiemPixelPanel_pnl = new System.Windows.Forms.Panel();
+            this.tabiemHNum_nud = new System.Windows.Forms.NumericUpDown();
+            this.tabiemWNum_nud = new System.Windows.Forms.NumericUpDown();
+            this.tabiemHNum_lbl = new System.Windows.Forms.Label();
+            this.tabiemWNum_lbl = new System.Windows.Forms.Label();
+            this.tabiemSubPixel_rdo = new System.Windows.Forms.RadioButton();
+            this.tabiemPixel_rdo = new System.Windows.Forms.RadioButton();
             this.tabimgeGradient = new System.Windows.Forms.GroupBox();
+            this.tabigReverse_chk = new System.Windows.Forms.CheckBox();
             this.tabigBaseColor_pnl = new System.Windows.Forms.Panel();
             this.tabigBaseColorCustom_btn = new System.Windows.Forms.Button();
             this.tabigBaseColor_lbl = new System.Windows.Forms.Label();
@@ -187,6 +180,46 @@ namespace Thunder
             this.tabigHWay_rdo = new System.Windows.Forms.RadioButton();
             this.tabigFirstLevel_cmb = new System.Windows.Forms.ComboBox();
             this.tabigLastLevel_cmb = new System.Windows.Forms.ComboBox();
+            this.tabimgeChess = new System.Windows.Forms.GroupBox();
+            this.tabiecHFlip_chk = new System.Windows.Forms.CheckBox();
+            this.tabiecVFlip_chk = new System.Windows.Forms.CheckBox();
+            this.tabiecBaseColorCustom_lbl = new System.Windows.Forms.Label();
+            this.tabiecGray_lbl = new System.Windows.Forms.Label();
+            this.tabiecBaseColorCustom_btn = new System.Windows.Forms.Button();
+            this.tabiecGray_hsc = new System.Windows.Forms.HScrollBar();
+            this.tabiecBaseColorM_btn = new System.Windows.Forms.Button();
+            this.tabiecVNum_nud = new System.Windows.Forms.NumericUpDown();
+            this.tabiecBaseColorA_btn = new System.Windows.Forms.Button();
+            this.tabiecHNum_nud = new System.Windows.Forms.NumericUpDown();
+            this.tabiecBaseColorY_btn = new System.Windows.Forms.Button();
+            this.tabiecBaseColor_lbl = new System.Windows.Forms.Label();
+            this.tabiecVNum_lbl = new System.Windows.Forms.Label();
+            this.tabiecBaseColorB_btn = new System.Windows.Forms.Button();
+            this.tabiecHNum_lbl = new System.Windows.Forms.Label();
+            this.tabiecBaseColorG_btn = new System.Windows.Forms.Button();
+            this.tabiecBaseColorW_btn = new System.Windows.Forms.Button();
+            this.tabiecBaseColorR_btn = new System.Windows.Forms.Button();
+            this.tabimgeFrame = new System.Windows.Forms.GroupBox();
+            this.tabiefOther_pnl = new System.Windows.Forms.Panel();
+            this.tabiefOther_cmb = new System.Windows.Forms.ComboBox();
+            this.tabiefOtherLoc_hsc = new System.Windows.Forms.HScrollBar();
+            this.tabiefOther_lst = new System.Windows.Forms.ListBox();
+            this.tabiefOtherAdd_btn = new System.Windows.Forms.Button();
+            this.tabiefOtherClear_btn = new System.Windows.Forms.Button();
+            this.tabiefOtherColor_btn = new System.Windows.Forms.Button();
+            this.tabiefOtherColor_lbl = new System.Windows.Forms.Label();
+            this.tabiefOtherLoc_lbl = new System.Windows.Forms.Label();
+            this.tabiefBack_btn = new System.Windows.Forms.Button();
+            this.tabiefLineColor_lbl = new System.Windows.Forms.Label();
+            this.tabiefBack_pic = new System.Windows.Forms.PictureBox();
+            this.tabiefMassNum_nud = new System.Windows.Forms.NumericUpDown();
+            this.tabiefMass_chk = new System.Windows.Forms.CheckBox();
+            this.tabiefOther_chk = new System.Windows.Forms.CheckBox();
+            this.tabiefNine_chk = new System.Windows.Forms.CheckBox();
+            this.tabiefOutside_chk = new System.Windows.Forms.CheckBox();
+            this.tabiefCenter_chk = new System.Windows.Forms.CheckBox();
+            this.tabiefLineColor_btn = new System.Windows.Forms.Button();
+            this.tabiefBack_lbl = new System.Windows.Forms.Label();
             this.tabimgeAdjust = new System.Windows.Forms.GroupBox();
             this.tabieaPanel_pnl = new System.Windows.Forms.Panel();
             this.tabieaLeftRight_pnl = new System.Windows.Forms.Panel();
@@ -207,37 +240,6 @@ namespace Thunder
             this.tabieaRotate90_rdo = new System.Windows.Forms.RadioButton();
             this.tabieaLeftRight_rdo = new System.Windows.Forms.RadioButton();
             this.tabieaUpDown_rdo = new System.Windows.Forms.RadioButton();
-            this.tabimgeMask = new System.Windows.Forms.GroupBox();
-            this.tabiemPixelGray_lbl = new System.Windows.Forms.Label();
-            this.tabiemPixelGray_vsc = new System.Windows.Forms.VScrollBar();
-            this.tabiemPixelColor_lbl = new System.Windows.Forms.Label();
-            this.tabiemPixelLoc_lbl = new System.Windows.Forms.Label();
-            this.tabiemPixelColor_btn = new System.Windows.Forms.Button();
-            this.tabiemPixelClear_btn = new System.Windows.Forms.Button();
-            this.tabiemPixelPanel_pnl = new System.Windows.Forms.Panel();
-            this.tabiemHNum_nud = new System.Windows.Forms.NumericUpDown();
-            this.tabiemWNum_nud = new System.Windows.Forms.NumericUpDown();
-            this.tabiemHNum_lbl = new System.Windows.Forms.Label();
-            this.tabiemWNum_lbl = new System.Windows.Forms.Label();
-            this.tabiemSubPixel_rdo = new System.Windows.Forms.RadioButton();
-            this.tabiemPixel_rdo = new System.Windows.Forms.RadioButton();
-            this.tabimgeChess = new System.Windows.Forms.GroupBox();
-            this.tabiecBaseColorCustom_lbl = new System.Windows.Forms.Label();
-            this.tabiecGray_lbl = new System.Windows.Forms.Label();
-            this.tabiecBaseColorCustom_btn = new System.Windows.Forms.Button();
-            this.tabiecGray_hsc = new System.Windows.Forms.HScrollBar();
-            this.tabiecBaseColorM_btn = new System.Windows.Forms.Button();
-            this.tabiecVNum_nud = new System.Windows.Forms.NumericUpDown();
-            this.tabiecBaseColorA_btn = new System.Windows.Forms.Button();
-            this.tabiecHNum_nud = new System.Windows.Forms.NumericUpDown();
-            this.tabiecBaseColorY_btn = new System.Windows.Forms.Button();
-            this.tabiecBaseColor_lbl = new System.Windows.Forms.Label();
-            this.tabiecVNum_lbl = new System.Windows.Forms.Label();
-            this.tabiecBaseColorB_btn = new System.Windows.Forms.Button();
-            this.tabiecHNum_lbl = new System.Windows.Forms.Label();
-            this.tabiecBaseColorG_btn = new System.Windows.Forms.Button();
-            this.tabiecBaseColorW_btn = new System.Windows.Forms.Button();
-            this.tabiecBaseColorR_btn = new System.Windows.Forms.Button();
             this.tabimgeMass = new System.Windows.Forms.GroupBox();
             this.tabiema = new System.Windows.Forms.Label();
             this.tabimgeFuncList = new System.Windows.Forms.ComboBox();
@@ -253,17 +255,12 @@ namespace Thunder
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.ssrStatus_lbl = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssrProgressbar_prg = new System.Windows.Forms.ToolStripProgressBar();
-            this.tabiecVFlip_chk = new System.Windows.Forms.CheckBox();
-            this.tabiecHFlip_chk = new System.Windows.Forms.CheckBox();
             this.imageItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.mnsSave_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabImgEditor.SuspendLayout();
             this.tabimgePanel.SuspendLayout();
-            this.tabimgeFrame.SuspendLayout();
-            this.tabiefOther_pnl.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiefBack_pic)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiefMassNum_nud)).BeginInit();
             this.tabimgeWindow.SuspendLayout();
             this.tabiwCustom_grp.SuspendLayout();
             this.tabiwCLayout_flp.SuspendLayout();
@@ -286,10 +283,20 @@ namespace Thunder
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePixelH_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePixelW_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePercent_nud)).BeginInit();
+            this.tabimgeMask.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiemHNum_nud)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiemWNum_nud)).BeginInit();
             this.tabimgeGradient.SuspendLayout();
             this.tabigBaseColor_pnl.SuspendLayout();
             this.tabigOther_grp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabigOtherSplit_nud)).BeginInit();
+            this.tabimgeChess.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiecVNum_nud)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiecHNum_nud)).BeginInit();
+            this.tabimgeFrame.SuspendLayout();
+            this.tabiefOther_pnl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiefBack_pic)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiefMassNum_nud)).BeginInit();
             this.tabimgeAdjust.SuspendLayout();
             this.tabieaPanel_pnl.SuspendLayout();
             this.tabieaLeftRight_pnl.SuspendLayout();
@@ -298,12 +305,6 @@ namespace Thunder
             this.tabieaUpDown_pnl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabieaUpDownD_pic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabieaUpDownU_pic)).BeginInit();
-            this.tabimgeMask.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiemHNum_nud)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiemWNum_nud)).BeginInit();
-            this.tabimgeChess.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiecVNum_nud)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiecHNum_nud)).BeginInit();
             this.tabimgeMass.SuspendLayout();
             this.tabDirList.SuspendLayout();
             this.tabImgList.SuspendLayout();
@@ -317,7 +318,6 @@ namespace Thunder
             // 
             this.menuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnsImport_btn,
             this.mnsFullscreen_btn,
             this.mnsH_txt,
             this.mnsX_lbl,
@@ -325,20 +325,14 @@ namespace Thunder
             this.mnsScreenlist_cmb,
             this.mnsGenerate_btn,
             this.mnsPattername_txt,
-            this.aAAToolStripMenuItem});
+            this.mnsAAA_btn,
+            this.mnsSave_btn});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
             this.menuStrip.Size = new System.Drawing.Size(948, 27);
             this.menuStrip.TabIndex = 12;
             this.menuStrip.Text = "menuStrip";
-            // 
-            // mnsImport_btn
-            // 
-            this.mnsImport_btn.Name = "mnsImport_btn";
-            this.mnsImport_btn.Size = new System.Drawing.Size(57, 23);
-            this.mnsImport_btn.Text = "Import";
-            this.mnsImport_btn.Click += new System.EventHandler(this.import_Click);
             // 
             // mnsFullscreen_btn
             // 
@@ -398,12 +392,14 @@ namespace Thunder
             this.mnsPattername_txt.Size = new System.Drawing.Size(129, 23);
             this.mnsPattername_txt.Text = "PatternName";
             // 
-            // aAAToolStripMenuItem
+            // mnsAAA_btn
             // 
-            this.aAAToolStripMenuItem.Name = "aAAToolStripMenuItem";
-            this.aAAToolStripMenuItem.Size = new System.Drawing.Size(43, 23);
-            this.aAAToolStripMenuItem.Text = "AAA";
-            this.aAAToolStripMenuItem.Click += new System.EventHandler(this.button1_Click);
+            this.mnsAAA_btn.Name = "mnsAAA_btn";
+            this.mnsAAA_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+            this.mnsAAA_btn.Size = new System.Drawing.Size(43, 23);
+            this.mnsAAA_btn.Text = "AAA";
+            this.mnsAAA_btn.Visible = false;
+            this.mnsAAA_btn.Click += new System.EventHandler(this.button1_Click);
             // 
             // tabControl
             // 
@@ -436,282 +432,18 @@ namespace Thunder
             // 
             // tabimgePanel
             // 
+            this.tabimgePanel.Controls.Add(this.tabimgeWindow);
+            this.tabimgePanel.Controls.Add(this.tabimgeMask);
+            this.tabimgePanel.Controls.Add(this.tabimgeGradient);
             this.tabimgePanel.Controls.Add(this.tabimgeChess);
             this.tabimgePanel.Controls.Add(this.tabimgeFrame);
-            this.tabimgePanel.Controls.Add(this.tabimgeWindow);
-            this.tabimgePanel.Controls.Add(this.tabimgeGradient);
             this.tabimgePanel.Controls.Add(this.tabimgeAdjust);
-            this.tabimgePanel.Controls.Add(this.tabimgeMask);
             this.tabimgePanel.Controls.Add(this.tabimgeMass);
             this.tabimgePanel.Location = new System.Drawing.Point(10, 26);
             this.tabimgePanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgePanel.Name = "tabimgePanel";
             this.tabimgePanel.Size = new System.Drawing.Size(640, 428);
             this.tabimgePanel.TabIndex = 11;
-            // 
-            // tabimgeFrame
-            // 
-            this.tabimgeFrame.Controls.Add(this.tabiefOther_pnl);
-            this.tabimgeFrame.Controls.Add(this.tabiefBack_btn);
-            this.tabimgeFrame.Controls.Add(this.tabiefLineColor_lbl);
-            this.tabimgeFrame.Controls.Add(this.tabiefBack_pic);
-            this.tabimgeFrame.Controls.Add(this.tabiefMassNum_nud);
-            this.tabimgeFrame.Controls.Add(this.tabiefMass_chk);
-            this.tabimgeFrame.Controls.Add(this.tabiefOther_chk);
-            this.tabimgeFrame.Controls.Add(this.tabiefNine_chk);
-            this.tabimgeFrame.Controls.Add(this.tabiefOutside_chk);
-            this.tabimgeFrame.Controls.Add(this.tabiefCenter_chk);
-            this.tabimgeFrame.Controls.Add(this.tabiefLineColor_btn);
-            this.tabimgeFrame.Controls.Add(this.tabiefBack_lbl);
-            this.tabimgeFrame.ImeMode = System.Windows.Forms.ImeMode.On;
-            this.tabimgeFrame.Location = new System.Drawing.Point(11, 93);
-            this.tabimgeFrame.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeFrame.Name = "tabimgeFrame";
-            this.tabimgeFrame.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeFrame.Size = new System.Drawing.Size(78, 85);
-            this.tabimgeFrame.TabIndex = 10;
-            this.tabimgeFrame.TabStop = false;
-            this.tabimgeFrame.Text = "Frame&&CrossLine&&Border";
-            // 
-            // tabiefOther_pnl
-            // 
-            this.tabiefOther_pnl.Controls.Add(this.tabiefOther_cmb);
-            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherLoc_hsc);
-            this.tabiefOther_pnl.Controls.Add(this.tabiefOther_lst);
-            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherAdd_btn);
-            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherClear_btn);
-            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherColor_btn);
-            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherColor_lbl);
-            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherLoc_lbl);
-            this.tabiefOther_pnl.Enabled = false;
-            this.tabiefOther_pnl.Location = new System.Drawing.Point(10, 105);
-            this.tabiefOther_pnl.Name = "tabiefOther_pnl";
-            this.tabiefOther_pnl.Size = new System.Drawing.Size(344, 189);
-            this.tabiefOther_pnl.TabIndex = 33;
-            // 
-            // tabiefOther_cmb
-            // 
-            this.tabiefOther_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tabiefOther_cmb.FormattingEnabled = true;
-            this.tabiefOther_cmb.Items.AddRange(new object[] {
-            "HLine",
-            "VLine"});
-            this.tabiefOther_cmb.Location = new System.Drawing.Point(10, 5);
-            this.tabiefOther_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefOther_cmb.Name = "tabiefOther_cmb";
-            this.tabiefOther_cmb.Size = new System.Drawing.Size(163, 20);
-            this.tabiefOther_cmb.TabIndex = 18;
-            this.tabiefOther_cmb.SelectedIndexChanged += new System.EventHandler(this.tabiefOther_cmb_SelectedIndexChanged);
-            // 
-            // tabiefOtherLoc_hsc
-            // 
-            this.tabiefOtherLoc_hsc.LargeChange = 1;
-            this.tabiefOtherLoc_hsc.Location = new System.Drawing.Point(10, 30);
-            this.tabiefOtherLoc_hsc.Minimum = 1;
-            this.tabiefOtherLoc_hsc.Name = "tabiefOtherLoc_hsc";
-            this.tabiefOtherLoc_hsc.Size = new System.Drawing.Size(250, 19);
-            this.tabiefOtherLoc_hsc.TabIndex = 19;
-            this.tabiefOtherLoc_hsc.Value = 1;
-            this.tabiefOtherLoc_hsc.ValueChanged += new System.EventHandler(this.gbxfHsblocation_ValueChanged);
-            // 
-            // tabiefOther_lst
-            // 
-            this.tabiefOther_lst.FormattingEnabled = true;
-            this.tabiefOther_lst.ItemHeight = 12;
-            this.tabiefOther_lst.Location = new System.Drawing.Point(10, 54);
-            this.tabiefOther_lst.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefOther_lst.Name = "tabiefOther_lst";
-            this.tabiefOther_lst.ScrollAlwaysVisible = true;
-            this.tabiefOther_lst.Size = new System.Drawing.Size(250, 124);
-            this.tabiefOther_lst.TabIndex = 23;
-            // 
-            // tabiefOtherAdd_btn
-            // 
-            this.tabiefOtherAdd_btn.Location = new System.Drawing.Point(275, 55);
-            this.tabiefOtherAdd_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefOtherAdd_btn.Name = "tabiefOtherAdd_btn";
-            this.tabiefOtherAdd_btn.Size = new System.Drawing.Size(40, 22);
-            this.tabiefOtherAdd_btn.TabIndex = 24;
-            this.tabiefOtherAdd_btn.Text = "Add";
-            this.tabiefOtherAdd_btn.UseVisualStyleBackColor = true;
-            this.tabiefOtherAdd_btn.Click += new System.EventHandler(this.gbxfBtnaddclear_Click);
-            // 
-            // tabiefOtherClear_btn
-            // 
-            this.tabiefOtherClear_btn.Location = new System.Drawing.Point(275, 80);
-            this.tabiefOtherClear_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefOtherClear_btn.Name = "tabiefOtherClear_btn";
-            this.tabiefOtherClear_btn.Size = new System.Drawing.Size(40, 22);
-            this.tabiefOtherClear_btn.TabIndex = 25;
-            this.tabiefOtherClear_btn.Text = "Clear";
-            this.tabiefOtherClear_btn.UseVisualStyleBackColor = true;
-            this.tabiefOtherClear_btn.Click += new System.EventHandler(this.gbxfBtnaddclear_Click);
-            // 
-            // tabiefOtherColor_btn
-            // 
-            this.tabiefOtherColor_btn.BackColor = System.Drawing.Color.White;
-            this.tabiefOtherColor_btn.ForeColor = System.Drawing.Color.White;
-            this.tabiefOtherColor_btn.Location = new System.Drawing.Point(237, 4);
-            this.tabiefOtherColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefOtherColor_btn.Name = "tabiefOtherColor_btn";
-            this.tabiefOtherColor_btn.Size = new System.Drawing.Size(24, 24);
-            this.tabiefOtherColor_btn.TabIndex = 26;
-            this.tabiefOtherColor_btn.UseVisualStyleBackColor = false;
-            this.tabiefOtherColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
-            // 
-            // tabiefOtherColor_lbl
-            // 
-            this.tabiefOtherColor_lbl.AutoSize = true;
-            this.tabiefOtherColor_lbl.Location = new System.Drawing.Point(192, 10);
-            this.tabiefOtherColor_lbl.Name = "tabiefOtherColor_lbl";
-            this.tabiefOtherColor_lbl.Size = new System.Drawing.Size(41, 12);
-            this.tabiefOtherColor_lbl.TabIndex = 28;
-            this.tabiefOtherColor_lbl.Text = "線顏色";
-            // 
-            // tabiefOtherLoc_lbl
-            // 
-            this.tabiefOtherLoc_lbl.AutoSize = true;
-            this.tabiefOtherLoc_lbl.Location = new System.Drawing.Point(275, 35);
-            this.tabiefOtherLoc_lbl.Name = "tabiefOtherLoc_lbl";
-            this.tabiefOtherLoc_lbl.Size = new System.Drawing.Size(11, 12);
-            this.tabiefOtherLoc_lbl.TabIndex = 27;
-            this.tabiefOtherLoc_lbl.Text = "0";
-            // 
-            // tabiefBack_btn
-            // 
-            this.tabiefBack_btn.BackColor = System.Drawing.Color.Black;
-            this.tabiefBack_btn.Location = new System.Drawing.Point(61, 14);
-            this.tabiefBack_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefBack_btn.Name = "tabiefBack_btn";
-            this.tabiefBack_btn.Size = new System.Drawing.Size(24, 24);
-            this.tabiefBack_btn.TabIndex = 9;
-            this.tabiefBack_btn.UseVisualStyleBackColor = false;
-            this.tabiefBack_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
-            // 
-            // tabiefLineColor_lbl
-            // 
-            this.tabiefLineColor_lbl.AutoSize = true;
-            this.tabiefLineColor_lbl.Location = new System.Drawing.Point(216, 54);
-            this.tabiefLineColor_lbl.Name = "tabiefLineColor_lbl";
-            this.tabiefLineColor_lbl.Size = new System.Drawing.Size(53, 24);
-            this.tabiefLineColor_lbl.TabIndex = 32;
-            this.tabiefLineColor_lbl.Text = "\n框線顏色";
-            // 
-            // tabiefBack_pic
-            // 
-            this.tabiefBack_pic.BackgroundImage = global::Thunder.Properties.Resources.Img;
-            this.tabiefBack_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabiefBack_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabiefBack_pic.Location = new System.Drawing.Point(144, 13);
-            this.tabiefBack_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefBack_pic.Name = "tabiefBack_pic";
-            this.tabiefBack_pic.Size = new System.Drawing.Size(41, 39);
-            this.tabiefBack_pic.TabIndex = 31;
-            this.tabiefBack_pic.TabStop = false;
-            this.tabiefBack_pic.Click += new System.EventHandler(this.import_Click);
-            // 
-            // tabiefMassNum_nud
-            // 
-            this.tabiefMassNum_nud.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.tabiefMassNum_nud.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.tabiefMassNum_nud.Location = new System.Drawing.Point(310, 31);
-            this.tabiefMassNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefMassNum_nud.Maximum = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
-            this.tabiefMassNum_nud.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.tabiefMassNum_nud.Name = "tabiefMassNum_nud";
-            this.tabiefMassNum_nud.Size = new System.Drawing.Size(39, 18);
-            this.tabiefMassNum_nud.TabIndex = 30;
-            this.tabiefMassNum_nud.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.tabiefMassNum_nud.Value = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
-            // 
-            // tabiefMass_chk
-            // 
-            this.tabiefMass_chk.AutoSize = true;
-            this.tabiefMass_chk.Location = new System.Drawing.Point(218, 20);
-            this.tabiefMass_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefMass_chk.Name = "tabiefMass_chk";
-            this.tabiefMass_chk.Size = new System.Drawing.Size(182, 28);
-            this.tabiefMass_chk.TabIndex = 29;
-            this.tabiefMass_chk.Text = "大量建圖\r\n(從0開始，每                階生成)";
-            this.tabiefMass_chk.UseVisualStyleBackColor = true;
-            // 
-            // tabiefOther_chk
-            // 
-            this.tabiefOther_chk.AutoSize = true;
-            this.tabiefOther_chk.Location = new System.Drawing.Point(10, 85);
-            this.tabiefOther_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefOther_chk.Name = "tabiefOther_chk";
-            this.tabiefOther_chk.Size = new System.Drawing.Size(81, 16);
-            this.tabiefOther_chk.TabIndex = 17;
-            this.tabiefOther_chk.Text = "其他(H&&V)";
-            this.tabiefOther_chk.UseVisualStyleBackColor = true;
-            this.tabiefOther_chk.CheckStateChanged += new System.EventHandler(this.Framechkother_CheckStateChanged);
-            // 
-            // tabiefNine_chk
-            // 
-            this.tabiefNine_chk.AutoSize = true;
-            this.tabiefNine_chk.Location = new System.Drawing.Point(138, 65);
-            this.tabiefNine_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefNine_chk.Name = "tabiefNine_chk";
-            this.tabiefNine_chk.Size = new System.Drawing.Size(72, 16);
-            this.tabiefNine_chk.TabIndex = 16;
-            this.tabiefNine_chk.Text = "九點對位";
-            this.tabiefNine_chk.UseVisualStyleBackColor = true;
-            // 
-            // tabiefOutside_chk
-            // 
-            this.tabiefOutside_chk.AutoSize = true;
-            this.tabiefOutside_chk.Location = new System.Drawing.Point(80, 65);
-            this.tabiefOutside_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefOutside_chk.Name = "tabiefOutside_chk";
-            this.tabiefOutside_chk.Size = new System.Drawing.Size(60, 16);
-            this.tabiefOutside_chk.TabIndex = 15;
-            this.tabiefOutside_chk.Text = "外框線";
-            this.tabiefOutside_chk.UseVisualStyleBackColor = true;
-            // 
-            // tabiefCenter_chk
-            // 
-            this.tabiefCenter_chk.AutoSize = true;
-            this.tabiefCenter_chk.Location = new System.Drawing.Point(10, 65);
-            this.tabiefCenter_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefCenter_chk.Name = "tabiefCenter_chk";
-            this.tabiefCenter_chk.Size = new System.Drawing.Size(72, 16);
-            this.tabiefCenter_chk.TabIndex = 14;
-            this.tabiefCenter_chk.Text = "中心對位";
-            this.tabiefCenter_chk.UseVisualStyleBackColor = true;
-            // 
-            // tabiefLineColor_btn
-            // 
-            this.tabiefLineColor_btn.BackColor = System.Drawing.Color.White;
-            this.tabiefLineColor_btn.ForeColor = System.Drawing.Color.White;
-            this.tabiefLineColor_btn.Location = new System.Drawing.Point(275, 62);
-            this.tabiefLineColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiefLineColor_btn.Name = "tabiefLineColor_btn";
-            this.tabiefLineColor_btn.Size = new System.Drawing.Size(24, 24);
-            this.tabiefLineColor_btn.TabIndex = 12;
-            this.tabiefLineColor_btn.UseVisualStyleBackColor = false;
-            this.tabiefLineColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
-            // 
-            // tabiefBack_lbl
-            // 
-            this.tabiefBack_lbl.AutoSize = true;
-            this.tabiefBack_lbl.Location = new System.Drawing.Point(10, 20);
-            this.tabiefBack_lbl.Name = "tabiefBack_lbl";
-            this.tabiefBack_lbl.Size = new System.Drawing.Size(131, 12);
-            this.tabiefBack_lbl.TabIndex = 11;
-            this.tabiefBack_lbl.Text = "背景顏色          導入截圖";
             // 
             // tabimgeWindow
             // 
@@ -724,11 +456,11 @@ namespace Thunder
             this.tabimgeWindow.Controls.Add(this.tabiwLineOutside_btn);
             this.tabimgeWindow.Controls.Add(this.tabiwWinLoc_grp);
             this.tabimgeWindow.Controls.Add(this.tabiwWinSize_grp);
-            this.tabimgeWindow.Location = new System.Drawing.Point(212, 8);
+            this.tabimgeWindow.Location = new System.Drawing.Point(25, 8);
             this.tabimgeWindow.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeWindow.Name = "tabimgeWindow";
             this.tabimgeWindow.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeWindow.Size = new System.Drawing.Size(81, 78);
+            this.tabimgeWindow.Size = new System.Drawing.Size(588, 362);
             this.tabimgeWindow.TabIndex = 0;
             this.tabimgeWindow.TabStop = false;
             this.tabimgeWindow.Text = "Window";
@@ -1477,7 +1209,7 @@ namespace Thunder
             // 
             this.tabiwWin_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.tabiwWin_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabiwWin_pic.Image = global::Thunder.Properties.Resources.Img;
+            this.tabiwWin_pic.Image = global::Thunder.Properties.Resources.img;
             this.tabiwWin_pic.Location = new System.Drawing.Point(2, 15);
             this.tabiwWin_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabiwWin_pic.Name = "tabiwWin_pic";
@@ -1549,7 +1281,7 @@ namespace Thunder
             // 
             this.tabiwBack_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.tabiwBack_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabiwBack_pic.Image = global::Thunder.Properties.Resources.Img;
+            this.tabiwBack_pic.Image = global::Thunder.Properties.Resources.img;
             this.tabiwBack_pic.InitialImage = null;
             this.tabiwBack_pic.Location = new System.Drawing.Point(2, 15);
             this.tabiwBack_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -1801,8 +1533,188 @@ namespace Thunder
             this.tabiwWinSizePercent_rdo.Text = "百分比(%)";
             this.tabiwWinSizePercent_rdo.UseVisualStyleBackColor = true;
             // 
+            // tabimgeMask
+            // 
+            this.tabimgeMask.Controls.Add(this.tabiemPixelGray_lbl);
+            this.tabimgeMask.Controls.Add(this.tabiemPixelGray_vsc);
+            this.tabimgeMask.Controls.Add(this.tabiemPixelColor_lbl);
+            this.tabimgeMask.Controls.Add(this.tabiemPixelLoc_lbl);
+            this.tabimgeMask.Controls.Add(this.tabiemPixelColor_btn);
+            this.tabimgeMask.Controls.Add(this.tabiemPixelClear_btn);
+            this.tabimgeMask.Controls.Add(this.tabiemPixelPanel_pnl);
+            this.tabimgeMask.Controls.Add(this.tabiemHNum_nud);
+            this.tabimgeMask.Controls.Add(this.tabiemWNum_nud);
+            this.tabimgeMask.Controls.Add(this.tabiemHNum_lbl);
+            this.tabimgeMask.Controls.Add(this.tabiemWNum_lbl);
+            this.tabimgeMask.Controls.Add(this.tabiemSubPixel_rdo);
+            this.tabimgeMask.Controls.Add(this.tabiemPixel_rdo);
+            this.tabimgeMask.Location = new System.Drawing.Point(112, 8);
+            this.tabimgeMask.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabimgeMask.Name = "tabimgeMask";
+            this.tabimgeMask.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabimgeMask.Size = new System.Drawing.Size(71, 65);
+            this.tabimgeMask.TabIndex = 0;
+            this.tabimgeMask.TabStop = false;
+            this.tabimgeMask.Text = "Mask(FlickerPattern)";
+            // 
+            // tabiemPixelGray_lbl
+            // 
+            this.tabiemPixelGray_lbl.AutoSize = true;
+            this.tabiemPixelGray_lbl.Font = new System.Drawing.Font("新細明體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.tabiemPixelGray_lbl.Location = new System.Drawing.Point(209, 44);
+            this.tabiemPixelGray_lbl.Name = "tabiemPixelGray_lbl";
+            this.tabiemPixelGray_lbl.Size = new System.Drawing.Size(55, 13);
+            this.tabiemPixelGray_lbl.TabIndex = 15;
+            this.tabiemPixelGray_lbl.Text = "Gray: 255";
+            this.tabiemPixelGray_lbl.Visible = false;
+            // 
+            // tabiemPixelGray_vsc
+            // 
+            this.tabiemPixelGray_vsc.LargeChange = 1;
+            this.tabiemPixelGray_vsc.Location = new System.Drawing.Point(241, 70);
+            this.tabiemPixelGray_vsc.Maximum = 255;
+            this.tabiemPixelGray_vsc.Name = "tabiemPixelGray_vsc";
+            this.tabiemPixelGray_vsc.Size = new System.Drawing.Size(20, 220);
+            this.tabiemPixelGray_vsc.TabIndex = 14;
+            this.tabiemPixelGray_vsc.Visible = false;
+            this.tabiemPixelGray_vsc.ValueChanged += new System.EventHandler(this.PixelGray_vsc_ValueChanged);
+            // 
+            // tabiemPixelColor_lbl
+            // 
+            this.tabiemPixelColor_lbl.AutoSize = true;
+            this.tabiemPixelColor_lbl.Location = new System.Drawing.Point(75, 295);
+            this.tabiemPixelColor_lbl.Name = "tabiemPixelColor_lbl";
+            this.tabiemPixelColor_lbl.Size = new System.Drawing.Size(53, 12);
+            this.tabiemPixelColor_lbl.TabIndex = 13;
+            this.tabiemPixelColor_lbl.Text = "選擇顏色";
+            // 
+            // tabiemPixelLoc_lbl
+            // 
+            this.tabiemPixelLoc_lbl.AutoSize = true;
+            this.tabiemPixelLoc_lbl.Location = new System.Drawing.Point(20, 295);
+            this.tabiemPixelLoc_lbl.Name = "tabiemPixelLoc_lbl";
+            this.tabiemPixelLoc_lbl.Size = new System.Drawing.Size(24, 12);
+            this.tabiemPixelLoc_lbl.TabIndex = 12;
+            this.tabiemPixelLoc_lbl.Text = "--,--";
+            // 
+            // tabiemPixelColor_btn
+            // 
+            this.tabiemPixelColor_btn.BackColor = System.Drawing.Color.White;
+            this.tabiemPixelColor_btn.Location = new System.Drawing.Point(130, 290);
+            this.tabiemPixelColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiemPixelColor_btn.Name = "tabiemPixelColor_btn";
+            this.tabiemPixelColor_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiemPixelColor_btn.TabIndex = 11;
+            this.tabiemPixelColor_btn.UseVisualStyleBackColor = false;
+            this.tabiemPixelColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
+            // 
+            // tabiemPixelClear_btn
+            // 
+            this.tabiemPixelClear_btn.Location = new System.Drawing.Point(190, 292);
+            this.tabiemPixelClear_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiemPixelClear_btn.Name = "tabiemPixelClear_btn";
+            this.tabiemPixelClear_btn.Size = new System.Drawing.Size(40, 24);
+            this.tabiemPixelClear_btn.TabIndex = 10;
+            this.tabiemPixelClear_btn.Text = "Clear";
+            this.tabiemPixelClear_btn.UseVisualStyleBackColor = true;
+            this.tabiemPixelClear_btn.Click += new System.EventHandler(this.MaskPanelCreat);
+            // 
+            // tabiemPixelPanel_pnl
+            // 
+            this.tabiemPixelPanel_pnl.BackgroundImage = global::Thunder.Properties.Resources.transparent;
+            this.tabiemPixelPanel_pnl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabiemPixelPanel_pnl.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.tabiemPixelPanel_pnl.Location = new System.Drawing.Point(10, 70);
+            this.tabiemPixelPanel_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiemPixelPanel_pnl.Name = "tabiemPixelPanel_pnl";
+            this.tabiemPixelPanel_pnl.Size = new System.Drawing.Size(220, 220);
+            this.tabiemPixelPanel_pnl.TabIndex = 9;
+            // 
+            // tabiemHNum_nud
+            // 
+            this.tabiemHNum_nud.Location = new System.Drawing.Point(150, 40);
+            this.tabiemHNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiemHNum_nud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.tabiemHNum_nud.Name = "tabiemHNum_nud";
+            this.tabiemHNum_nud.Size = new System.Drawing.Size(50, 22);
+            this.tabiemHNum_nud.TabIndex = 5;
+            this.tabiemHNum_nud.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.tabiemHNum_nud.Click += new System.EventHandler(this.MaskPanelCreat);
+            // 
+            // tabiemWNum_nud
+            // 
+            this.tabiemWNum_nud.Location = new System.Drawing.Point(50, 40);
+            this.tabiemWNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiemWNum_nud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.tabiemWNum_nud.Name = "tabiemWNum_nud";
+            this.tabiemWNum_nud.Size = new System.Drawing.Size(50, 22);
+            this.tabiemWNum_nud.TabIndex = 4;
+            this.tabiemWNum_nud.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.tabiemWNum_nud.Click += new System.EventHandler(this.MaskPanelCreat);
+            // 
+            // tabiemHNum_lbl
+            // 
+            this.tabiemHNum_lbl.AutoSize = true;
+            this.tabiemHNum_lbl.Location = new System.Drawing.Point(110, 45);
+            this.tabiemHNum_lbl.Name = "tabiemHNum_lbl";
+            this.tabiemHNum_lbl.Size = new System.Drawing.Size(36, 12);
+            this.tabiemHNum_lbl.TabIndex = 3;
+            this.tabiemHNum_lbl.Text = "Height";
+            // 
+            // tabiemWNum_lbl
+            // 
+            this.tabiemWNum_lbl.AutoSize = true;
+            this.tabiemWNum_lbl.Location = new System.Drawing.Point(15, 45);
+            this.tabiemWNum_lbl.Name = "tabiemWNum_lbl";
+            this.tabiemWNum_lbl.Size = new System.Drawing.Size(34, 12);
+            this.tabiemWNum_lbl.TabIndex = 2;
+            this.tabiemWNum_lbl.Text = "Width";
+            // 
+            // tabiemSubPixel_rdo
+            // 
+            this.tabiemSubPixel_rdo.AutoSize = true;
+            this.tabiemSubPixel_rdo.Location = new System.Drawing.Point(100, 15);
+            this.tabiemSubPixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiemSubPixel_rdo.Name = "tabiemSubPixel_rdo";
+            this.tabiemSubPixel_rdo.Size = new System.Drawing.Size(92, 16);
+            this.tabiemSubPixel_rdo.TabIndex = 1;
+            this.tabiemSubPixel_rdo.Text = "Sub Pixel Base";
+            this.tabiemSubPixel_rdo.UseVisualStyleBackColor = true;
+            this.tabiemSubPixel_rdo.CheckedChanged += new System.EventHandler(this.Pixel_rdo_CheckedChanged);
+            // 
+            // tabiemPixel_rdo
+            // 
+            this.tabiemPixel_rdo.AutoSize = true;
+            this.tabiemPixel_rdo.Checked = true;
+            this.tabiemPixel_rdo.Location = new System.Drawing.Point(10, 15);
+            this.tabiemPixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiemPixel_rdo.Name = "tabiemPixel_rdo";
+            this.tabiemPixel_rdo.Size = new System.Drawing.Size(71, 16);
+            this.tabiemPixel_rdo.TabIndex = 0;
+            this.tabiemPixel_rdo.TabStop = true;
+            this.tabiemPixel_rdo.Text = "Pixel Base";
+            this.tabiemPixel_rdo.UseVisualStyleBackColor = true;
+            this.tabiemPixel_rdo.CheckedChanged += new System.EventHandler(this.Pixel_rdo_CheckedChanged);
+            // 
             // tabimgeGradient
             // 
+            this.tabimgeGradient.Controls.Add(this.tabigReverse_chk);
             this.tabimgeGradient.Controls.Add(this.tabigBaseColor_pnl);
             this.tabimgeGradient.Controls.Add(this.tabigOther_chk);
             this.tabimgeGradient.Controls.Add(this.tabigOther_grp);
@@ -1819,11 +1731,22 @@ namespace Thunder
             this.tabimgeGradient.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeGradient.Name = "tabimgeGradient";
             this.tabimgeGradient.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeGradient.Size = new System.Drawing.Size(80, 82);
+            this.tabimgeGradient.Size = new System.Drawing.Size(77, 78);
             this.tabimgeGradient.TabIndex = 10;
             this.tabimgeGradient.TabStop = false;
             this.tabimgeGradient.Text = "Gradient";
             this.tabimgeGradient.Visible = false;
+            // 
+            // tabigReverse_chk
+            // 
+            this.tabigReverse_chk.AutoSize = true;
+            this.tabigReverse_chk.Enabled = false;
+            this.tabigReverse_chk.Location = new System.Drawing.Point(166, 61);
+            this.tabigReverse_chk.Name = "tabigReverse_chk";
+            this.tabigReverse_chk.Size = new System.Drawing.Size(48, 16);
+            this.tabigReverse_chk.TabIndex = 25;
+            this.tabigReverse_chk.Text = "反向";
+            this.tabigReverse_chk.UseVisualStyleBackColor = true;
             // 
             // tabigBaseColor_pnl
             // 
@@ -2230,7 +2153,7 @@ namespace Thunder
             // tabigFirstLevel_lbl
             // 
             this.tabigFirstLevel_lbl.AutoSize = true;
-            this.tabigFirstLevel_lbl.Location = new System.Drawing.Point(177, 42);
+            this.tabigFirstLevel_lbl.Location = new System.Drawing.Point(255, 40);
             this.tabigFirstLevel_lbl.Name = "tabigFirstLevel_lbl";
             this.tabigFirstLevel_lbl.Size = new System.Drawing.Size(51, 36);
             this.tabigFirstLevel_lbl.TabIndex = 6;
@@ -2261,7 +2184,7 @@ namespace Thunder
             "191",
             "223",
             "255"});
-            this.tabigFirstLevel_cmb.Location = new System.Drawing.Point(234, 37);
+            this.tabigFirstLevel_cmb.Location = new System.Drawing.Point(312, 35);
             this.tabigFirstLevel_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabigFirstLevel_cmb.Name = "tabigFirstLevel_cmb";
             this.tabigFirstLevel_cmb.Size = new System.Drawing.Size(50, 20);
@@ -2281,446 +2204,12 @@ namespace Thunder
             "191",
             "223",
             "255"});
-            this.tabigLastLevel_cmb.Location = new System.Drawing.Point(234, 62);
+            this.tabigLastLevel_cmb.Location = new System.Drawing.Point(312, 60);
             this.tabigLastLevel_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabigLastLevel_cmb.Name = "tabigLastLevel_cmb";
             this.tabigLastLevel_cmb.Size = new System.Drawing.Size(50, 20);
             this.tabigLastLevel_cmb.TabIndex = 9;
             this.tabigLastLevel_cmb.Text = "255";
-            // 
-            // tabimgeAdjust
-            // 
-            this.tabimgeAdjust.Controls.Add(this.tabieaPanel_pnl);
-            this.tabimgeAdjust.Controls.Add(this.tabieaClear_btn);
-            this.tabimgeAdjust.Controls.Add(this.tabieaVFlip_rdo);
-            this.tabimgeAdjust.Controls.Add(this.tabieaHFlip_rdo);
-            this.tabimgeAdjust.Controls.Add(this.tabieaResize_rdo);
-            this.tabimgeAdjust.Controls.Add(this.tabieaImport_btn);
-            this.tabimgeAdjust.Controls.Add(this.tabieaTrans_btn);
-            this.tabimgeAdjust.Controls.Add(this.tabieaRotate270_rdo);
-            this.tabimgeAdjust.Controls.Add(this.tabieaRotate180_rdo);
-            this.tabimgeAdjust.Controls.Add(this.tabieaRotate90_rdo);
-            this.tabimgeAdjust.Controls.Add(this.tabieaLeftRight_rdo);
-            this.tabimgeAdjust.Controls.Add(this.tabieaUpDown_rdo);
-            this.tabimgeAdjust.Location = new System.Drawing.Point(3, 189);
-            this.tabimgeAdjust.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeAdjust.Name = "tabimgeAdjust";
-            this.tabimgeAdjust.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeAdjust.Size = new System.Drawing.Size(83, 82);
-            this.tabimgeAdjust.TabIndex = 0;
-            this.tabimgeAdjust.TabStop = false;
-            this.tabimgeAdjust.Text = "  ImgAdjus";
-            // 
-            // tabieaPanel_pnl
-            // 
-            this.tabieaPanel_pnl.Controls.Add(this.tabieaLeftRight_pnl);
-            this.tabieaPanel_pnl.Controls.Add(this.tabieaUpDown_pnl);
-            this.tabieaPanel_pnl.Controls.Add(this.tabieaPatternList_chl);
-            this.tabieaPanel_pnl.Location = new System.Drawing.Point(165, 15);
-            this.tabieaPanel_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaPanel_pnl.Name = "tabieaPanel_pnl";
-            this.tabieaPanel_pnl.Size = new System.Drawing.Size(260, 240);
-            this.tabieaPanel_pnl.TabIndex = 12;
-            // 
-            // tabieaLeftRight_pnl
-            // 
-            this.tabieaLeftRight_pnl.Controls.Add(this.tabieaLeftRightR_pic);
-            this.tabieaLeftRight_pnl.Controls.Add(this.tabieaLeftRightL_pic);
-            this.tabieaLeftRight_pnl.Location = new System.Drawing.Point(140, 15);
-            this.tabieaLeftRight_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaLeftRight_pnl.Name = "tabieaLeftRight_pnl";
-            this.tabieaLeftRight_pnl.Size = new System.Drawing.Size(110, 91);
-            this.tabieaLeftRight_pnl.TabIndex = 9;
-            // 
-            // tabieaLeftRightR_pic
-            // 
-            this.tabieaLeftRightR_pic.BackgroundImage = global::Thunder.Properties.Resources.Img;
-            this.tabieaLeftRightR_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabieaLeftRightR_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabieaLeftRightR_pic.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tabieaLeftRightR_pic.Location = new System.Drawing.Point(73, 0);
-            this.tabieaLeftRightR_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaLeftRightR_pic.Name = "tabieaLeftRightR_pic";
-            this.tabieaLeftRightR_pic.Size = new System.Drawing.Size(37, 91);
-            this.tabieaLeftRightR_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.tabieaLeftRightR_pic.TabIndex = 1;
-            this.tabieaLeftRightR_pic.TabStop = false;
-            this.tabieaLeftRightR_pic.Click += new System.EventHandler(this.tabiea_pic_Click);
-            // 
-            // tabieaLeftRightL_pic
-            // 
-            this.tabieaLeftRightL_pic.BackgroundImage = global::Thunder.Properties.Resources.Img;
-            this.tabieaLeftRightL_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabieaLeftRightL_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabieaLeftRightL_pic.Dock = System.Windows.Forms.DockStyle.Left;
-            this.tabieaLeftRightL_pic.Location = new System.Drawing.Point(0, 0);
-            this.tabieaLeftRightL_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaLeftRightL_pic.Name = "tabieaLeftRightL_pic";
-            this.tabieaLeftRightL_pic.Size = new System.Drawing.Size(39, 91);
-            this.tabieaLeftRightL_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.tabieaLeftRightL_pic.TabIndex = 0;
-            this.tabieaLeftRightL_pic.TabStop = false;
-            this.tabieaLeftRightL_pic.Click += new System.EventHandler(this.tabiea_pic_Click);
-            // 
-            // tabieaUpDown_pnl
-            // 
-            this.tabieaUpDown_pnl.Controls.Add(this.tabieaUpDownD_pic);
-            this.tabieaUpDown_pnl.Controls.Add(this.tabieaUpDownU_pic);
-            this.tabieaUpDown_pnl.Location = new System.Drawing.Point(15, 15);
-            this.tabieaUpDown_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaUpDown_pnl.Name = "tabieaUpDown_pnl";
-            this.tabieaUpDown_pnl.Size = new System.Drawing.Size(106, 89);
-            this.tabieaUpDown_pnl.TabIndex = 8;
-            // 
-            // tabieaUpDownD_pic
-            // 
-            this.tabieaUpDownD_pic.BackgroundImage = global::Thunder.Properties.Resources.Img;
-            this.tabieaUpDownD_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabieaUpDownD_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabieaUpDownD_pic.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tabieaUpDownD_pic.Location = new System.Drawing.Point(0, 56);
-            this.tabieaUpDownD_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaUpDownD_pic.Name = "tabieaUpDownD_pic";
-            this.tabieaUpDownD_pic.Size = new System.Drawing.Size(106, 33);
-            this.tabieaUpDownD_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.tabieaUpDownD_pic.TabIndex = 1;
-            this.tabieaUpDownD_pic.TabStop = false;
-            this.tabieaUpDownD_pic.Click += new System.EventHandler(this.tabiea_pic_Click);
-            // 
-            // tabieaUpDownU_pic
-            // 
-            this.tabieaUpDownU_pic.BackgroundImage = global::Thunder.Properties.Resources.Img;
-            this.tabieaUpDownU_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.tabieaUpDownU_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabieaUpDownU_pic.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tabieaUpDownU_pic.Location = new System.Drawing.Point(0, 0);
-            this.tabieaUpDownU_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaUpDownU_pic.Name = "tabieaUpDownU_pic";
-            this.tabieaUpDownU_pic.Size = new System.Drawing.Size(106, 33);
-            this.tabieaUpDownU_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.tabieaUpDownU_pic.TabIndex = 0;
-            this.tabieaUpDownU_pic.TabStop = false;
-            this.tabieaUpDownU_pic.Click += new System.EventHandler(this.tabiea_pic_Click);
-            // 
-            // tabieaPatternList_chl
-            // 
-            this.tabieaPatternList_chl.CheckOnClick = true;
-            this.tabieaPatternList_chl.FormattingEnabled = true;
-            this.tabieaPatternList_chl.HorizontalScrollbar = true;
-            this.tabieaPatternList_chl.Location = new System.Drawing.Point(6, 127);
-            this.tabieaPatternList_chl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaPatternList_chl.Name = "tabieaPatternList_chl";
-            this.tabieaPatternList_chl.Size = new System.Drawing.Size(116, 89);
-            this.tabieaPatternList_chl.TabIndex = 7;
-            this.tabieaPatternList_chl.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.tabieaPatternList_chL_ItemCheck);
-            // 
-            // tabieaClear_btn
-            // 
-            this.tabieaClear_btn.Location = new System.Drawing.Point(90, 15);
-            this.tabieaClear_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaClear_btn.Name = "tabieaClear_btn";
-            this.tabieaClear_btn.Size = new System.Drawing.Size(64, 24);
-            this.tabieaClear_btn.TabIndex = 11;
-            this.tabieaClear_btn.Text = "Clear";
-            this.tabieaClear_btn.UseVisualStyleBackColor = true;
-            this.tabieaClear_btn.Click += new System.EventHandler(this.tabieaClear_btn_Click);
-            // 
-            // tabieaVFlip_rdo
-            // 
-            this.tabieaVFlip_rdo.AutoSize = true;
-            this.tabieaVFlip_rdo.Location = new System.Drawing.Point(15, 185);
-            this.tabieaVFlip_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaVFlip_rdo.Name = "tabieaVFlip_rdo";
-            this.tabieaVFlip_rdo.Size = new System.Drawing.Size(71, 16);
-            this.tabieaVFlip_rdo.TabIndex = 10;
-            this.tabieaVFlip_rdo.Text = "垂直翻轉";
-            this.tabieaVFlip_rdo.UseVisualStyleBackColor = true;
-            this.tabieaVFlip_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
-            // 
-            // tabieaHFlip_rdo
-            // 
-            this.tabieaHFlip_rdo.AutoSize = true;
-            this.tabieaHFlip_rdo.Location = new System.Drawing.Point(15, 165);
-            this.tabieaHFlip_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaHFlip_rdo.Name = "tabieaHFlip_rdo";
-            this.tabieaHFlip_rdo.Size = new System.Drawing.Size(71, 16);
-            this.tabieaHFlip_rdo.TabIndex = 9;
-            this.tabieaHFlip_rdo.Text = "水平翻轉";
-            this.tabieaHFlip_rdo.UseVisualStyleBackColor = true;
-            this.tabieaHFlip_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
-            // 
-            // tabieaResize_rdo
-            // 
-            this.tabieaResize_rdo.AutoSize = true;
-            this.tabieaResize_rdo.Location = new System.Drawing.Point(15, 45);
-            this.tabieaResize_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaResize_rdo.Name = "tabieaResize_rdo";
-            this.tabieaResize_rdo.Size = new System.Drawing.Size(55, 16);
-            this.tabieaResize_rdo.TabIndex = 8;
-            this.tabieaResize_rdo.Text = "ReSize";
-            this.tabieaResize_rdo.UseVisualStyleBackColor = true;
-            this.tabieaResize_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
-            // 
-            // tabieaImport_btn
-            // 
-            this.tabieaImport_btn.Location = new System.Drawing.Point(10, 15);
-            this.tabieaImport_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaImport_btn.Name = "tabieaImport_btn";
-            this.tabieaImport_btn.Size = new System.Drawing.Size(64, 24);
-            this.tabieaImport_btn.TabIndex = 6;
-            this.tabieaImport_btn.Text = "導入圖片";
-            this.tabieaImport_btn.UseVisualStyleBackColor = true;
-            this.tabieaImport_btn.Click += new System.EventHandler(this.import_Click);
-            // 
-            // tabieaTrans_btn
-            // 
-            this.tabieaTrans_btn.Location = new System.Drawing.Point(15, 220);
-            this.tabieaTrans_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaTrans_btn.Name = "tabieaTrans_btn";
-            this.tabieaTrans_btn.Size = new System.Drawing.Size(64, 24);
-            this.tabieaTrans_btn.TabIndex = 5;
-            this.tabieaTrans_btn.Text = "Translate";
-            this.tabieaTrans_btn.UseVisualStyleBackColor = true;
-            this.tabieaTrans_btn.Click += new System.EventHandler(this.tabieaTrans_btn_Click);
-            // 
-            // tabieaRotate270_rdo
-            // 
-            this.tabieaRotate270_rdo.AutoSize = true;
-            this.tabieaRotate270_rdo.Location = new System.Drawing.Point(15, 145);
-            this.tabieaRotate270_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaRotate270_rdo.Name = "tabieaRotate270_rdo";
-            this.tabieaRotate270_rdo.Size = new System.Drawing.Size(68, 16);
-            this.tabieaRotate270_rdo.TabIndex = 4;
-            this.tabieaRotate270_rdo.Text = "旋轉270°";
-            this.tabieaRotate270_rdo.UseVisualStyleBackColor = true;
-            this.tabieaRotate270_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
-            // 
-            // tabieaRotate180_rdo
-            // 
-            this.tabieaRotate180_rdo.AutoSize = true;
-            this.tabieaRotate180_rdo.Location = new System.Drawing.Point(15, 125);
-            this.tabieaRotate180_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaRotate180_rdo.Name = "tabieaRotate180_rdo";
-            this.tabieaRotate180_rdo.Size = new System.Drawing.Size(68, 16);
-            this.tabieaRotate180_rdo.TabIndex = 3;
-            this.tabieaRotate180_rdo.Text = "旋轉180°";
-            this.tabieaRotate180_rdo.UseVisualStyleBackColor = true;
-            this.tabieaRotate180_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
-            // 
-            // tabieaRotate90_rdo
-            // 
-            this.tabieaRotate90_rdo.AutoSize = true;
-            this.tabieaRotate90_rdo.Location = new System.Drawing.Point(15, 105);
-            this.tabieaRotate90_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaRotate90_rdo.Name = "tabieaRotate90_rdo";
-            this.tabieaRotate90_rdo.Size = new System.Drawing.Size(62, 16);
-            this.tabieaRotate90_rdo.TabIndex = 2;
-            this.tabieaRotate90_rdo.Text = "旋轉90°";
-            this.tabieaRotate90_rdo.UseVisualStyleBackColor = true;
-            this.tabieaRotate90_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
-            // 
-            // tabieaLeftRight_rdo
-            // 
-            this.tabieaLeftRight_rdo.AutoSize = true;
-            this.tabieaLeftRight_rdo.Location = new System.Drawing.Point(15, 85);
-            this.tabieaLeftRight_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaLeftRight_rdo.Name = "tabieaLeftRight_rdo";
-            this.tabieaLeftRight_rdo.Size = new System.Drawing.Size(71, 16);
-            this.tabieaLeftRight_rdo.TabIndex = 1;
-            this.tabieaLeftRight_rdo.Text = "左右組合";
-            this.tabieaLeftRight_rdo.UseVisualStyleBackColor = true;
-            this.tabieaLeftRight_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
-            // 
-            // tabieaUpDown_rdo
-            // 
-            this.tabieaUpDown_rdo.AutoSize = true;
-            this.tabieaUpDown_rdo.Location = new System.Drawing.Point(15, 65);
-            this.tabieaUpDown_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabieaUpDown_rdo.Name = "tabieaUpDown_rdo";
-            this.tabieaUpDown_rdo.Size = new System.Drawing.Size(71, 16);
-            this.tabieaUpDown_rdo.TabIndex = 0;
-            this.tabieaUpDown_rdo.Text = "上下組合";
-            this.tabieaUpDown_rdo.UseVisualStyleBackColor = true;
-            this.tabieaUpDown_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
-            // 
-            // tabimgeMask
-            // 
-            this.tabimgeMask.Controls.Add(this.tabiemPixelGray_lbl);
-            this.tabimgeMask.Controls.Add(this.tabiemPixelGray_vsc);
-            this.tabimgeMask.Controls.Add(this.tabiemPixelColor_lbl);
-            this.tabimgeMask.Controls.Add(this.tabiemPixelLoc_lbl);
-            this.tabimgeMask.Controls.Add(this.tabiemPixelColor_btn);
-            this.tabimgeMask.Controls.Add(this.tabiemPixelClear_btn);
-            this.tabimgeMask.Controls.Add(this.tabiemPixelPanel_pnl);
-            this.tabimgeMask.Controls.Add(this.tabiemHNum_nud);
-            this.tabimgeMask.Controls.Add(this.tabiemWNum_nud);
-            this.tabimgeMask.Controls.Add(this.tabiemHNum_lbl);
-            this.tabimgeMask.Controls.Add(this.tabiemWNum_lbl);
-            this.tabimgeMask.Controls.Add(this.tabiemSubPixel_rdo);
-            this.tabimgeMask.Controls.Add(this.tabiemPixel_rdo);
-            this.tabimgeMask.Location = new System.Drawing.Point(112, 8);
-            this.tabimgeMask.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeMask.Name = "tabimgeMask";
-            this.tabimgeMask.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeMask.Size = new System.Drawing.Size(76, 78);
-            this.tabimgeMask.TabIndex = 0;
-            this.tabimgeMask.TabStop = false;
-            this.tabimgeMask.Text = "Mask(FlickerPattern)";
-            // 
-            // tabiemPixelGray_lbl
-            // 
-            this.tabiemPixelGray_lbl.AutoSize = true;
-            this.tabiemPixelGray_lbl.Font = new System.Drawing.Font("新細明體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.tabiemPixelGray_lbl.Location = new System.Drawing.Point(209, 44);
-            this.tabiemPixelGray_lbl.Name = "tabiemPixelGray_lbl";
-            this.tabiemPixelGray_lbl.Size = new System.Drawing.Size(55, 13);
-            this.tabiemPixelGray_lbl.TabIndex = 15;
-            this.tabiemPixelGray_lbl.Text = "Gray: 255";
-            this.tabiemPixelGray_lbl.Visible = false;
-            // 
-            // tabiemPixelGray_vsc
-            // 
-            this.tabiemPixelGray_vsc.LargeChange = 1;
-            this.tabiemPixelGray_vsc.Location = new System.Drawing.Point(241, 70);
-            this.tabiemPixelGray_vsc.Maximum = 255;
-            this.tabiemPixelGray_vsc.Name = "tabiemPixelGray_vsc";
-            this.tabiemPixelGray_vsc.Size = new System.Drawing.Size(20, 220);
-            this.tabiemPixelGray_vsc.TabIndex = 14;
-            this.tabiemPixelGray_vsc.Visible = false;
-            this.tabiemPixelGray_vsc.ValueChanged += new System.EventHandler(this.PixelGray_vsc_ValueChanged);
-            // 
-            // tabiemPixelColor_lbl
-            // 
-            this.tabiemPixelColor_lbl.AutoSize = true;
-            this.tabiemPixelColor_lbl.Location = new System.Drawing.Point(75, 295);
-            this.tabiemPixelColor_lbl.Name = "tabiemPixelColor_lbl";
-            this.tabiemPixelColor_lbl.Size = new System.Drawing.Size(53, 12);
-            this.tabiemPixelColor_lbl.TabIndex = 13;
-            this.tabiemPixelColor_lbl.Text = "選擇顏色";
-            // 
-            // tabiemPixelLoc_lbl
-            // 
-            this.tabiemPixelLoc_lbl.AutoSize = true;
-            this.tabiemPixelLoc_lbl.Location = new System.Drawing.Point(20, 295);
-            this.tabiemPixelLoc_lbl.Name = "tabiemPixelLoc_lbl";
-            this.tabiemPixelLoc_lbl.Size = new System.Drawing.Size(24, 12);
-            this.tabiemPixelLoc_lbl.TabIndex = 12;
-            this.tabiemPixelLoc_lbl.Text = "--,--";
-            // 
-            // tabiemPixelColor_btn
-            // 
-            this.tabiemPixelColor_btn.BackColor = System.Drawing.Color.White;
-            this.tabiemPixelColor_btn.Location = new System.Drawing.Point(130, 290);
-            this.tabiemPixelColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiemPixelColor_btn.Name = "tabiemPixelColor_btn";
-            this.tabiemPixelColor_btn.Size = new System.Drawing.Size(24, 24);
-            this.tabiemPixelColor_btn.TabIndex = 11;
-            this.tabiemPixelColor_btn.UseVisualStyleBackColor = false;
-            this.tabiemPixelColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
-            // 
-            // tabiemPixelClear_btn
-            // 
-            this.tabiemPixelClear_btn.Location = new System.Drawing.Point(190, 292);
-            this.tabiemPixelClear_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiemPixelClear_btn.Name = "tabiemPixelClear_btn";
-            this.tabiemPixelClear_btn.Size = new System.Drawing.Size(40, 24);
-            this.tabiemPixelClear_btn.TabIndex = 10;
-            this.tabiemPixelClear_btn.Text = "Clear";
-            this.tabiemPixelClear_btn.UseVisualStyleBackColor = true;
-            this.tabiemPixelClear_btn.Click += new System.EventHandler(this.MaskPanelCreat);
-            // 
-            // tabiemPixelPanel_pnl
-            // 
-            this.tabiemPixelPanel_pnl.BackgroundImage = global::Thunder.Properties.Resources.transparent;
-            this.tabiemPixelPanel_pnl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabiemPixelPanel_pnl.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.tabiemPixelPanel_pnl.Location = new System.Drawing.Point(10, 70);
-            this.tabiemPixelPanel_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiemPixelPanel_pnl.Name = "tabiemPixelPanel_pnl";
-            this.tabiemPixelPanel_pnl.Size = new System.Drawing.Size(220, 220);
-            this.tabiemPixelPanel_pnl.TabIndex = 9;
-            // 
-            // tabiemHNum_nud
-            // 
-            this.tabiemHNum_nud.Location = new System.Drawing.Point(150, 40);
-            this.tabiemHNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiemHNum_nud.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.tabiemHNum_nud.Name = "tabiemHNum_nud";
-            this.tabiemHNum_nud.Size = new System.Drawing.Size(50, 22);
-            this.tabiemHNum_nud.TabIndex = 5;
-            this.tabiemHNum_nud.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.tabiemHNum_nud.Click += new System.EventHandler(this.MaskPanelCreat);
-            // 
-            // tabiemWNum_nud
-            // 
-            this.tabiemWNum_nud.Location = new System.Drawing.Point(50, 40);
-            this.tabiemWNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiemWNum_nud.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.tabiemWNum_nud.Name = "tabiemWNum_nud";
-            this.tabiemWNum_nud.Size = new System.Drawing.Size(50, 22);
-            this.tabiemWNum_nud.TabIndex = 4;
-            this.tabiemWNum_nud.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.tabiemWNum_nud.Click += new System.EventHandler(this.MaskPanelCreat);
-            // 
-            // tabiemHNum_lbl
-            // 
-            this.tabiemHNum_lbl.AutoSize = true;
-            this.tabiemHNum_lbl.Location = new System.Drawing.Point(110, 45);
-            this.tabiemHNum_lbl.Name = "tabiemHNum_lbl";
-            this.tabiemHNum_lbl.Size = new System.Drawing.Size(36, 12);
-            this.tabiemHNum_lbl.TabIndex = 3;
-            this.tabiemHNum_lbl.Text = "Height";
-            // 
-            // tabiemWNum_lbl
-            // 
-            this.tabiemWNum_lbl.AutoSize = true;
-            this.tabiemWNum_lbl.Location = new System.Drawing.Point(15, 45);
-            this.tabiemWNum_lbl.Name = "tabiemWNum_lbl";
-            this.tabiemWNum_lbl.Size = new System.Drawing.Size(34, 12);
-            this.tabiemWNum_lbl.TabIndex = 2;
-            this.tabiemWNum_lbl.Text = "Width";
-            // 
-            // tabiemSubPixel_rdo
-            // 
-            this.tabiemSubPixel_rdo.AutoSize = true;
-            this.tabiemSubPixel_rdo.Location = new System.Drawing.Point(100, 15);
-            this.tabiemSubPixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiemSubPixel_rdo.Name = "tabiemSubPixel_rdo";
-            this.tabiemSubPixel_rdo.Size = new System.Drawing.Size(92, 16);
-            this.tabiemSubPixel_rdo.TabIndex = 1;
-            this.tabiemSubPixel_rdo.Text = "Sub Pixel Base";
-            this.tabiemSubPixel_rdo.UseVisualStyleBackColor = true;
-            this.tabiemSubPixel_rdo.CheckedChanged += new System.EventHandler(this.Pixel_rdo_CheckedChanged);
-            // 
-            // tabiemPixel_rdo
-            // 
-            this.tabiemPixel_rdo.AutoSize = true;
-            this.tabiemPixel_rdo.Checked = true;
-            this.tabiemPixel_rdo.Location = new System.Drawing.Point(10, 15);
-            this.tabiemPixel_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabiemPixel_rdo.Name = "tabiemPixel_rdo";
-            this.tabiemPixel_rdo.Size = new System.Drawing.Size(71, 16);
-            this.tabiemPixel_rdo.TabIndex = 0;
-            this.tabiemPixel_rdo.TabStop = true;
-            this.tabiemPixel_rdo.Text = "Pixel Base";
-            this.tabiemPixel_rdo.UseVisualStyleBackColor = true;
-            this.tabiemPixel_rdo.CheckedChanged += new System.EventHandler(this.Pixel_rdo_CheckedChanged);
             // 
             // tabimgeChess
             // 
@@ -2742,14 +2231,34 @@ namespace Thunder
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorG_btn);
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorW_btn);
             this.tabimgeChess.Controls.Add(this.tabiecBaseColorR_btn);
-            this.tabimgeChess.Location = new System.Drawing.Point(9, 8);
+            this.tabimgeChess.Location = new System.Drawing.Point(120, 108);
             this.tabimgeChess.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeChess.Name = "tabimgeChess";
             this.tabimgeChess.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeChess.Size = new System.Drawing.Size(423, 342);
+            this.tabimgeChess.Size = new System.Drawing.Size(78, 65);
             this.tabimgeChess.TabIndex = 0;
             this.tabimgeChess.TabStop = false;
             this.tabimgeChess.Text = "Chess";
+            // 
+            // tabiecHFlip_chk
+            // 
+            this.tabiecHFlip_chk.AutoSize = true;
+            this.tabiecHFlip_chk.Location = new System.Drawing.Point(20, 175);
+            this.tabiecHFlip_chk.Name = "tabiecHFlip_chk";
+            this.tabiecHFlip_chk.Size = new System.Drawing.Size(50, 16);
+            this.tabiecHFlip_chk.TabIndex = 40;
+            this.tabiecHFlip_chk.Text = "HFlip";
+            this.tabiecHFlip_chk.UseVisualStyleBackColor = true;
+            // 
+            // tabiecVFlip_chk
+            // 
+            this.tabiecVFlip_chk.AutoSize = true;
+            this.tabiecVFlip_chk.Location = new System.Drawing.Point(20, 150);
+            this.tabiecVFlip_chk.Name = "tabiecVFlip_chk";
+            this.tabiecVFlip_chk.Size = new System.Drawing.Size(50, 16);
+            this.tabiecVFlip_chk.TabIndex = 39;
+            this.tabiecVFlip_chk.Text = "VFlip";
+            this.tabiecVFlip_chk.UseVisualStyleBackColor = true;
             // 
             // tabiecBaseColorCustom_lbl
             // 
@@ -2950,6 +2459,525 @@ namespace Thunder
             this.tabiecBaseColorR_btn.UseVisualStyleBackColor = false;
             this.tabiecBaseColorR_btn.Click += new System.EventHandler(this.GradientColor_Click);
             // 
+            // tabimgeFrame
+            // 
+            this.tabimgeFrame.Controls.Add(this.tabiefOther_pnl);
+            this.tabimgeFrame.Controls.Add(this.tabiefBack_btn);
+            this.tabimgeFrame.Controls.Add(this.tabiefLineColor_lbl);
+            this.tabimgeFrame.Controls.Add(this.tabiefBack_pic);
+            this.tabimgeFrame.Controls.Add(this.tabiefMassNum_nud);
+            this.tabimgeFrame.Controls.Add(this.tabiefMass_chk);
+            this.tabimgeFrame.Controls.Add(this.tabiefOther_chk);
+            this.tabimgeFrame.Controls.Add(this.tabiefNine_chk);
+            this.tabimgeFrame.Controls.Add(this.tabiefOutside_chk);
+            this.tabimgeFrame.Controls.Add(this.tabiefCenter_chk);
+            this.tabimgeFrame.Controls.Add(this.tabiefLineColor_btn);
+            this.tabimgeFrame.Controls.Add(this.tabiefBack_lbl);
+            this.tabimgeFrame.ImeMode = System.Windows.Forms.ImeMode.On;
+            this.tabimgeFrame.Location = new System.Drawing.Point(11, 93);
+            this.tabimgeFrame.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabimgeFrame.Name = "tabimgeFrame";
+            this.tabimgeFrame.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabimgeFrame.Size = new System.Drawing.Size(78, 85);
+            this.tabimgeFrame.TabIndex = 10;
+            this.tabimgeFrame.TabStop = false;
+            this.tabimgeFrame.Text = "Frame&&CrossLine&&Border";
+            // 
+            // tabiefOther_pnl
+            // 
+            this.tabiefOther_pnl.Controls.Add(this.tabiefOther_cmb);
+            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherLoc_hsc);
+            this.tabiefOther_pnl.Controls.Add(this.tabiefOther_lst);
+            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherAdd_btn);
+            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherClear_btn);
+            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherColor_btn);
+            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherColor_lbl);
+            this.tabiefOther_pnl.Controls.Add(this.tabiefOtherLoc_lbl);
+            this.tabiefOther_pnl.Enabled = false;
+            this.tabiefOther_pnl.Location = new System.Drawing.Point(10, 105);
+            this.tabiefOther_pnl.Name = "tabiefOther_pnl";
+            this.tabiefOther_pnl.Size = new System.Drawing.Size(344, 189);
+            this.tabiefOther_pnl.TabIndex = 33;
+            // 
+            // tabiefOther_cmb
+            // 
+            this.tabiefOther_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tabiefOther_cmb.FormattingEnabled = true;
+            this.tabiefOther_cmb.Items.AddRange(new object[] {
+            "HLine",
+            "VLine"});
+            this.tabiefOther_cmb.Location = new System.Drawing.Point(10, 5);
+            this.tabiefOther_cmb.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefOther_cmb.Name = "tabiefOther_cmb";
+            this.tabiefOther_cmb.Size = new System.Drawing.Size(163, 20);
+            this.tabiefOther_cmb.TabIndex = 18;
+            this.tabiefOther_cmb.SelectedIndexChanged += new System.EventHandler(this.tabiefOther_cmb_SelectedIndexChanged);
+            // 
+            // tabiefOtherLoc_hsc
+            // 
+            this.tabiefOtherLoc_hsc.LargeChange = 1;
+            this.tabiefOtherLoc_hsc.Location = new System.Drawing.Point(10, 30);
+            this.tabiefOtherLoc_hsc.Minimum = 1;
+            this.tabiefOtherLoc_hsc.Name = "tabiefOtherLoc_hsc";
+            this.tabiefOtherLoc_hsc.Size = new System.Drawing.Size(250, 19);
+            this.tabiefOtherLoc_hsc.TabIndex = 19;
+            this.tabiefOtherLoc_hsc.Value = 1;
+            this.tabiefOtherLoc_hsc.ValueChanged += new System.EventHandler(this.gbxfHsblocation_ValueChanged);
+            // 
+            // tabiefOther_lst
+            // 
+            this.tabiefOther_lst.FormattingEnabled = true;
+            this.tabiefOther_lst.ItemHeight = 12;
+            this.tabiefOther_lst.Location = new System.Drawing.Point(10, 54);
+            this.tabiefOther_lst.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefOther_lst.Name = "tabiefOther_lst";
+            this.tabiefOther_lst.ScrollAlwaysVisible = true;
+            this.tabiefOther_lst.Size = new System.Drawing.Size(250, 124);
+            this.tabiefOther_lst.TabIndex = 23;
+            // 
+            // tabiefOtherAdd_btn
+            // 
+            this.tabiefOtherAdd_btn.Location = new System.Drawing.Point(275, 55);
+            this.tabiefOtherAdd_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefOtherAdd_btn.Name = "tabiefOtherAdd_btn";
+            this.tabiefOtherAdd_btn.Size = new System.Drawing.Size(40, 22);
+            this.tabiefOtherAdd_btn.TabIndex = 24;
+            this.tabiefOtherAdd_btn.Text = "Add";
+            this.tabiefOtherAdd_btn.UseVisualStyleBackColor = true;
+            this.tabiefOtherAdd_btn.Click += new System.EventHandler(this.gbxfBtnaddclear_Click);
+            // 
+            // tabiefOtherClear_btn
+            // 
+            this.tabiefOtherClear_btn.Location = new System.Drawing.Point(275, 80);
+            this.tabiefOtherClear_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefOtherClear_btn.Name = "tabiefOtherClear_btn";
+            this.tabiefOtherClear_btn.Size = new System.Drawing.Size(40, 22);
+            this.tabiefOtherClear_btn.TabIndex = 25;
+            this.tabiefOtherClear_btn.Text = "Clear";
+            this.tabiefOtherClear_btn.UseVisualStyleBackColor = true;
+            this.tabiefOtherClear_btn.Click += new System.EventHandler(this.gbxfBtnaddclear_Click);
+            // 
+            // tabiefOtherColor_btn
+            // 
+            this.tabiefOtherColor_btn.BackColor = System.Drawing.Color.White;
+            this.tabiefOtherColor_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiefOtherColor_btn.Location = new System.Drawing.Point(237, 4);
+            this.tabiefOtherColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefOtherColor_btn.Name = "tabiefOtherColor_btn";
+            this.tabiefOtherColor_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiefOtherColor_btn.TabIndex = 26;
+            this.tabiefOtherColor_btn.UseVisualStyleBackColor = false;
+            this.tabiefOtherColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
+            // 
+            // tabiefOtherColor_lbl
+            // 
+            this.tabiefOtherColor_lbl.AutoSize = true;
+            this.tabiefOtherColor_lbl.Location = new System.Drawing.Point(192, 10);
+            this.tabiefOtherColor_lbl.Name = "tabiefOtherColor_lbl";
+            this.tabiefOtherColor_lbl.Size = new System.Drawing.Size(41, 12);
+            this.tabiefOtherColor_lbl.TabIndex = 28;
+            this.tabiefOtherColor_lbl.Text = "線顏色";
+            // 
+            // tabiefOtherLoc_lbl
+            // 
+            this.tabiefOtherLoc_lbl.AutoSize = true;
+            this.tabiefOtherLoc_lbl.Location = new System.Drawing.Point(275, 35);
+            this.tabiefOtherLoc_lbl.Name = "tabiefOtherLoc_lbl";
+            this.tabiefOtherLoc_lbl.Size = new System.Drawing.Size(11, 12);
+            this.tabiefOtherLoc_lbl.TabIndex = 27;
+            this.tabiefOtherLoc_lbl.Text = "0";
+            // 
+            // tabiefBack_btn
+            // 
+            this.tabiefBack_btn.BackColor = System.Drawing.Color.Black;
+            this.tabiefBack_btn.Location = new System.Drawing.Point(61, 14);
+            this.tabiefBack_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefBack_btn.Name = "tabiefBack_btn";
+            this.tabiefBack_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiefBack_btn.TabIndex = 9;
+            this.tabiefBack_btn.UseVisualStyleBackColor = false;
+            this.tabiefBack_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
+            // 
+            // tabiefLineColor_lbl
+            // 
+            this.tabiefLineColor_lbl.AutoSize = true;
+            this.tabiefLineColor_lbl.Location = new System.Drawing.Point(216, 54);
+            this.tabiefLineColor_lbl.Name = "tabiefLineColor_lbl";
+            this.tabiefLineColor_lbl.Size = new System.Drawing.Size(53, 24);
+            this.tabiefLineColor_lbl.TabIndex = 32;
+            this.tabiefLineColor_lbl.Text = "\n框線顏色";
+            // 
+            // tabiefBack_pic
+            // 
+            this.tabiefBack_pic.BackgroundImage = global::Thunder.Properties.Resources.img;
+            this.tabiefBack_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabiefBack_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabiefBack_pic.Location = new System.Drawing.Point(144, 13);
+            this.tabiefBack_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefBack_pic.Name = "tabiefBack_pic";
+            this.tabiefBack_pic.Size = new System.Drawing.Size(41, 39);
+            this.tabiefBack_pic.TabIndex = 31;
+            this.tabiefBack_pic.TabStop = false;
+            this.tabiefBack_pic.Click += new System.EventHandler(this.import_Click);
+            // 
+            // tabiefMassNum_nud
+            // 
+            this.tabiefMassNum_nud.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tabiefMassNum_nud.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.tabiefMassNum_nud.Location = new System.Drawing.Point(310, 31);
+            this.tabiefMassNum_nud.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefMassNum_nud.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.tabiefMassNum_nud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.tabiefMassNum_nud.Name = "tabiefMassNum_nud";
+            this.tabiefMassNum_nud.Size = new System.Drawing.Size(39, 18);
+            this.tabiefMassNum_nud.TabIndex = 30;
+            this.tabiefMassNum_nud.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tabiefMassNum_nud.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            // 
+            // tabiefMass_chk
+            // 
+            this.tabiefMass_chk.AutoSize = true;
+            this.tabiefMass_chk.Location = new System.Drawing.Point(218, 20);
+            this.tabiefMass_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefMass_chk.Name = "tabiefMass_chk";
+            this.tabiefMass_chk.Size = new System.Drawing.Size(182, 28);
+            this.tabiefMass_chk.TabIndex = 29;
+            this.tabiefMass_chk.Text = "大量建圖\r\n(從0開始，每                階生成)";
+            this.tabiefMass_chk.UseVisualStyleBackColor = true;
+            // 
+            // tabiefOther_chk
+            // 
+            this.tabiefOther_chk.AutoSize = true;
+            this.tabiefOther_chk.Location = new System.Drawing.Point(10, 85);
+            this.tabiefOther_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefOther_chk.Name = "tabiefOther_chk";
+            this.tabiefOther_chk.Size = new System.Drawing.Size(81, 16);
+            this.tabiefOther_chk.TabIndex = 17;
+            this.tabiefOther_chk.Text = "其他(H&&V)";
+            this.tabiefOther_chk.UseVisualStyleBackColor = true;
+            this.tabiefOther_chk.CheckStateChanged += new System.EventHandler(this.Framechkother_CheckStateChanged);
+            // 
+            // tabiefNine_chk
+            // 
+            this.tabiefNine_chk.AutoSize = true;
+            this.tabiefNine_chk.Location = new System.Drawing.Point(138, 65);
+            this.tabiefNine_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefNine_chk.Name = "tabiefNine_chk";
+            this.tabiefNine_chk.Size = new System.Drawing.Size(72, 16);
+            this.tabiefNine_chk.TabIndex = 16;
+            this.tabiefNine_chk.Text = "九點對位";
+            this.tabiefNine_chk.UseVisualStyleBackColor = true;
+            // 
+            // tabiefOutside_chk
+            // 
+            this.tabiefOutside_chk.AutoSize = true;
+            this.tabiefOutside_chk.Location = new System.Drawing.Point(80, 65);
+            this.tabiefOutside_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefOutside_chk.Name = "tabiefOutside_chk";
+            this.tabiefOutside_chk.Size = new System.Drawing.Size(60, 16);
+            this.tabiefOutside_chk.TabIndex = 15;
+            this.tabiefOutside_chk.Text = "外框線";
+            this.tabiefOutside_chk.UseVisualStyleBackColor = true;
+            // 
+            // tabiefCenter_chk
+            // 
+            this.tabiefCenter_chk.AutoSize = true;
+            this.tabiefCenter_chk.Location = new System.Drawing.Point(10, 65);
+            this.tabiefCenter_chk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefCenter_chk.Name = "tabiefCenter_chk";
+            this.tabiefCenter_chk.Size = new System.Drawing.Size(72, 16);
+            this.tabiefCenter_chk.TabIndex = 14;
+            this.tabiefCenter_chk.Text = "中心對位";
+            this.tabiefCenter_chk.UseVisualStyleBackColor = true;
+            // 
+            // tabiefLineColor_btn
+            // 
+            this.tabiefLineColor_btn.BackColor = System.Drawing.Color.White;
+            this.tabiefLineColor_btn.ForeColor = System.Drawing.Color.White;
+            this.tabiefLineColor_btn.Location = new System.Drawing.Point(275, 62);
+            this.tabiefLineColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabiefLineColor_btn.Name = "tabiefLineColor_btn";
+            this.tabiefLineColor_btn.Size = new System.Drawing.Size(24, 24);
+            this.tabiefLineColor_btn.TabIndex = 12;
+            this.tabiefLineColor_btn.UseVisualStyleBackColor = false;
+            this.tabiefLineColor_btn.Click += new System.EventHandler(this.SetButtonBackgroundColor);
+            // 
+            // tabiefBack_lbl
+            // 
+            this.tabiefBack_lbl.AutoSize = true;
+            this.tabiefBack_lbl.Location = new System.Drawing.Point(10, 20);
+            this.tabiefBack_lbl.Name = "tabiefBack_lbl";
+            this.tabiefBack_lbl.Size = new System.Drawing.Size(131, 12);
+            this.tabiefBack_lbl.TabIndex = 11;
+            this.tabiefBack_lbl.Text = "背景顏色          導入截圖";
+            // 
+            // tabimgeAdjust
+            // 
+            this.tabimgeAdjust.Controls.Add(this.tabieaPanel_pnl);
+            this.tabimgeAdjust.Controls.Add(this.tabieaClear_btn);
+            this.tabimgeAdjust.Controls.Add(this.tabieaVFlip_rdo);
+            this.tabimgeAdjust.Controls.Add(this.tabieaHFlip_rdo);
+            this.tabimgeAdjust.Controls.Add(this.tabieaResize_rdo);
+            this.tabimgeAdjust.Controls.Add(this.tabieaImport_btn);
+            this.tabimgeAdjust.Controls.Add(this.tabieaTrans_btn);
+            this.tabimgeAdjust.Controls.Add(this.tabieaRotate270_rdo);
+            this.tabimgeAdjust.Controls.Add(this.tabieaRotate180_rdo);
+            this.tabimgeAdjust.Controls.Add(this.tabieaRotate90_rdo);
+            this.tabimgeAdjust.Controls.Add(this.tabieaLeftRight_rdo);
+            this.tabimgeAdjust.Controls.Add(this.tabieaUpDown_rdo);
+            this.tabimgeAdjust.Location = new System.Drawing.Point(3, 189);
+            this.tabimgeAdjust.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabimgeAdjust.Name = "tabimgeAdjust";
+            this.tabimgeAdjust.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabimgeAdjust.Size = new System.Drawing.Size(83, 82);
+            this.tabimgeAdjust.TabIndex = 0;
+            this.tabimgeAdjust.TabStop = false;
+            this.tabimgeAdjust.Text = "  ImgAdjus";
+            // 
+            // tabieaPanel_pnl
+            // 
+            this.tabieaPanel_pnl.Controls.Add(this.tabieaLeftRight_pnl);
+            this.tabieaPanel_pnl.Controls.Add(this.tabieaUpDown_pnl);
+            this.tabieaPanel_pnl.Controls.Add(this.tabieaPatternList_chl);
+            this.tabieaPanel_pnl.Location = new System.Drawing.Point(165, 15);
+            this.tabieaPanel_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaPanel_pnl.Name = "tabieaPanel_pnl";
+            this.tabieaPanel_pnl.Size = new System.Drawing.Size(260, 240);
+            this.tabieaPanel_pnl.TabIndex = 12;
+            // 
+            // tabieaLeftRight_pnl
+            // 
+            this.tabieaLeftRight_pnl.Controls.Add(this.tabieaLeftRightR_pic);
+            this.tabieaLeftRight_pnl.Controls.Add(this.tabieaLeftRightL_pic);
+            this.tabieaLeftRight_pnl.Location = new System.Drawing.Point(140, 15);
+            this.tabieaLeftRight_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaLeftRight_pnl.Name = "tabieaLeftRight_pnl";
+            this.tabieaLeftRight_pnl.Size = new System.Drawing.Size(110, 91);
+            this.tabieaLeftRight_pnl.TabIndex = 9;
+            // 
+            // tabieaLeftRightR_pic
+            // 
+            this.tabieaLeftRightR_pic.BackgroundImage = global::Thunder.Properties.Resources.img;
+            this.tabieaLeftRightR_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabieaLeftRightR_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabieaLeftRightR_pic.Dock = System.Windows.Forms.DockStyle.Right;
+            this.tabieaLeftRightR_pic.Location = new System.Drawing.Point(73, 0);
+            this.tabieaLeftRightR_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaLeftRightR_pic.Name = "tabieaLeftRightR_pic";
+            this.tabieaLeftRightR_pic.Size = new System.Drawing.Size(37, 91);
+            this.tabieaLeftRightR_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.tabieaLeftRightR_pic.TabIndex = 1;
+            this.tabieaLeftRightR_pic.TabStop = false;
+            this.tabieaLeftRightR_pic.Click += new System.EventHandler(this.tabiea_pic_Click);
+            // 
+            // tabieaLeftRightL_pic
+            // 
+            this.tabieaLeftRightL_pic.BackgroundImage = global::Thunder.Properties.Resources.img;
+            this.tabieaLeftRightL_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabieaLeftRightL_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabieaLeftRightL_pic.Dock = System.Windows.Forms.DockStyle.Left;
+            this.tabieaLeftRightL_pic.Location = new System.Drawing.Point(0, 0);
+            this.tabieaLeftRightL_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaLeftRightL_pic.Name = "tabieaLeftRightL_pic";
+            this.tabieaLeftRightL_pic.Size = new System.Drawing.Size(39, 91);
+            this.tabieaLeftRightL_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.tabieaLeftRightL_pic.TabIndex = 0;
+            this.tabieaLeftRightL_pic.TabStop = false;
+            this.tabieaLeftRightL_pic.Click += new System.EventHandler(this.tabiea_pic_Click);
+            // 
+            // tabieaUpDown_pnl
+            // 
+            this.tabieaUpDown_pnl.Controls.Add(this.tabieaUpDownD_pic);
+            this.tabieaUpDown_pnl.Controls.Add(this.tabieaUpDownU_pic);
+            this.tabieaUpDown_pnl.Location = new System.Drawing.Point(15, 15);
+            this.tabieaUpDown_pnl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaUpDown_pnl.Name = "tabieaUpDown_pnl";
+            this.tabieaUpDown_pnl.Size = new System.Drawing.Size(106, 89);
+            this.tabieaUpDown_pnl.TabIndex = 8;
+            // 
+            // tabieaUpDownD_pic
+            // 
+            this.tabieaUpDownD_pic.BackgroundImage = global::Thunder.Properties.Resources.img;
+            this.tabieaUpDownD_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabieaUpDownD_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabieaUpDownD_pic.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tabieaUpDownD_pic.Location = new System.Drawing.Point(0, 56);
+            this.tabieaUpDownD_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaUpDownD_pic.Name = "tabieaUpDownD_pic";
+            this.tabieaUpDownD_pic.Size = new System.Drawing.Size(106, 33);
+            this.tabieaUpDownD_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.tabieaUpDownD_pic.TabIndex = 1;
+            this.tabieaUpDownD_pic.TabStop = false;
+            this.tabieaUpDownD_pic.Click += new System.EventHandler(this.tabiea_pic_Click);
+            // 
+            // tabieaUpDownU_pic
+            // 
+            this.tabieaUpDownU_pic.BackgroundImage = global::Thunder.Properties.Resources.img;
+            this.tabieaUpDownU_pic.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabieaUpDownU_pic.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabieaUpDownU_pic.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tabieaUpDownU_pic.Location = new System.Drawing.Point(0, 0);
+            this.tabieaUpDownU_pic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaUpDownU_pic.Name = "tabieaUpDownU_pic";
+            this.tabieaUpDownU_pic.Size = new System.Drawing.Size(106, 33);
+            this.tabieaUpDownU_pic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.tabieaUpDownU_pic.TabIndex = 0;
+            this.tabieaUpDownU_pic.TabStop = false;
+            this.tabieaUpDownU_pic.Click += new System.EventHandler(this.tabiea_pic_Click);
+            // 
+            // tabieaPatternList_chl
+            // 
+            this.tabieaPatternList_chl.CheckOnClick = true;
+            this.tabieaPatternList_chl.FormattingEnabled = true;
+            this.tabieaPatternList_chl.HorizontalScrollbar = true;
+            this.tabieaPatternList_chl.Location = new System.Drawing.Point(6, 127);
+            this.tabieaPatternList_chl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaPatternList_chl.Name = "tabieaPatternList_chl";
+            this.tabieaPatternList_chl.Size = new System.Drawing.Size(116, 89);
+            this.tabieaPatternList_chl.TabIndex = 7;
+            this.tabieaPatternList_chl.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.tabieaPatternList_chL_ItemCheck);
+            // 
+            // tabieaClear_btn
+            // 
+            this.tabieaClear_btn.Location = new System.Drawing.Point(90, 15);
+            this.tabieaClear_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaClear_btn.Name = "tabieaClear_btn";
+            this.tabieaClear_btn.Size = new System.Drawing.Size(64, 24);
+            this.tabieaClear_btn.TabIndex = 11;
+            this.tabieaClear_btn.Text = "Clear";
+            this.tabieaClear_btn.UseVisualStyleBackColor = true;
+            this.tabieaClear_btn.Click += new System.EventHandler(this.tabieaClear_btn_Click);
+            // 
+            // tabieaVFlip_rdo
+            // 
+            this.tabieaVFlip_rdo.AutoSize = true;
+            this.tabieaVFlip_rdo.Location = new System.Drawing.Point(15, 185);
+            this.tabieaVFlip_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaVFlip_rdo.Name = "tabieaVFlip_rdo";
+            this.tabieaVFlip_rdo.Size = new System.Drawing.Size(71, 16);
+            this.tabieaVFlip_rdo.TabIndex = 10;
+            this.tabieaVFlip_rdo.Text = "垂直翻轉";
+            this.tabieaVFlip_rdo.UseVisualStyleBackColor = true;
+            this.tabieaVFlip_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
+            // 
+            // tabieaHFlip_rdo
+            // 
+            this.tabieaHFlip_rdo.AutoSize = true;
+            this.tabieaHFlip_rdo.Location = new System.Drawing.Point(15, 165);
+            this.tabieaHFlip_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaHFlip_rdo.Name = "tabieaHFlip_rdo";
+            this.tabieaHFlip_rdo.Size = new System.Drawing.Size(71, 16);
+            this.tabieaHFlip_rdo.TabIndex = 9;
+            this.tabieaHFlip_rdo.Text = "水平翻轉";
+            this.tabieaHFlip_rdo.UseVisualStyleBackColor = true;
+            this.tabieaHFlip_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
+            // 
+            // tabieaResize_rdo
+            // 
+            this.tabieaResize_rdo.AutoSize = true;
+            this.tabieaResize_rdo.Location = new System.Drawing.Point(15, 45);
+            this.tabieaResize_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaResize_rdo.Name = "tabieaResize_rdo";
+            this.tabieaResize_rdo.Size = new System.Drawing.Size(55, 16);
+            this.tabieaResize_rdo.TabIndex = 8;
+            this.tabieaResize_rdo.Text = "ReSize";
+            this.tabieaResize_rdo.UseVisualStyleBackColor = true;
+            this.tabieaResize_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
+            // 
+            // tabieaImport_btn
+            // 
+            this.tabieaImport_btn.Location = new System.Drawing.Point(10, 15);
+            this.tabieaImport_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaImport_btn.Name = "tabieaImport_btn";
+            this.tabieaImport_btn.Size = new System.Drawing.Size(64, 24);
+            this.tabieaImport_btn.TabIndex = 6;
+            this.tabieaImport_btn.Text = "導入圖片";
+            this.tabieaImport_btn.UseVisualStyleBackColor = true;
+            this.tabieaImport_btn.Click += new System.EventHandler(this.import_Click);
+            // 
+            // tabieaTrans_btn
+            // 
+            this.tabieaTrans_btn.Location = new System.Drawing.Point(15, 220);
+            this.tabieaTrans_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaTrans_btn.Name = "tabieaTrans_btn";
+            this.tabieaTrans_btn.Size = new System.Drawing.Size(64, 24);
+            this.tabieaTrans_btn.TabIndex = 5;
+            this.tabieaTrans_btn.Text = "Translate";
+            this.tabieaTrans_btn.UseVisualStyleBackColor = true;
+            this.tabieaTrans_btn.Click += new System.EventHandler(this.tabieaTrans_btn_Click);
+            // 
+            // tabieaRotate270_rdo
+            // 
+            this.tabieaRotate270_rdo.AutoSize = true;
+            this.tabieaRotate270_rdo.Location = new System.Drawing.Point(15, 145);
+            this.tabieaRotate270_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaRotate270_rdo.Name = "tabieaRotate270_rdo";
+            this.tabieaRotate270_rdo.Size = new System.Drawing.Size(68, 16);
+            this.tabieaRotate270_rdo.TabIndex = 4;
+            this.tabieaRotate270_rdo.Text = "旋轉270°";
+            this.tabieaRotate270_rdo.UseVisualStyleBackColor = true;
+            this.tabieaRotate270_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
+            // 
+            // tabieaRotate180_rdo
+            // 
+            this.tabieaRotate180_rdo.AutoSize = true;
+            this.tabieaRotate180_rdo.Location = new System.Drawing.Point(15, 125);
+            this.tabieaRotate180_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaRotate180_rdo.Name = "tabieaRotate180_rdo";
+            this.tabieaRotate180_rdo.Size = new System.Drawing.Size(68, 16);
+            this.tabieaRotate180_rdo.TabIndex = 3;
+            this.tabieaRotate180_rdo.Text = "旋轉180°";
+            this.tabieaRotate180_rdo.UseVisualStyleBackColor = true;
+            this.tabieaRotate180_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
+            // 
+            // tabieaRotate90_rdo
+            // 
+            this.tabieaRotate90_rdo.AutoSize = true;
+            this.tabieaRotate90_rdo.Location = new System.Drawing.Point(15, 105);
+            this.tabieaRotate90_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaRotate90_rdo.Name = "tabieaRotate90_rdo";
+            this.tabieaRotate90_rdo.Size = new System.Drawing.Size(62, 16);
+            this.tabieaRotate90_rdo.TabIndex = 2;
+            this.tabieaRotate90_rdo.Text = "旋轉90°";
+            this.tabieaRotate90_rdo.UseVisualStyleBackColor = true;
+            this.tabieaRotate90_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
+            // 
+            // tabieaLeftRight_rdo
+            // 
+            this.tabieaLeftRight_rdo.AutoSize = true;
+            this.tabieaLeftRight_rdo.Location = new System.Drawing.Point(15, 85);
+            this.tabieaLeftRight_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaLeftRight_rdo.Name = "tabieaLeftRight_rdo";
+            this.tabieaLeftRight_rdo.Size = new System.Drawing.Size(71, 16);
+            this.tabieaLeftRight_rdo.TabIndex = 1;
+            this.tabieaLeftRight_rdo.Text = "左右組合";
+            this.tabieaLeftRight_rdo.UseVisualStyleBackColor = true;
+            this.tabieaLeftRight_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
+            // 
+            // tabieaUpDown_rdo
+            // 
+            this.tabieaUpDown_rdo.AutoSize = true;
+            this.tabieaUpDown_rdo.Location = new System.Drawing.Point(15, 65);
+            this.tabieaUpDown_rdo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tabieaUpDown_rdo.Name = "tabieaUpDown_rdo";
+            this.tabieaUpDown_rdo.Size = new System.Drawing.Size(71, 16);
+            this.tabieaUpDown_rdo.TabIndex = 0;
+            this.tabieaUpDown_rdo.Text = "上下組合";
+            this.tabieaUpDown_rdo.UseVisualStyleBackColor = true;
+            this.tabieaUpDown_rdo.CheckedChanged += new System.EventHandler(this.tabiea_rdo_CheckedChanged);
+            // 
             // tabimgeMass
             // 
             this.tabimgeMass.Controls.Add(this.tabiema);
@@ -3034,22 +3062,6 @@ namespace Thunder
             this.tabilPatternList_lst.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.tabilPatternList_lst.FormattingEnabled = true;
             this.tabilPatternList_lst.ItemHeight = 16;
-            this.tabilPatternList_lst.Items.AddRange(new object[] {
-            "Solid\t,Black\t\t,con-white",
-            "Solid\t,White\t\t,",
-            "Solid\t,Red\t\t,",
-            "Solid\t,Green\t\t,",
-            "Solid\t,Blue\t\t,",
-            "Solid\t,50%Gary\t\t,",
-            "Solid\t,25%Gary\t\t,",
-            "Solid\t,Yellow\t\t,",
-            "Solid\t,Aqua\t\t,",
-            "Solid\t,Magenta\t\t,",
-            "Chess\t,5*5\t,",
-            "Chess\t,8*8\t,",
-            "Chess\t,8*4\t,",
-            "Chess\t,1*2\t,",
-            "Chess\t,1*2\t,v"});
             this.tabilPatternList_lst.Location = new System.Drawing.Point(3, 2);
             this.tabilPatternList_lst.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabilPatternList_lst.Name = "tabilPatternList_lst";
@@ -3152,29 +3164,17 @@ namespace Thunder
             this.ssrProgressbar_prg.Size = new System.Drawing.Size(171, 13);
             this.ssrProgressbar_prg.Visible = false;
             // 
-            // tabiecVFlip_chk
-            // 
-            this.tabiecVFlip_chk.AutoSize = true;
-            this.tabiecVFlip_chk.Location = new System.Drawing.Point(20, 150);
-            this.tabiecVFlip_chk.Name = "tabiecVFlip_chk";
-            this.tabiecVFlip_chk.Size = new System.Drawing.Size(50, 16);
-            this.tabiecVFlip_chk.TabIndex = 39;
-            this.tabiecVFlip_chk.Text = "VFlip";
-            this.tabiecVFlip_chk.UseVisualStyleBackColor = true;
-            // 
-            // tabiecHFlip_chk
-            // 
-            this.tabiecHFlip_chk.AutoSize = true;
-            this.tabiecHFlip_chk.Location = new System.Drawing.Point(20, 175);
-            this.tabiecHFlip_chk.Name = "tabiecHFlip_chk";
-            this.tabiecHFlip_chk.Size = new System.Drawing.Size(50, 16);
-            this.tabiecHFlip_chk.TabIndex = 40;
-            this.tabiecHFlip_chk.Text = "HFlip";
-            this.tabiecHFlip_chk.UseVisualStyleBackColor = true;
-            // 
             // imageItemBindingSource
             // 
             this.imageItemBindingSource.DataSource = typeof(Thunder.ImageItem);
+            // 
+            // mnsSave_btn
+            // 
+            this.mnsSave_btn.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.mnsSave_btn.Name = "mnsSave_btn";
+            this.mnsSave_btn.Size = new System.Drawing.Size(46, 23);
+            this.mnsSave_btn.Text = "Save";
+            this.mnsSave_btn.Click += new System.EventHandler(this.Save_Click);
             // 
             // mainWindow
             // 
@@ -3201,12 +3201,6 @@ namespace Thunder
             this.tabControl.ResumeLayout(false);
             this.tabImgEditor.ResumeLayout(false);
             this.tabimgePanel.ResumeLayout(false);
-            this.tabimgeFrame.ResumeLayout(false);
-            this.tabimgeFrame.PerformLayout();
-            this.tabiefOther_pnl.ResumeLayout(false);
-            this.tabiefOther_pnl.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiefBack_pic)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiefMassNum_nud)).EndInit();
             this.tabimgeWindow.ResumeLayout(false);
             this.tabimgeWindow.PerformLayout();
             this.tabiwCustom_grp.ResumeLayout(false);
@@ -3238,6 +3232,10 @@ namespace Thunder
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePixelH_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePixelW_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabiwWinSizePercent_nud)).EndInit();
+            this.tabimgeMask.ResumeLayout(false);
+            this.tabimgeMask.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiemHNum_nud)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiemWNum_nud)).EndInit();
             this.tabimgeGradient.ResumeLayout(false);
             this.tabimgeGradient.PerformLayout();
             this.tabigBaseColor_pnl.ResumeLayout(false);
@@ -3245,6 +3243,16 @@ namespace Thunder
             this.tabigOther_grp.ResumeLayout(false);
             this.tabigOther_grp.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabigOtherSplit_nud)).EndInit();
+            this.tabimgeChess.ResumeLayout(false);
+            this.tabimgeChess.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiecVNum_nud)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiecHNum_nud)).EndInit();
+            this.tabimgeFrame.ResumeLayout(false);
+            this.tabimgeFrame.PerformLayout();
+            this.tabiefOther_pnl.ResumeLayout(false);
+            this.tabiefOther_pnl.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiefBack_pic)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tabiefMassNum_nud)).EndInit();
             this.tabimgeAdjust.ResumeLayout(false);
             this.tabimgeAdjust.PerformLayout();
             this.tabieaPanel_pnl.ResumeLayout(false);
@@ -3254,14 +3262,6 @@ namespace Thunder
             this.tabieaUpDown_pnl.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tabieaUpDownD_pic)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tabieaUpDownU_pic)).EndInit();
-            this.tabimgeMask.ResumeLayout(false);
-            this.tabimgeMask.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiemHNum_nud)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiemWNum_nud)).EndInit();
-            this.tabimgeChess.ResumeLayout(false);
-            this.tabimgeChess.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiecVNum_nud)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tabiecHNum_nud)).EndInit();
             this.tabimgeMass.ResumeLayout(false);
             this.tabimgeMass.PerformLayout();
             this.tabDirList.ResumeLayout(false);
@@ -3279,7 +3279,6 @@ namespace Thunder
 
         #endregion
         private MenuStrip menuStrip;
-        private ToolStripMenuItem mnsImport_btn;
         private ToolStripMenuItem mnsFullscreen_btn;
         private ToolStripTextBox mnsH_txt;
         private ToolStripMenuItem mnsX_lbl;
@@ -3494,12 +3493,14 @@ namespace Thunder
         private Panel tabimgePanel;
         private Panel tabiwCustomFunc_pnl;
         private FlowLayoutPanel tabiwCLayout_flp;
-        private ToolStripMenuItem aAAToolStripMenuItem;
+        private ToolStripMenuItem mnsAAA_btn;
         public Button tabiefBack_btn;
         private BindingSource imageItemBindingSource;
         public ToolStripComboBox mnsScreenlist_cmb;
         public CheckBox tabiefCenter_chk;
         private CheckBox tabiecHFlip_chk;
         private CheckBox tabiecVFlip_chk;
+        private CheckBox tabigReverse_chk;
+        private ToolStripMenuItem mnsSave_btn;
     }
 }

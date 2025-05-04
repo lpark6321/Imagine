@@ -286,15 +286,21 @@ namespace Thunder
                 // 獲取程式所在資料夾的 config.txt 檔案
                 string configFilePath = Directory.GetFiles(Application.StartupPath, "config.txt").FirstOrDefault();
 
-                // 如果找到 config.txt，顯示檔案名稱
+                // 如果找到 config.txt，將其內容讀取為字串並傳入 PopulateListBox 函式
                 if (!string.IsNullOrEmpty(configFilePath))
                 {
-                    //MessageBox.Show($"找到檔案：{Path.GetFileName(configFilePath)}", "搜尋結果", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    try
+                    {
+                        PopulateListBox(File.ReadAllText(configFilePath)); // 將字串傳入 PopulateListBox
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 else
                 {
-                    //PopulateListBox();
-                    MessageBox.Show("未找到 config.txt 檔案！", "搜尋結果", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    PopulateListBox(Resources.config);
                 }
             }
         }  // 切換tab
@@ -364,7 +370,7 @@ namespace Thunder
                 MessageBox.Show($"圖片生成失敗：{ex.Message}");
             }
         }  // 按下生成圖片
-        public void GenerateImage(string type, int width, int height)
+        public void GenerateImage(string type, int width, int height, string tag="")
         {
             Bitmap CurrentBitmap = new Bitmap(width, height);
             using (Graphics g = Graphics.FromImage(CurrentBitmap))
@@ -739,6 +745,8 @@ namespace Thunder
                     default:
                         throw new NotSupportedException("不支援的圖片類型！");
                 }
+                // 設置圖片的標籤
+                mypicture.tag = tag != "" ? tag : mypicture.tag;
             }
             // 釋放資源
             CurrentBitmap.Dispose();
@@ -1008,7 +1016,7 @@ namespace Thunder
         {
             string trimlower(string st)
             {
-                return st.ToString().Trim().ToLower();
+                return st.Trim().ToLower();
             }
             if (sender is ListBox targetList)
             {
@@ -1023,35 +1031,46 @@ namespace Thunder
                         switch (type)
                         {
                             case "solid":
+                                tabimgeFuncList.SelectedIndex = 0;
                                 funcFrame(trimlower(patternVar[1]), trimlower(patternVar[2]));
                                 break;
-                            case "grad":
+                            case "gradient":
+                                tabimgeFuncList.SelectedIndex = 1;
+                                funcGrad(trimlower(patternVar[1]), trimlower(patternVar[2]));
                                 break;
                             case "chess":
+                                tabimgeFuncList.SelectedIndex = 2;
                                 funcChess(trimlower(patternVar[1]), trimlower(patternVar[2]));
                                 break;
                             case "window":
+                                tabimgeFuncList.SelectedIndex = 3;
+                                funcWind(trimlower(patternVar[1]), trimlower(patternVar[2]));
                                 break;
                             case "mask":
+                                tabimgeFuncList.SelectedIndex = 4;
+                                funcMask(trimlower(patternVar[1]), trimlower(patternVar[2]));
                                 break;
                             default:
+                                MessageBox.Show("不支援的圖片類型！");
                                 break;
                         }
-                        GenerateImage(type, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text)); // 重新生成圖片
+                        string tag = patternVar.Length > 3 ? patternVar[3].Substring(5) : "";
+                        GenerateImage(type, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text), tag); // 重新生成圖片
                     }
                     showimgPicture_pic.Image = mypicture.Getpicture();
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
                 }
             }
         }  // ListBox選擇圖片
-        private void PopulateListBox()
+        private void PopulateListBox(string configfile)
         {
-            byte[] config = Resources.config;
-            // 初始化 ListView
-            PopulateListView();
-            // 初始化狀態列
-            showimgSize_btn.Text = "當前圖片大小：";
-        }  // Form載入時
+            //byte[] config = Resources.config;
+            tabilPatternList_lst.Items.Clear();
+            foreach (string line in configfile.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                tabilPatternList_lst.Items.Add(line);
+            }
+        }  // ListBox載入圖片
         // 圖片處理 groupbox 功能--------------------------------------------------------------------------------------
         private void SetButtonBackgroundColor(object sender, EventArgs e)
         {
@@ -2422,6 +2441,8 @@ namespace Thunder
             // 調用 CodeFile1 的函式，並傳遞 Form1 的實例
             //CodeFile1.func1(this);
             //CodeFile1.funcFrame(showimgGenerate_btn);
+            showimgPicture_pic.Image = Resources.run;
+            showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
         }  //menustripAAA 測試用按鍵
         private bool IsMouseMoveBound(Object targetObject, String targerString)
         {
@@ -2440,31 +2461,31 @@ namespace Thunder
             return false;
         }
         // listbox功能-----------------------------------------------------------------------------------
-        private void funcFrame(string color, string line)
+        private Color switchcolor(string sc)
         {
-            Color switchcolor(string sc)
+            if (sc.Contains("."))
             {
-                if (sc.Contains("."))
+                // 這裡的 Name 是從 ListBox 中獲取的顏色名稱
+                string[] colorParts = sc.Split('.');
+                return Color.FromArgb(int.Parse(colorParts[0]), int.Parse(colorParts[1]), int.Parse(colorParts[2])); // 修改 Form1 的背景顏色
+            }
+            else
+            {
+                // 根據傳入的顏色名稱來設置顏色
+                try
                 {
-                    // 這裡的 Name 是從 ListBox 中獲取的顏色名稱
-                    string[] colorParts = color.Split('.');
-                    return Color.FromArgb(int.Parse(colorParts[0]), int.Parse(colorParts[1]), int.Parse(colorParts[2])); // 修改 Form1 的背景顏色
+                    return Color.FromName(sc);
                 }
-                else
+                catch
                 {
-                    // 根據傳入的顏色名稱來設置顏色
-                    try
-                    {
-                        return Color.FromName(sc);
-                    }
-                    catch
-                    {
-                        // 如果顏色名稱無效，則使用 Color.FromName 方法將其轉換為顏色
-                        MessageBox.Show($"無法識別顏色：{sc}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return Color.Gray;
-                    }
+                    // 如果顏色名稱無效，則使用 Color.FromName 方法將其轉換為顏色
+                    MessageBox.Show($"無法識別顏色：{sc}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return Color.Gray;
                 }
             }
+        }
+        private void funcFrame(string color, string line)
+        {
             if (color.EndsWith("%gary"))
             {
                 int cc = (int)((float.Parse(color.Split('%')[0]) / 100) * 256) - 1;
@@ -2504,9 +2525,202 @@ namespace Thunder
             }
             else 
             {
-                //tabiecHFlip_chk.Checked = false;
-                //tabiecVFlip_chk.Checked = false;
+                tabiecHFlip_chk.Checked = false;
+                tabiecVFlip_chk.Checked = false;
+            }
+        }  // listbox控制棋盤格
+        private void funcGrad(string color, string hv)
+        {
+            if (hv.StartsWith("h"))
+            {
+                tabigHWay_rdo.Checked = true;
+            }
+            else if (hv.StartsWith("v"))
+            {
+                tabigVWay_rdo.Checked = true;
+            }
+            else
+            {
+                tabigColorBar_rdo.Checked = true;
+            }
+            if (color.StartsWith("colorbar"))
+            {
+                tabigOther_chk.Checked = true;
+                if (color.Contains("four"))
+                {
+                    ColorBar_btn_Click(tabigFourColor_btn, EventArgs.Empty); // 修正 'e' 為 'EventArgs.Empty'  
+                }
+                else
+                {
+                    string[] colorbars = color.Split('-');
+                    if (colorbars.Length >= 3)
+                    {
+                        tabigOtherVSplit_rdo.Checked = colorbars[1].Contains("v");
+                        string [] barcolor = colorbars[2].Split('.');
+                        tabigOtherSplit_nud.Value = int.Parse(barcolor[0]);
+                        for (int i = 0; i < barcolor.Length - 1; i++)
+                        {
+                            tabigOtherSplit_pnl.Controls[i].BackColor = switchcolor(barcolor[i + 1]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                tabigOther_chk.Checked = false;
+                tabigBaseColor_lbl.BackColor = switchcolor(color); // 修改 Form1 的背景顏色  
             }
         }
+        private void funcMask(string num, string onoff)
+        {
+            string[] numParts = num.Split('-');
+            if (numParts.Length >= 2)
+            {
+                string[] numhw = numParts[1].Split('*');
+                if (numhw.Length >= 2)
+                {
+                    tabiemWNum_nud.Value = int.Parse(numhw[0]);
+                    tabiemHNum_nud.Value = int.Parse(numhw[1]);
+                }
+                else
+                {
+                    tabiemWNum_nud.Value = int.Parse(numParts[1]);
+                    tabiemHNum_nud.Value = int.Parse(numParts[1]);
+                }
+
+                MaskPanelCreat(tabiemPixelClear_btn, EventArgs.Empty);
+                onoff = onoff.Replace(".", "");
+                if (numParts[0].Contains("p"))
+                {
+                    tabiemPixel_rdo.Checked = true;
+                    for (int i = 0; i < tabiemHNum_nud.Value; i++)
+                    {
+                        for (int j = 0; j < tabiemWNum_nud.Value; j++)
+                        {
+                            Panel targetPanel =
+                                tabiemPixelPanel_pnl.Controls[i * (int)tabiemWNum_nud.Value + j] as Panel;
+                            if (targetPanel != null)
+                            {
+                                targetPanel.BackColor = onoff[(i * (int)tabiemWNum_nud.Value) + j] == '1' ? Color.White : Color.Black;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    tabiemSubPixel_rdo.Checked = true;
+                    if (numParts.Length >= 3)
+                    {
+                        tabiemPixelGray_vsc.Value = int.Parse(numParts[2]) + 1;
+                    }
+                    for (int i = 0; i < tabiemHNum_nud.Value; i++)
+                    {
+                        for (int j = 0; j < tabiemWNum_nud.Value * 3; j++)
+                        {
+                            Panel targetPanel =
+                                tabiemPixelPanel_pnl.Controls[i * (int)tabiemWNum_nud.Value * 3 + j] as Panel;
+                            if (targetPanel != null)
+                            {
+                                if (onoff[(i * (int)tabiemWNum_nud.Value) + j] == '0')
+                                {
+                                    targetPanel.BackColor = Color.Black;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }  // listbox控制遮罩
+        private void funcWind(string color, string sizeloc)
+        {
+            if (color.Contains("excel"))
+            {
+                tabiwBackColor_rdo.Checked = true;
+                tabiwWinCustom_rdo.Checked = true;
+                windowPictureBox_Click(tabiwWinCustom_rdo, EventArgs.Empty);
+                tabiwCustom_cmb.SelectedIndex = 0;
+                tabiwBack_pic.BackColor = Color.Gray;
+                int wnum = 2;
+                int hnum = 2;
+                string onoff = "1010";
+                switch (color)
+                {
+                    case "excel1":
+                        onoff = "1010";
+                        wnum = hnum = 2;
+                        break;
+                    case "excel2":
+                        onoff = "1111";
+                        wnum = hnum = 2;
+                        break;
+                    case "excel3":
+                        onoff = "1111";
+                        wnum = hnum = 2;
+                        break;
+                    case "excel4":
+                        onoff = "11111111";
+                        wnum = hnum = 2;
+                        break;
+                    case "excel5":
+                        onoff = "1111111111";
+                        wnum = hnum = 2;
+                        break;
+                    case "excel6":
+                        onoff = "111111111111";
+                        wnum = hnum = 2;
+                        break;
+                    case "excel7":
+                        onoff = "11111111111111";
+                        wnum = hnum = 2;
+                        break;
+                    default:
+                        break;
+                }
+                tabiwCMaskWNum_nud.Value = wnum;
+                tabiwCMaskHNum_nud.Value = hnum;
+                for (int i = 0; i < hnum; i++)
+                {
+                    for (int j = 0; j < wnum; j++)
+                    {
+                        Panel targetPanel =
+                            tabiwCMaskPixelPanel_pnl.Controls[i * 2 + j] as Panel;
+                        if (targetPanel != null)
+                        {
+                            targetPanel.BackColor = onoff[i * 2 + j] == '1' ? Color.White : Color.Black;
+                        }
+                    }
+                }
+                Custom_btn_Click(tabiwCustom_btn, EventArgs.Empty);
+            }
+            else
+            {
+                string[] colorParts = color.Split('-');
+                if (colorParts.Length >= 2)
+                {
+                    tabiwBackColor_rdo.Checked = true;
+                    tabiwWinColor_rdo.Checked = true;
+                    tabiwBack_pic.BackColor = switchcolor(colorParts[0]); // 修改 Form1 的背景顏色
+                    tabiwBack_pic.Image = null;
+                    tabiwWin_pic.BackColor = switchcolor(colorParts[1]); // 修改 Form1 的背景顏色
+                    tabiwWin_pic.Image = null;
+                }
+            }
+
+            if (sizeloc.Contains("c"))
+            {
+                tabiwWinLocCenter_rdo.Checked = true;
+            }
+
+            if (sizeloc.Contains("%"))
+            {
+                tabiwWinSizePercent_rdo.Checked = true;
+                tabiwWinSizePercent_nud.Value = int.Parse(sizeloc.Split('%')[0]);
+            }
+            else 
+            {
+                tabiwWinSizePercent_rdo.Checked = true;
+                tabiwWinSizePercent_nud.Value = 50;
+            }
+        } // listbox控制窗口
     }
 }
