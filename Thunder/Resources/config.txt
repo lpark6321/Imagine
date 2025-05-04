@@ -1,0 +1,30 @@
+Solid	,Black		,con-white	,note:十字黑圖
+Solid	,White		,			,note:白圖
+Solid	,Red		,			,note:紅圖
+Solid	,Lime		,
+Solid	,Blue		,
+Solid	,50%Gary	,
+Solid	,25%Gary	,
+Solid	,Yellow		,
+Solid	,Aqua		,
+Solid	,Magenta	,
+Chess	,5*5	,
+Chess	,8*8	,
+Chess	,32*32	,
+Chess	,8*4	,
+Chess	,1*2	,
+Chess	,1*2	,v
+Gradient ,White		,v-256-1
+Gradient ,colorbar-v-4.White.Red.Lime.Blue	,v-256-1
+Gradient ,colorbar-four	,h-256-1
+Gradient ,colorbar-four	,
+Mask	,p-2*2		,10.01
+Mask	,s-2*2-127		,101010.101010
+Window	,Gray-Black		,50%c
+Window	,excel1		,
+Window	,excel2		,
+Window	,excel3		,
+Window	,excel4		,
+Window	,excel5		,
+Window	,excel6		,
+Window	,excel7		,

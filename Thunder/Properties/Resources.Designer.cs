@@ -71,12 +71,11 @@ namespace Thunder.Properties {
         }
         
         /// <summary>
-        ///   查詢類型 System.Byte[] 的當地語系化資源。
+        ///   查詢類似  的當地語系化字串。
         /// </summary>
-        internal static byte[] config {
+        internal static string config {
             get {
-                object obj = ResourceManager.GetObject("config", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("config", resourceCulture);
             }
         }
         
@@ -93,9 +92,19 @@ namespace Thunder.Properties {
         /// <summary>
         ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
         /// </summary>
-        internal static System.Drawing.Bitmap Img {
+        internal static System.Drawing.Bitmap img {
             get {
-                object obj = ResourceManager.GetObject("Img", resourceCulture);
+                object obj = ResourceManager.GetObject("img", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類型 System.Drawing.Bitmap 的當地語系化資源。
+        /// </summary>
+        internal static System.Drawing.Bitmap run {
+            get {
+                object obj = ResourceManager.GetObject("run", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
