@@ -196,9 +196,29 @@ namespace Thunder
 
                     }
                 }
-                else if (e.KeyCode == Keys.Up)
+                else if (e.KeyCode == Keys.W)
                 {
-                    //this.FormBorderStyle = FormBorderStyle.None;
+                    // 使用 Point 結構來修改游標位置  
+                    Point currentPosition = Cursor.Position;
+                    Cursor.Position = new Point(currentPosition.X, currentPosition.Y - 1);
+                }
+                else if (e.KeyCode == Keys.A)
+                {
+                    // 使用 Point 結構來修改游標位置  
+                    Point currentPosition = Cursor.Position;
+                    Cursor.Position = new Point(currentPosition.X - 1, currentPosition.Y);
+                }
+                else if (e.KeyCode == Keys.S)
+                {
+                    // 使用 Point 結構來修改游標位置  
+                    Point currentPosition = Cursor.Position;
+                    Cursor.Position = new Point(currentPosition.X, currentPosition.Y + 1);
+                }
+                else if (e.KeyCode == Keys.D)
+                {
+                    // 使用 Point 結構來修改游標位置  
+                    Point currentPosition = Cursor.Position;
+                    Cursor.Position = new Point(currentPosition.X + 1, currentPosition.Y);
                 }
             }
         }  //鍵盤事件
