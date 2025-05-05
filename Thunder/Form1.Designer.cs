@@ -42,6 +42,7 @@ namespace Thunder
             this.mnsGenerate_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsPattername_txt = new System.Windows.Forms.ToolStripTextBox();
             this.mnsAAA_btn = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnsSave_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabImgEditor = new System.Windows.Forms.TabPage();
             this.tabimgePanel = new System.Windows.Forms.Panel();
@@ -256,7 +257,6 @@ namespace Thunder
             this.ssrStatus_lbl = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssrProgressbar_prg = new System.Windows.Forms.ToolStripProgressBar();
             this.imageItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.mnsSave_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.tabImgEditor.SuspendLayout();
@@ -395,11 +395,19 @@ namespace Thunder
             // mnsAAA_btn
             // 
             this.mnsAAA_btn.Name = "mnsAAA_btn";
-            this.mnsAAA_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+            this.mnsAAA_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
             this.mnsAAA_btn.Size = new System.Drawing.Size(43, 23);
             this.mnsAAA_btn.Text = "AAA";
             this.mnsAAA_btn.Visible = false;
             this.mnsAAA_btn.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // mnsSave_btn
+            // 
+            this.mnsSave_btn.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.mnsSave_btn.Name = "mnsSave_btn";
+            this.mnsSave_btn.Size = new System.Drawing.Size(46, 23);
+            this.mnsSave_btn.Text = "Save";
+            this.mnsSave_btn.Click += new System.EventHandler(this.Save_Click);
             // 
             // tabControl
             // 
@@ -456,11 +464,11 @@ namespace Thunder
             this.tabimgeWindow.Controls.Add(this.tabiwLineOutside_btn);
             this.tabimgeWindow.Controls.Add(this.tabiwWinLoc_grp);
             this.tabimgeWindow.Controls.Add(this.tabiwWinSize_grp);
-            this.tabimgeWindow.Location = new System.Drawing.Point(25, 8);
+            this.tabimgeWindow.Location = new System.Drawing.Point(237, 8);
             this.tabimgeWindow.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeWindow.Name = "tabimgeWindow";
             this.tabimgeWindow.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeWindow.Size = new System.Drawing.Size(588, 362);
+            this.tabimgeWindow.Size = new System.Drawing.Size(561, 66);
             this.tabimgeWindow.TabIndex = 0;
             this.tabimgeWindow.TabStop = false;
             this.tabimgeWindow.Text = "Window";
@@ -1552,7 +1560,7 @@ namespace Thunder
             this.tabimgeMask.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeMask.Name = "tabimgeMask";
             this.tabimgeMask.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeMask.Size = new System.Drawing.Size(71, 65);
+            this.tabimgeMask.Size = new System.Drawing.Size(332, 342);
             this.tabimgeMask.TabIndex = 0;
             this.tabimgeMask.TabStop = false;
             this.tabimgeMask.Text = "Mask(FlickerPattern)";
@@ -1731,7 +1739,7 @@ namespace Thunder
             this.tabimgeGradient.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeGradient.Name = "tabimgeGradient";
             this.tabimgeGradient.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeGradient.Size = new System.Drawing.Size(77, 78);
+            this.tabimgeGradient.Size = new System.Drawing.Size(84, 70);
             this.tabimgeGradient.TabIndex = 10;
             this.tabimgeGradient.TabStop = false;
             this.tabimgeGradient.Text = "Gradient";
@@ -3167,14 +3175,6 @@ namespace Thunder
             // imageItemBindingSource
             // 
             this.imageItemBindingSource.DataSource = typeof(Thunder.ImageItem);
-            // 
-            // mnsSave_btn
-            // 
-            this.mnsSave_btn.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.mnsSave_btn.Name = "mnsSave_btn";
-            this.mnsSave_btn.Size = new System.Drawing.Size(46, 23);
-            this.mnsSave_btn.Text = "Save";
-            this.mnsSave_btn.Click += new System.EventHandler(this.Save_Click);
             // 
             // mainWindow
             // 

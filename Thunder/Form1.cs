@@ -653,83 +653,209 @@ namespace Thunder
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "mask":
-                        // 這裡可以添加遮罩的生成邏輯
-                        if (tabiemPixel_rdo.Checked)
+                        if (true) // 如果True 就用Lockbit 如果False就用Setpixel
                         {
-                            int pixelW = (int)tabiemWNum_nud.Value;
-                            int pixelH = (int)tabiemHNum_nud.Value;
-
-                            using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
+                            if (tabiemPixel_rdo.Checked)
                             {
-                                // 遍歷 tabiemPixelPanel_pnl 的子 Panel  
-                                foreach (Control control in tabiemPixelPanel_pnl.Controls)
-                                {
-                                    if (control is Panel panel)
-                                    {
-                                        // 解析 Panel 的座標 (Tag 格式為 "x,y")  
-                                        string[] coordinates = panel.Tag.ToString().Split(',');
-                                        int x = int.Parse(coordinates[0]);
-                                        int y = int.Parse(coordinates[1]);
+                                int pixelW = (int)tabiemWNum_nud.Value;
+                                int pixelH = (int)tabiemHNum_nud.Value;
 
-                                        // 使用 Panel 的背景顏色填充對應的像素  
-                                        pixelimage.SetPixel(x, y, panel.BackColor);
+                                using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
+                                {
+                                    // 鎖定位圖的像素數據
+                                    BitmapData pixelData = pixelimage.LockBits(
+                                        new Rectangle(0, 0, pixelimage.Width, pixelimage.Height),
+                                        ImageLockMode.WriteOnly,
+                                        PixelFormat.Format32bppArgb);
+
+                                    int stride = pixelData.Stride;
+                                    IntPtr ptr = pixelData.Scan0;
+                                    byte[] pixelBuffer = new byte[stride * pixelH];
+
+                                    // 初始化像素數據
+                                    foreach (Control control in tabiemPixelPanel_pnl.Controls)
+                                    {
+                                        if (control is Panel panel)
+                                        {
+                                            // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                                            string[] coordinates = panel.Tag.ToString().Split(',');
+                                            int x = int.Parse(coordinates[0]);
+                                            int y = int.Parse(coordinates[1]);
+
+                                            // 計算像素在數組中的索引
+                                            int index = (y * stride) + (x * 4);
+
+                                            // 設置像素顏色
+                                            Color color = panel.BackColor;
+                                            pixelBuffer[index] = color.B;       // 藍色
+                                            pixelBuffer[index + 1] = color.G;  // 綠色
+                                            pixelBuffer[index + 2] = color.R;  // 紅色
+                                            pixelBuffer[index + 3] = color.A;  // 透明度
+                                        }
+                                    }
+
+                                    // 將像素數據寫回位圖
+                                    System.Runtime.InteropServices.Marshal.Copy(pixelBuffer, 0, ptr, pixelBuffer.Length);
+                                    pixelimage.UnlockBits(pixelData);
+
+                                    // 將 pixelimage 填滿 currentBitmap
+                                    for (int j = 0; j < CurrentBitmap.Height; j += pixelH)
+                                    {
+                                        for (int i = 0; i < CurrentBitmap.Width; i += pixelW)
+                                        {
+                                            g.DrawImage(pixelimage, i, j);
+                                        }
                                     }
                                 }
+                            }
+                            else if (tabiemSubPixel_rdo.Checked)
+                            {
+                                int pixelW = (int)tabiemWNum_nud.Value;
+                                int pixelH = (int)tabiemHNum_nud.Value;
 
-                                // 將 pixelimage 填滿 currentBitmap  
-                                for (int j = 0; j < CurrentBitmap.Height; j += pixelH)
+                                using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
                                 {
-                                    for (int i = 0; i < CurrentBitmap.Width; i += pixelW)
+                                    // 鎖定位圖的像素數據
+                                    BitmapData pixelData = pixelimage.LockBits(
+                                        new Rectangle(0, 0, pixelimage.Width, pixelimage.Height),
+                                        ImageLockMode.WriteOnly,
+                                        PixelFormat.Format32bppArgb);
+
+                                    int stride = pixelData.Stride;
+                                    IntPtr ptr = pixelData.Scan0;
+                                    byte[] pixelBuffer = new byte[stride * pixelH];
+
+                                    // 初始化像素數據
+                                    for (int i = 0; i < tabiemPixelPanel_pnl.Controls.Count; i += 3)
                                     {
-                                        g.DrawImage(pixelimage, i, j);
+                                        if (i + 2 < tabiemPixelPanel_pnl.Controls.Count)
+                                        {
+                                            // 獲取三個 Panel
+                                            Panel panel1 = tabiemPixelPanel_pnl.Controls[i] as Panel;
+                                            Panel panel2 = tabiemPixelPanel_pnl.Controls[i + 1] as Panel;
+                                            Panel panel3 = tabiemPixelPanel_pnl.Controls[i + 2] as Panel;
+
+                                            if (panel1 != null && panel2 != null && panel3 != null)
+                                            {
+                                                // 根據 Panel 的背景顏色組合成 Color
+                                                int subpixelr = panel1.BackColor.R;
+                                                int subpixelg = panel2.BackColor.G;
+                                                int subpixelb = panel3.BackColor.B;
+
+                                                Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
+
+                                                // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                                                string[] coordinates = panel1.Tag.ToString().Split(',');
+                                                int x = int.Parse(coordinates[0]) / 3;
+                                                int y = int.Parse(coordinates[1]);
+
+                                                // 計算像素在數組中的索引
+                                                int index = (y * stride) + (x * 4);
+
+                                                // 設置像素顏色
+                                                pixelBuffer[index] = combinedColor.B;       // 藍色
+                                                pixelBuffer[index + 1] = combinedColor.G;  // 綠色
+                                                pixelBuffer[index + 2] = combinedColor.R;  // 紅色
+                                                pixelBuffer[index + 3] = combinedColor.A;  // 透明度
+                                            }
+                                        }
+                                    }
+
+                                    // 將像素數據寫回位圖
+                                    System.Runtime.InteropServices.Marshal.Copy(pixelBuffer, 0, ptr, pixelBuffer.Length);
+                                    pixelimage.UnlockBits(pixelData);
+
+                                    // 將 pixelimage 填滿 currentBitmap
+                                    for (int j = 0; j < CurrentBitmap.Height; j += pixelH)
+                                    {
+                                        for (int i = 0; i < CurrentBitmap.Width; i += pixelW)
+                                        {
+                                            g.DrawImage(pixelimage, i, j);
+                                        }
                                     }
                                 }
                             }
                         }
-                        else if (tabiemSubPixel_rdo.Checked)
+                        else
                         {
-                            int pixelW = (int)tabiemWNum_nud.Value;
-                            int pixelH = (int)tabiemHNum_nud.Value;
-
-                            using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
+                            // 這裡可以添加遮罩的生成邏輯
+                            if (tabiemPixel_rdo.Checked)
                             {
+                                int pixelW = (int)tabiemWNum_nud.Value;
+                                int pixelH = (int)tabiemHNum_nud.Value;
 
-                                // 遍歷 tabiemPixelPanel_pnl 的子 Panel，每三個一組組合成 Color.FromArgb() 的三個參數  
-                                for (int i = 0; i < tabiemPixelPanel_pnl.Controls.Count; i += 3)
+                                using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
                                 {
-                                    if (i + 2 < tabiemPixelPanel_pnl.Controls.Count)
+                                    // 遍歷 tabiemPixelPanel_pnl 的子 Panel  
+                                    foreach (Control control in tabiemPixelPanel_pnl.Controls)
                                     {
-                                        // 獲取三個 Panel  
-                                        Panel panel1 = tabiemPixelPanel_pnl.Controls[i] as Panel;
-                                        Panel panel2 = tabiemPixelPanel_pnl.Controls[i + 1] as Panel;
-                                        Panel panel3 = tabiemPixelPanel_pnl.Controls[i + 2] as Panel;
-
-                                        if (panel1 != null && panel2 != null && panel3 != null)
+                                        if (control is Panel panel)
                                         {
-                                            // 根據 Panel 的背景顏色組合成 Color  
-                                            int subpixelr = panel1.BackColor.R;
-                                            int subpixelg = panel2.BackColor.G;
-                                            int subpixelb = panel3.BackColor.B;
-
-                                            Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
-
                                             // 解析 Panel 的座標 (Tag 格式為 "x,y")  
-                                            string[] coordinates = panel1.Tag.ToString().Split(',');
-                                            int x = int.Parse(coordinates[0]) / 3;
+                                            string[] coordinates = panel.Tag.ToString().Split(',');
+                                            int x = int.Parse(coordinates[0]);
                                             int y = int.Parse(coordinates[1]);
-                                            // 在這裡可以使用 combinedColor，例如：  
-                                            pixelimage.SetPixel(x, y, combinedColor);
+
+                                            // 使用 Panel 的背景顏色填充對應的像素  
+                                            pixelimage.SetPixel(x, y, panel.BackColor);
+                                        }
+                                    }
+
+                                    // 將 pixelimage 填滿 currentBitmap  
+                                    for (int j = 0; j < CurrentBitmap.Height; j += pixelH)
+                                    {
+                                        for (int i = 0; i < CurrentBitmap.Width; i += pixelW)
+                                        {
+                                            g.DrawImage(pixelimage, i, j);
                                         }
                                     }
                                 }
+                            }
+                            else if (tabiemSubPixel_rdo.Checked)
+                            {
+                                int pixelW = (int)tabiemWNum_nud.Value;
+                                int pixelH = (int)tabiemHNum_nud.Value;
 
-
-                                // 將 pixelimage 填滿 currentBitmap  
-                                for (int j = 0; j < CurrentBitmap.Height; j += pixelH)
+                                using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
                                 {
-                                    for (int i = 0; i < CurrentBitmap.Width; i += pixelW)
+
+                                    // 遍歷 tabiemPixelPanel_pnl 的子 Panel，每三個一組組合成 Color.FromArgb() 的三個參數  
+                                    for (int i = 0; i < tabiemPixelPanel_pnl.Controls.Count; i += 3)
                                     {
-                                        g.DrawImage(pixelimage, i, j);
+                                        if (i + 2 < tabiemPixelPanel_pnl.Controls.Count)
+                                        {
+                                            // 獲取三個 Panel  
+                                            Panel panel1 = tabiemPixelPanel_pnl.Controls[i] as Panel;
+                                            Panel panel2 = tabiemPixelPanel_pnl.Controls[i + 1] as Panel;
+                                            Panel panel3 = tabiemPixelPanel_pnl.Controls[i + 2] as Panel;
+
+                                            if (panel1 != null && panel2 != null && panel3 != null)
+                                            {
+                                                // 根據 Panel 的背景顏色組合成 Color  
+                                                int subpixelr = panel1.BackColor.R;
+                                                int subpixelg = panel2.BackColor.G;
+                                                int subpixelb = panel3.BackColor.B;
+
+                                                Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
+
+                                                // 解析 Panel 的座標 (Tag 格式為 "x,y")  
+                                                string[] coordinates = panel1.Tag.ToString().Split(',');
+                                                int x = int.Parse(coordinates[0]) / 3;
+                                                int y = int.Parse(coordinates[1]);
+                                                // 在這裡可以使用 combinedColor，例如：  
+                                                pixelimage.SetPixel(x, y, combinedColor);
+                                            }
+                                        }
+                                    }
+
+
+                                    // 將 pixelimage 填滿 currentBitmap  
+                                    for (int j = 0; j < CurrentBitmap.Height; j += pixelH)
+                                    {
+                                        for (int i = 0; i < CurrentBitmap.Width; i += pixelW)
+                                        {
+                                            g.DrawImage(pixelimage, i, j);
+                                        }
                                     }
                                 }
                             }
@@ -2169,69 +2295,195 @@ namespace Thunder
             {
                 if (tabiwCustom_cmb.Text == "Mask")
                 {
-                    int pixelW = (int)tabiwCMaskWNum_nud.Value;
-                    int pixelH = (int)tabiwCMaskHNum_nud.Value;
-                    Panel targetPanel = tabiwCMaskPixelPanel_pnl;
-                    // 使用遮罩圖片
-                    using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
+                    if (true)
                     {
                         if (tabiwCMaskPixel_rdo.Checked)
                         {
-                            // 遍歷 tabiemPixelPanel_pnl 的子 Panel  
-                            foreach (Control control in targetPanel.Controls)
-                            {
-                                if (control is Panel panel)
-                                {
-                                    // 解析 Panel 的座標 (Tag 格式為 "x,y")  
-                                    string[] coordinates = panel.Tag.ToString().Split(',');
-                                    int x = int.Parse(coordinates[0]);
-                                    int y = int.Parse(coordinates[1]);
+                            int pixelW = (int)tabiwCMaskWNum_nud.Value;
+                            int pixelH = (int)tabiwCMaskHNum_nud.Value;
 
-                                    // 使用 Panel 的背景顏色填充對應的像素  
-                                    pixelimage.SetPixel(x, y, panel.BackColor);
+                            using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
+                            {
+                                // 鎖定位圖的像素數據
+                                BitmapData pixelData = pixelimage.LockBits(
+                                    new Rectangle(0, 0, pixelimage.Width, pixelimage.Height),
+                                    ImageLockMode.WriteOnly,
+                                    PixelFormat.Format32bppArgb);
+
+                                int stride = pixelData.Stride;
+                                IntPtr ptr = pixelData.Scan0;
+                                byte[] pixelBuffer = new byte[stride * pixelH];
+
+                                // 初始化像素數據
+                                foreach (Control control in tabiwCMaskPixelPanel_pnl.Controls)
+                                {
+                                    if (control is Panel panel)
+                                    {
+                                        // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                                        string[] coordinates = panel.Tag.ToString().Split(',');
+                                        int x = int.Parse(coordinates[0]);
+                                        int y = int.Parse(coordinates[1]);
+
+                                        // 計算像素在數組中的索引
+                                        int index = (y * stride) + (x * 4);
+
+                                        // 設置像素顏色
+                                        Color color = panel.BackColor;
+                                        pixelBuffer[index] = color.B;       // 藍色
+                                        pixelBuffer[index + 1] = color.G;  // 綠色
+                                        pixelBuffer[index + 2] = color.R;  // 紅色
+                                        pixelBuffer[index + 3] = color.A;  // 透明度
+                                    }
+                                }
+
+                                // 將像素數據寫回位圖
+                                System.Runtime.InteropServices.Marshal.Copy(pixelBuffer, 0, ptr, pixelBuffer.Length);
+                                pixelimage.UnlockBits(pixelData);
+
+                                // 將 pixelimage 填滿 bitmap
+                                for (int j = 0; j < bitmap.Height; j += pixelH)
+                                {
+                                    for (int i = 0; i < bitmap.Width; i += pixelW)
+                                    {
+                                        g.DrawImage(pixelimage, i, j);
+                                    }
                                 }
                             }
                         }
                         else if (tabiwCMaskSubPixel_rdo.Checked)
                         {
-                            // 遍歷 tabiemPixelPanel_pnl 的子 Panel，每三個一組組合成 Color.FromArgb() 的三個參數  
-                            for (int i = 0; i < targetPanel.Controls.Count; i += 3)
+                            int pixelW = (int)tabiwCMaskWNum_nud.Value;
+                            int pixelH = (int)tabiwCMaskHNum_nud.Value;
+
+                            using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
                             {
-                                if (i + 2 < targetPanel.Controls.Count)
+                                // 鎖定位圖的像素數據
+                                BitmapData pixelData = pixelimage.LockBits(
+                                    new Rectangle(0, 0, pixelimage.Width, pixelimage.Height),
+                                    ImageLockMode.WriteOnly,
+                                    PixelFormat.Format32bppArgb);
+
+                                int stride = pixelData.Stride;
+                                IntPtr ptr = pixelData.Scan0;
+                                byte[] pixelBuffer = new byte[stride * pixelH];
+
+                                // 初始化像素數據
+                                for (int i = 0; i < tabiwCMaskPixelPanel_pnl.Controls.Count; i += 3)
                                 {
-                                    // 獲取三個 Panel  
-                                    Panel panel1 = targetPanel.Controls[i] as Panel;
-                                    Panel panel2 = targetPanel.Controls[i + 1] as Panel;
-                                    Panel panel3 = targetPanel.Controls[i + 2] as Panel;
-
-                                    if (panel1 != null && panel2 != null && panel3 != null)
+                                    if (i + 2 < tabiwCMaskPixelPanel_pnl.Controls.Count)
                                     {
-                                        // 根據 Panel 的背景顏色組合成 Color  
-                                        int subpixelr = panel1.BackColor.R;
-                                        int subpixelg = panel2.BackColor.G;
-                                        int subpixelb = panel3.BackColor.B;
+                                        // 獲取三個 Panel
+                                        Panel panel1 = tabiwCMaskPixelPanel_pnl.Controls[i] as Panel;
+                                        Panel panel2 = tabiwCMaskPixelPanel_pnl.Controls[i + 1] as Panel;
+                                        Panel panel3 = tabiwCMaskPixelPanel_pnl.Controls[i + 2] as Panel;
 
-                                        Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
+                                        if (panel1 != null && panel2 != null && panel3 != null)
+                                        {
+                                            // 根據 Panel 的背景顏色組合成 Color
+                                            int subpixelr = panel1.BackColor.R;
+                                            int subpixelg = panel2.BackColor.G;
+                                            int subpixelb = panel3.BackColor.B;
 
-                                        // 解析 Panel 的座標 (Tag 格式為 "x,y")  
-                                        string[] coordinates = panel1.Tag.ToString().Split(',');
-                                        int x = int.Parse(coordinates[0]) / 3;
-                                        int y = int.Parse(coordinates[1]);
-                                        // 在這裡可以使用 combinedColor，例如：  
-                                        pixelimage.SetPixel(x, y, combinedColor);
+                                            Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
+
+                                            // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                                            string[] coordinates = panel1.Tag.ToString().Split(',');
+                                            int x = int.Parse(coordinates[0]) / 3;
+                                            int y = int.Parse(coordinates[1]);
+
+                                            // 計算像素在數組中的索引
+                                            int index = (y * stride) + (x * 4);
+
+                                            // 設置像素顏色
+                                            pixelBuffer[index] = combinedColor.B;       // 藍色
+                                            pixelBuffer[index + 1] = combinedColor.G;  // 綠色
+                                            pixelBuffer[index + 2] = combinedColor.R;  // 紅色
+                                            pixelBuffer[index + 3] = combinedColor.A;  // 透明度
+                                        }
+                                    }
+                                }
+
+                                // 將像素數據寫回位圖
+                                System.Runtime.InteropServices.Marshal.Copy(pixelBuffer, 0, ptr, pixelBuffer.Length);
+                                pixelimage.UnlockBits(pixelData);
+
+                                // 將 pixelimage 填滿 bitmap
+                                for (int j = 0; j < bitmap.Height; j += pixelH)
+                                {
+                                    for (int i = 0; i < bitmap.Width; i += pixelW)
+                                    {
+                                        g.DrawImage(pixelimage, i, j);
                                     }
                                 }
                             }
                         }
-                        // 將 pixelimage 填滿 currentBitmap  
-                        for (int j = 0; j < bitmap.Height; j += pixelH)
+
+                    }
+                    else 
+                    { 
+                    int pixelW = (int)tabiwCMaskWNum_nud.Value;
+                    int pixelH = (int)tabiwCMaskHNum_nud.Value;
+                    Panel targetPanel = tabiwCMaskPixelPanel_pnl;
+                        // 使用遮罩圖片
+                        using (Bitmap pixelimage = new Bitmap(pixelW, pixelH))
                         {
-                            for (int i = 0; i < bitmap.Width; i += pixelW)
+                            if (tabiwCMaskPixel_rdo.Checked)
                             {
-                                g.DrawImage(pixelimage, i, j);
+                                // 遍歷 tabiemPixelPanel_pnl 的子 Panel  
+                                foreach (Control control in targetPanel.Controls)
+                                {
+                                    if (control is Panel panel)
+                                    {
+                                        // 解析 Panel 的座標 (Tag 格式為 "x,y")  
+                                        string[] coordinates = panel.Tag.ToString().Split(',');
+                                        int x = int.Parse(coordinates[0]);
+                                        int y = int.Parse(coordinates[1]);
+
+                                        // 使用 Panel 的背景顏色填充對應的像素  
+                                        pixelimage.SetPixel(x, y, panel.BackColor);
+                                    }
+                                }
+                            }
+                            else if (tabiwCMaskSubPixel_rdo.Checked)
+                            {
+                                // 遍歷 tabiemPixelPanel_pnl 的子 Panel，每三個一組組合成 Color.FromArgb() 的三個參數  
+                                for (int i = 0; i < targetPanel.Controls.Count; i += 3)
+                                {
+                                    if (i + 2 < targetPanel.Controls.Count)
+                                    {
+                                        // 獲取三個 Panel  
+                                        Panel panel1 = targetPanel.Controls[i] as Panel;
+                                        Panel panel2 = targetPanel.Controls[i + 1] as Panel;
+                                        Panel panel3 = targetPanel.Controls[i + 2] as Panel;
+
+                                        if (panel1 != null && panel2 != null && panel3 != null)
+                                        {
+                                            // 根據 Panel 的背景顏色組合成 Color  
+                                            int subpixelr = panel1.BackColor.R;
+                                            int subpixelg = panel2.BackColor.G;
+                                            int subpixelb = panel3.BackColor.B;
+
+                                            Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
+
+                                            // 解析 Panel 的座標 (Tag 格式為 "x,y")  
+                                            string[] coordinates = panel1.Tag.ToString().Split(',');
+                                            int x = int.Parse(coordinates[0]) / 3;
+                                            int y = int.Parse(coordinates[1]);
+                                            // 在這裡可以使用 combinedColor，例如：  
+                                            pixelimage.SetPixel(x, y, combinedColor);
+                                        }
+                                    }
+                                }
+                            }
+                            // 將 pixelimage 填滿 currentBitmap  
+                            for (int j = 0; j < bitmap.Height; j += pixelH)
+                            {
+                                for (int i = 0; i < bitmap.Width; i += pixelW)
+                                {
+                                    g.DrawImage(pixelimage, i, j);
+                                }
                             }
                         }
-
                     }
                 }
                 else if (tabiwCustom_cmb.Text == "Gradient")
@@ -2438,11 +2690,10 @@ namespace Thunder
         // 其他--------------------------------------------------------------------------------------------------------
         private void button1_Click(object sender, EventArgs e)
         {
-            // 調用 CodeFile1 的函式，並傳遞 Form1 的實例
-            //CodeFile1.func1(this);
-            //CodeFile1.funcFrame(showimgGenerate_btn);
-            showimgPicture_pic.Image = Resources.run;
-            showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
+            //showimgPicture_pic.Image = Resources.run;
+            //showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
+
+            MessageBox.Show($"{tabiemPixelGray_vsc.Value}");
         }  //menustripAAA 測試用按鍵
         private bool IsMouseMoveBound(Object targetObject, String targerString)
         {
@@ -2546,9 +2797,22 @@ namespace Thunder
             if (color.StartsWith("colorbar"))
             {
                 tabigOther_chk.Checked = true;
+                if (color.EndsWith("h"))
+                {
+                    tabigOtherHSplit_rdo.Checked = true;
+                }
+                else if (color.EndsWith("v"))
+                {
+                    tabigOtherVSplit_rdo.Checked = true;
+                }
+                SplitPanelCreat(tabigOtherSplit_nud, EventArgs.Empty); // 修正 'e' 為 'EventArgs.Empty'
                 if (color.Contains("four"))
                 {
                     ColorBar_btn_Click(tabigFourColor_btn, EventArgs.Empty); // 修正 'e' 為 'EventArgs.Empty'  
+                }
+                else if(color.Contains("eight"))
+                {
+                    ColorBar_btn_Click(tabigEightColor_btn, EventArgs.Empty); // 修正 'e' 為 'EventArgs.Empty'  
                 }
                 else
                 {
@@ -2556,7 +2820,7 @@ namespace Thunder
                     if (colorbars.Length >= 3)
                     {
                         tabigOtherVSplit_rdo.Checked = colorbars[1].Contains("v");
-                        string [] barcolor = colorbars[2].Split('.');
+                        string[] barcolor = colorbars[2].Split('.');
                         tabigOtherSplit_nud.Value = int.Parse(barcolor[0]);
                         for (int i = 0; i < barcolor.Length - 1; i++)
                         {
@@ -2601,7 +2865,13 @@ namespace Thunder
                                 tabiemPixelPanel_pnl.Controls[i * (int)tabiemWNum_nud.Value + j] as Panel;
                             if (targetPanel != null)
                             {
-                                targetPanel.BackColor = onoff[(i * (int)tabiemWNum_nud.Value) + j] == '1' ? Color.White : Color.Black;
+                                // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                                string[] coordinates = targetPanel.Tag.ToString().Split(',');
+                                // 計算在 onoff 字符串中的索引
+                                int index = (int.Parse(coordinates[1]) * (int)tabiemWNum_nud.Value) + int.Parse(coordinates[0]);
+                                // 設置 Panel 的顏色
+                                targetPanel.BackColor = onoff[index] == '0' ? Color.Black : 
+                                    onoff[index] == '1' ? Color.White : Color.Gray;
                             }
                         }
                     }
@@ -2609,10 +2879,12 @@ namespace Thunder
                 else
                 {
                     tabiemSubPixel_rdo.Checked = true;
+                    //MaskPanelCreat(tabiemPixelClear_btn, EventArgs.Empty);
                     if (numParts.Length >= 3)
                     {
-                        tabiemPixelGray_vsc.Value = int.Parse(numParts[2]) + 1;
+                        tabiemPixelGray_vsc.Value = 255 - int.Parse(numParts[2]);
                     }
+
                     for (int i = 0; i < tabiemHNum_nud.Value; i++)
                     {
                         for (int j = 0; j < tabiemWNum_nud.Value * 3; j++)
@@ -2621,7 +2893,12 @@ namespace Thunder
                                 tabiemPixelPanel_pnl.Controls[i * (int)tabiemWNum_nud.Value * 3 + j] as Panel;
                             if (targetPanel != null)
                             {
-                                if (onoff[(i * (int)tabiemWNum_nud.Value) + j] == '0')
+                                // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                                string[] coordinates = targetPanel.Tag.ToString().Split(',');
+                                // 計算在 onoff 字符串中的索引
+                                int index = (int.Parse(coordinates[1]) * (int)tabiemWNum_nud.Value * 3) + int.Parse(coordinates[0]);
+                                // 設置 Panel 的顏色
+                                if (onoff[index] == '0')
                                 {
                                     targetPanel.BackColor = Color.Black;
                                 }
@@ -2646,36 +2923,44 @@ namespace Thunder
                 switch (color)
                 {
                     case "excel1":
-                        onoff = "1010";
+                        onoff = "10.22";
                         wnum = hnum = 2;
                         break;
                     case "excel2":
-                        onoff = "1111";
-                        wnum = hnum = 2;
+                        onoff = "0011.2222";
+                        wnum = 4;
+                        hnum = 2;
                         break;
                     case "excel3":
-                        onoff = "1111";
-                        wnum = hnum = 2;
+                        onoff = "0001.2222";
+                        wnum = 4;
+                        hnum = 2;
                         break;
                     case "excel4":
-                        onoff = "11111111";
-                        wnum = hnum = 2;
+                        onoff = "000000000111.222222222222";
+                        wnum = 12;
+                        hnum = 2;
                         break;
                     case "excel5":
-                        onoff = "1111111111";
-                        wnum = hnum = 2;
+                        onoff = "000111000111000000.222222222222222222";
+                        wnum = 18;
+                        hnum = 2;
                         break;
                     case "excel6":
-                        onoff = "111111111111";
-                        wnum = hnum = 2;
+                        onoff = "000111000111000000000111,222222222222222222222222";
+                        wnum = 24;
+                        hnum = 2;
                         break;
                     case "excel7":
-                        onoff = "11111111111111";
-                        wnum = hnum = 2;
+                        onoff = "000000100000100000.222222222222222222.222222222222222222.000011000011000000";
+                        wnum = 18;
+                        hnum = 4;
                         break;
                     default:
                         break;
                 }
+
+                onoff = onoff.Replace(".", "");
                 tabiwCMaskWNum_nud.Value = wnum;
                 tabiwCMaskHNum_nud.Value = hnum;
                 for (int i = 0; i < hnum; i++)
@@ -2686,7 +2971,23 @@ namespace Thunder
                             tabiwCMaskPixelPanel_pnl.Controls[i * 2 + j] as Panel;
                         if (targetPanel != null)
                         {
-                            targetPanel.BackColor = onoff[i * 2 + j] == '1' ? Color.White : Color.Black;
+                            // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                            string[] coordinates = targetPanel.Tag.ToString().Split(',');
+                            // 計算在 onoff 字符串中的索引
+                            int index = (int.Parse(coordinates[1]) * (int)tabiwCMaskWNum_nud.Value) + int.Parse(coordinates[0]);
+                            // 設置 Panel 的顏色
+                            if (onoff[i * 2 + j] == '1')
+                            {
+                                targetPanel.BackColor = Color.White;
+                            }
+                            else if (onoff[i * 2 + j] == '2')
+                            {
+                                targetPanel.BackColor = Color.Gray;
+                            }
+                            else
+                            {
+                                targetPanel.BackColor = Color.Black;
+                            }
                         }
                     }
                 }
