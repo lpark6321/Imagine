@@ -434,7 +434,7 @@ namespace Thunder
                         // 繪製外框線（如果選中）
                         if (tabiefOutside_chk.Checked)
                         {
-                            using (Pen borderPen = new Pen(tabiefLineColor_btn.BackColor, 1)) // 外框線顏色和寬度
+                            using (Pen borderPen = new Pen(tabiefLineColor_btn.BackColor, (int)tabiefLineSize_nud.Value)) // 外框線顏色和寬度
                             {
                                 g.DrawRectangle(borderPen, 0, 0, width - 1, height - 1);
                             }
@@ -443,7 +443,7 @@ namespace Thunder
                         // 繪製中心對位線（如果選中）
                         if (tabiefCenter_chk.Checked)
                         {
-                            using (Pen centerPen = new Pen(tabiefLineColor_btn.BackColor, 1)) // 中心線顏色和寬度
+                            using (Pen centerPen = new Pen(tabiefLineColor_btn.BackColor, (int)tabiefLineSize_nud.Value)) // 中心線顏色和寬度
                             {
                                 g.DrawLine(centerPen, width / 2, 0, width / 2, height); // 垂直中心線
                                 g.DrawLine(centerPen, 0, height / 2, width, height / 2); // 水平中心線
@@ -453,7 +453,7 @@ namespace Thunder
                         // 繪製九點對位線（如果選中）
                         if (tabiefNine_chk.Checked)
                         {
-                            using (Pen ninePointPen = new Pen(tabiefLineColor_btn.BackColor, 1)) // 九點線顏色和寬度
+                            using (Pen ninePointPen = new Pen(tabiefLineColor_btn.BackColor, (int)tabiefLineSize_nud.Value)) // 九點線顏色和寬度
                             {
                                 g.DrawLine(ninePointPen, width / 8, 0, width / 8, height); // 左垂直線
                                 g.DrawLine(ninePointPen, 7 * width / 8, 0, 7 * width / 8, height); // 右垂直線
@@ -525,7 +525,7 @@ namespace Thunder
                             int stepNum = Math.Min(int.Parse(tabigStep_cmb.Text), divisionSize); // 獲取漸層階數
                             int startColorValue = int.Parse(tabigFirstLevel_cmb.Text); // 開始顏色值  
                             int endColorValue = int.Parse(tabigLastLevel_cmb.Text); // 結束顏色值  
-                            backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions);
+                            backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions, tabigReverse_chk.Checked);
                             backBitmap = ConvertARGBToRGB(backBitmap);
                         }
                         CurrentBitmap = backBitmap;
@@ -587,22 +587,57 @@ namespace Thunder
                         int newHeight = tabiwWinSizePercent_rdo.Checked ? int.Parse(mnsH_txt.Text) * percent / 100 : int.Parse(tabiwWinSizePixelH_nud.Text);
                         int xstart = 0;
                         int ystart = 0;
-                        if (tabiwWinLocCenter_rdo.Checked) // 置中
+                        if (tabiwDiagonal_btn.Checked)
                         {
-                            xstart = (width - newWidth) / 2;
-                            ystart = (height - newHeight) / 2;
+                            using (Brush brush = new SolidBrush(tabiwWin_pic.BackColor))
+                            {
+
+                                // 定義三角形的三個頂點  
+                                Point[] trianglePoints =
+                                {
+                                   new Point(width, 0), // 右上角  
+                                   new Point(width, height), // 右下角  
+                                   new Point(0, 0) // 左上角  
+                               };
+
+                                // 繪製右上角的三角形  
+                                g.FillPolygon(brush, trianglePoints);
+                            }
                         }
-                        else if (tabiwWinLocPixcel_rdo.Checked)
+                        else
                         {
-                            xstart = (int)tabiwWinLocPixcelX_nud.Value;
-                            ystart = (int)tabiwWinLocPixcelY_nud.Value;
-                        }
-                        else if (tabiwWinLocTwo_rdo.Checked)
-                        {
-                            xstart = width / 5;
-                            ystart = height / 5;
-                            newWidth = xstart;
-                            newHeight = ystart;
+                            if (tabiwWinLocCenter_rdo.Checked) // 置中
+                            {
+                                xstart = (width - newWidth) / 2;
+                                ystart = (height - newHeight) / 2;
+                            }
+                            else if (tabiwWinLocPixcel_rdo.Checked)
+                            {
+                                xstart = (int)tabiwWinLocPixcelX_nud.Value;
+                                ystart = (int)tabiwWinLocPixcelY_nud.Value;
+                            }
+                            else if (tabiwWinLocTwo_rdo.Checked)
+                            {
+                                xstart = width / 5;
+                                ystart = height / 5;
+                                newWidth = xstart;
+                                newHeight = ystart;
+                                if (tabiwWinColor_rdo.Checked) // 純色方塊
+                                {
+                                    g.FillRectangle(new SolidBrush(tabiwWin_pic.BackColor), xstart, ystart, newWidth, newHeight);
+                                }
+                                else if (tabiwWinImg_rdo.Checked)// 繪製圖片方塊
+                                {
+                                    g.DrawImage(tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
+                                }
+                                else if (tabiwWinCustom_rdo.Checked)
+                                {
+                                    g.DrawImage(tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
+                                }
+                                xstart = width / 5 * 3;
+                                ystart = height / 5 * 3;
+                            }
+
                             if (tabiwWinColor_rdo.Checked) // 純色方塊
                             {
                                 g.FillRectangle(new SolidBrush(tabiwWin_pic.BackColor), xstart, ystart, newWidth, newHeight);
@@ -615,22 +650,9 @@ namespace Thunder
                             {
                                 g.DrawImage(tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
                             }
-                            xstart = width / 5 * 3;
-                            ystart = height / 5 * 3;
                         }
+                        
 
-                        if (tabiwWinColor_rdo.Checked) // 純色方塊
-                        {
-                            g.FillRectangle(new SolidBrush(tabiwWin_pic.BackColor), xstart, ystart, newWidth, newHeight);
-                        }
-                        else if (tabiwWinImg_rdo.Checked)// 繪製圖片方塊
-                        {
-                            g.DrawImage(tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
-                        }
-                        else if (tabiwWinCustom_rdo.Checked)
-                        {
-                            g.DrawImage(tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
-                        }
 
                         // 繪製外框線（如果選中）
                         if (tabiwLineOutside_btn.Checked)
@@ -1344,17 +1366,18 @@ namespace Thunder
         {
             if (tabiefOther_cmb.Text == "HLine")
             {
-                tabiefOtherLoc_hsc.Maximum = (int.Parse(mnsH_txt.Text)); // 將 msTxtH.Text 轉換為 int  
+                tabiefOtherLoc_hsc.Maximum = (int.Parse(mnsH_txt.Text)-1); // 將 msTxtH.Text 轉換為 int  
             }
             else if (tabiefOther_cmb.Text == "VLine")
             {
-                tabiefOtherLoc_hsc.Maximum = (int.Parse(mnsW_txt.Text)); // 將 msTxtW.Text 轉換為 int  
+                tabiefOtherLoc_hsc.Maximum = (int.Parse(mnsW_txt.Text)-1); // 將 msTxtW.Text 轉換為 int  
             }
         }  // Frame 其他線的選擇HLine/VLine
-        private Bitmap ApplyTransparency(Bitmap originalBitmap, int startAlpha, int endAlpha, bool isVertical, int steps, int segments)
+        private Bitmap ApplyTransparency(Bitmap originalBitmap, int startAlpha, int endAlpha, bool isVertical, int steps, int segments, bool reverse)
         {
             // 複製原始圖片，避免直接修改
-            Bitmap resultBitmap = new Bitmap(originalBitmap);
+            //Bitmap resultBitmap = new Bitmap(originalBitmap);
+            Bitmap resultBitmap = originalBitmap;
 
             // 鎖定圖片的像素資料
             Rectangle rect = new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height);
@@ -1393,6 +1416,11 @@ namespace Thunder
 
                     // 計算透明度
                     int stepIndex = (int)((float)positionInSegment / segmentLength * (steps));
+                    // 如果分區是奇數，反向透明度
+                    if (reverse && segmentIndex % 2 == 1)
+                    {
+                        stepIndex = steps - 1 - stepIndex;
+                    }
                     byte alpha = (byte)(startAlpha + alphaStep * stepIndex);
 
                     //// 如果透明度方向是從 255 到 0，則反轉透明度
@@ -2543,7 +2571,7 @@ namespace Thunder
                         int stepNum = Math.Min(int.Parse(tabiwCGradStep_cmb.Text), divisionSize); // 獲取漸層階數
                         int startColorValue = int.Parse(tabiwCGradFirstLevel_cmb.Text); // 開始顏色值  
                         int endColorValue = int.Parse(tabiwCGradLastLevel_cmb.Text); // 結束顏色值  
-                        bitmap = ApplyTransparency(bitmap, startColorValue, endColorValue, tabiwCGradHWay_rdo.Checked, stepNum, divisions);
+                        bitmap = ApplyTransparency(bitmap, startColorValue, endColorValue, tabiwCGradHWay_rdo.Checked, stepNum, divisions, tabiwCGradReverse_chk.Checked);
                         bitmap = ConvertARGBToRGB(bitmap);
                     }
 
@@ -3023,5 +3051,24 @@ namespace Thunder
                 tabiwWinSizePercent_nud.Value = 50;
             }
         } // listbox控制窗口
+
+        private void tabiwDiagonal_btn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox targetchk)
+            {
+                if (targetchk.Checked)
+                {
+                    tabiwWinLoc_grp.Enabled = false;
+                    tabiwWinImg_rdo.Enabled = false;
+                    tabiwWinCustom_rdo.Enabled = false;
+                }
+                else
+                {
+                    tabiwWinLoc_grp.Enabled = true;
+                    tabiwWinImg_rdo.Enabled = true;
+                    tabiwWinCustom_rdo.Enabled = true;
+                }
+            }
+        }
     }
 }
