@@ -1,42 +1,42 @@
-Solid	,Black		,con-white	,note:十字黑圖
-Solid	,White		,			,note:白圖
-Solid	,Red		,			,note:紅圖
-Solid	,Lime		,
-Solid	,Blue		,
-Solid	,50%Gary	,
-Solid	,25%Gary	,
-Solid	,Yellow		,
-Solid	,Aqua		,
-Solid	,Magenta	,
-Chess	,5*5	,
-Chess	,8*8	,
-Chess	,32*32	,
-Chess	,8*4	,
-Chess	,1*2	,
-Chess	,1*2	,v
-Gradient ,White		,v-256-1
-Gradient ,White		,h-256-1
-Gradient ,colorbar-v-4.White.Red.Lime.Blue	,v-256-1
-Gradient ,colorbar-four-h	,v-256-1
-Gradient ,colorbar-four-v	,h-256-1
-Mask	,p-2*2		,20.02						,note:pixelonoff
-Mask	,s-2*2-127	,101010.010101				,note:subpixelonoff
-Mask	,p-4*2		,1100.0011					,note:2h1v e
-Mask	,p-4*2		,1001.0110					,note:2h1v o
-Mask	,p-2*4		,10.10.01.01				,note:1h2v e
-Mask	,p-2*4		,10.01.01.10				,note:1h2v o
-Mask	,s-4*2-127	,101001010110.010110101001	,note:aabbba
-Mask	,s-2*1-127	,101010						,note:v strip sub 127G
-Mask	,p-10*2		,1010101010.1010101010							,note:v strip dot
-Mask	,s-4*2-255	,011010011010.011010011010						,note:v strip sub KGBKGK
-Mask	,p-5*2		,11111.00000						,note:h strip 1line
-Mask	,p-5*3		,11111.00000.00000					,note:h strip 2line
-Window	,Gray-Black		,50%c					,note:K/Gray
-Window	,Gray-Black		,50%c					,note:K/dot
-Window	,excel1		,	,note:CrossTalkB_1
-Window	,excel2		,	,note:CrossTalkB_2
-Window	,excel3		,	,note:CrossTalkB_3
-Window	,excel4		,	,note:CrossTalkB_4
-Window	,excel5		,	,note:CrossTalkB_5
-Window	,excel6		,	,note:CrossTalkB_6
-Window	,excel7		,	,note:CrossTalkB_7
+十字黑圖,				Solid,		Black,				con-white	
+白圖,					Solid,		White,			
+紅圖,					Solid,		Red,			
+綠,						Solid,		Lime,
+藍,						Solid,		Blue,
+127灰,					Solid,		50%Gary,
+64灰,					Solid,		25%Gary,
+黃,						Solid,		Yellow,
+水藍,					Solid,		Aqua,
+紫羅蘭,					Solid,		Magenta,
+55馬賽克,				Chess,		5*5,
+88馬賽克,				Chess,		8*8,
+3232馬賽克,				Chess,		32*32,
+84馬賽克,				Chess,		8*4,
+上白下黑,				Chess,		1*2,
+上黑下白,				Chess,		1*2,				v
+V白漸層,				Gradient,	White,				v-256-1
+H白漸層,				Gradient,	White,				h-256-1
+ColorBar,				Gradient,	colorbar-h-4.White.Red.Lime.Blue,
+ColorBarV漸層,			Gradient,	colorbar-four-h,	v-256-1
+ColorBarH漸層,			Gradient,	colorbar-four-v,	h-256-1
+pixelonoff,				Mask,		p-2*2,				20.02						
+subpixelonoff,			Mask,		s-2*2-127,			101010.010101			
+2h1v e,					Mask,		p-4*2,				1100.0011					
+2h1v o,					Mask,		p-4*2,				1001.0110					
+1h2v e,					Mask,		p-2*4,				10.10.01.01				
+1h2v o,					Mask,		p-2*4,				10.01.01.10				
+aabbba,					Mask,		s-4*2-127,			101001010110.010110101001	
+v strip sub 127G,		Mask		,s-2*1-127,1		01010					
+v strip dot,			Mask		,p-10*2,			1010101010.1010101010						
+v strip sub KGBKGK,		Mask		,s-4*2-255,			011010011010.011010011010				
+h strip 1line,			Mask		,p-5*2,				11111.00000					
+h strip 2line,			Mask		,p-5*3,				11111.00000.00000				
+K/Gray,					Window,		Gray-Black,			50%c					
+K/dot,					Window,		Gray-Black,			50%c				
+CrossTalkB_1,			Window,		excel1,
+CrossTalkB_2,			Window,		excel2,	
+CrossTalkB_3,			Window,		excel3,	
+CrossTalkB_4,			Window,		excel4,	
+CrossTalkB_5,			Window,		excel5,	
+CrossTalkB_6,			Window,		excel6,	
+CrossTalkB_7,			Window,		excel7,	

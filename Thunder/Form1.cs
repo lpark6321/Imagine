@@ -1174,35 +1174,35 @@ namespace Thunder
                     string[] patternVar = targetList.SelectedItem.ToString().Split(',');
                     if (patternVar.Length >= 3)
                     {
-                        string type = trimlower(patternVar[0]);
+                        string type = trimlower(patternVar[1]);
                         //char[] TrimChars = { '\t', '\n', ' ' };
                         switch (type)
                         {
                             case "solid":
                                 tabimgeFuncList.SelectedIndex = 0;
-                                funcFrame(trimlower(patternVar[1]), trimlower(patternVar[2]));
+                                funcFrame(trimlower(patternVar[2]), trimlower(patternVar[3]));
                                 break;
                             case "gradient":
                                 tabimgeFuncList.SelectedIndex = 1;
-                                funcGrad(trimlower(patternVar[1]), trimlower(patternVar[2]));
+                                funcGrad(trimlower(patternVar[2]), trimlower(patternVar[3]));
                                 break;
                             case "chess":
                                 tabimgeFuncList.SelectedIndex = 2;
-                                funcChess(trimlower(patternVar[1]), trimlower(patternVar[2]));
+                                funcChess(trimlower(patternVar[2]), trimlower(patternVar[3]));
                                 break;
                             case "window":
                                 tabimgeFuncList.SelectedIndex = 3;
-                                funcWind(trimlower(patternVar[1]), trimlower(patternVar[2]));
+                                funcWind(trimlower(patternVar[2]), trimlower(patternVar[3]));
                                 break;
                             case "mask":
                                 tabimgeFuncList.SelectedIndex = 4;
-                                funcMask(trimlower(patternVar[1]), trimlower(patternVar[2]));
+                                funcMask(trimlower(patternVar[2]), trimlower(patternVar[3]));
                                 break;
                             default:
                                 MessageBox.Show("不支援的圖片類型！");
                                 break;
                         }
-                        string tag = patternVar.Length > 3 ? patternVar[3].Substring(5) : "";
+                        string tag = patternVar[0];
                         GenerateImage(type, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text), tag); // 重新生成圖片
                     }
                     showimgPicture_pic.Image = mypicture.Getpicture();
@@ -2862,7 +2862,7 @@ namespace Thunder
                 tabigOther_chk.Checked = false;
                 tabigBaseColor_lbl.BackColor = switchcolor(color); // 修改 Form1 的背景顏色  
             }
-        }
+        }  // listbox控制漸層
         private void funcMask(string num, string onoff)
         {
             string[] numParts = num.Split('-');
@@ -3069,6 +3069,6 @@ namespace Thunder
                     tabiwWinCustom_rdo.Enabled = true;
                 }
             }
-        }
+        }  // Window對角線選擇
     }
 }
