@@ -505,7 +505,6 @@ namespace Thunder
                                                     }
                                                     else
                                                     {
-                                                        //MessageBox.Show("123");
                                                         g2.FillRectangle(new SolidBrush(panel.BackColor), index * width / split, 0, width / split, height);
                                                     }
                                                 }
@@ -1373,7 +1372,7 @@ namespace Thunder
                 tabiefOtherLoc_hsc.Maximum = (int.Parse(mnsW_txt.Text)-1); // 將 msTxtW.Text 轉換為 int  
             }
         }  // Frame 其他線的選擇HLine/VLine
-        private Bitmap ApplyTransparency(Bitmap originalBitmap, int startAlpha, int endAlpha, bool isVertical, int steps, int segments, bool reverse)
+        private Bitmap ApplyTransparency(Bitmap originalBitmap, int startAlpha, int endAlpha, bool isH, int steps, int segments, bool reverse)
         {
             // 複製原始圖片，避免直接修改
             //Bitmap resultBitmap = new Bitmap(originalBitmap);
@@ -1389,50 +1388,54 @@ namespace Thunder
             byte[] pixelValues = new byte[bytes];
             System.Runtime.InteropServices.Marshal.Copy(ptr, pixelValues, 0, bytes);
 
-            // 計算每個分區的長度
-            int dimension = isVertical ? resultBitmap.Height : resultBitmap.Width;
-            int segmentLength = dimension / segments;
 
-            // 處理分階數大於分區長度的情況
-            steps = Math.Min(steps, segmentLength);
-
-            // 計算每個階段的透明度變化量
-            int alphaRange = endAlpha - startAlpha;
-            float alphaStep = (float)alphaRange / (steps - 1);
-
-            // 遍歷每個像素
-            for (int y = 0; y < resultBitmap.Height; y++)
+            if (reverse)
             {
-                for (int x = 0; x < resultBitmap.Width; x++)
+                int dimension = isH ? resultBitmap.Width : resultBitmap.Height;
+                int segmentLength = isH ? resultBitmap.Height : resultBitmap.Width;
+            }
+            else
+            {
+                // 計算每個分區的長度
+                int dimension = isH ? resultBitmap.Height : resultBitmap.Width;
+                int segmentLength = dimension / segments;
+                // 處理分階數大於分區長度的情況
+                steps = Math.Min(steps, segmentLength);
+
+                // 計算每個階段的透明度變化量
+                int alphaRange = endAlpha - startAlpha;
+                float alphaStep = (float)alphaRange / (steps - 1);
+
+                // 遍歷每個像素
+                for (int y = 0; y < resultBitmap.Height; y++)
                 {
-                    int index = (y * bitmapData.Stride) + (x * 4); // 每個像素佔 4 個位元組 (BGRA)
-
-                    // 計算當前像素所在的分區
-                    int position = isVertical ? y : x;
-                    int segmentIndex = position / segmentLength;
-
-                    // 計算當前像素在分區內的位置
-                    int positionInSegment = position % segmentLength;
-
-                    // 計算透明度
-                    int stepIndex = (int)((float)positionInSegment / segmentLength * (steps));
-                    // 如果分區是奇數，反向透明度
-                    if (reverse && segmentIndex % 2 == 1)
+                    for (int x = 0; x < resultBitmap.Width; x++)
                     {
-                        stepIndex = steps - 1 - stepIndex;
+                        int index = (y * bitmapData.Stride) + (x * 4); // 每個像素佔 4 個位元組 (BGRA)
+
+                        // 計算當前像素所在的分區
+                        int position = isH ? y : x;
+                        //int segmentIndex = position / segmentLength;
+
+                        // 計算當前像素在分區內的位置
+                        int positionInSegment = position % segmentLength;
+
+                        // 計算透明度
+                        int stepIndex = (int)((float)positionInSegment / segmentLength * (steps));
+                        //// 如果分區是奇數，反向透明度
+                        //if (reverse && segmentIndex % 2 == 1)
+                        //{
+                        //    stepIndex = steps - 1 - stepIndex;
+                        //}
+                        byte alpha = (byte)(startAlpha + alphaStep * stepIndex);
+
+
+                        // 修改 Alpha 值
+                        pixelValues[index + 3] = alpha; // Alpha 通道
                     }
-                    byte alpha = (byte)(startAlpha + alphaStep * stepIndex);
-
-                    //// 如果透明度方向是從 255 到 0，則反轉透明度
-                    //if (startAlpha > endAlpha)
-                    //{
-                    //    alpha = (byte)(startAlpha + alphaStep * stepIndex);
-                    //}
-
-                    // 修改 Alpha 值
-                    pixelValues[index + 3] = alpha; // Alpha 通道
                 }
             }
+            
 
             // 將修改後的像素資料寫回圖片
             System.Runtime.InteropServices.Marshal.Copy(pixelValues, 0, ptr, bytes);
