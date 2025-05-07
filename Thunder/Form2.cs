@@ -95,11 +95,15 @@ namespace Thunder
         {
             if (sender is Form targetform)
             {
-                // 按下 ESC 鍵退出全螢幕  
-                if (e.KeyCode == Keys.Escape)
+                if (e.KeyCode == Keys.F1)
                 {
                     //Close();
                     pictureWindow_DoubleClick(sender, e);
+                }
+                else if (e.KeyCode == Keys.Escape)// 按下 ESC 鍵退出全螢幕 
+                {
+                    Close();
+                    //pictureWindow_DoubleClick(sender, e);
                 }
                 else if (e.KeyCode == Keys.Right)
                 {
