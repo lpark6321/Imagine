@@ -8,6 +8,8 @@
 黃,						Solid,		Yellow,
 水藍,					Solid,		Aqua,
 紫羅蘭,					Solid,		Magenta,
+6bitXP,					Solid,		14.27.41,
+8bitXP,					Solid,		58.110.165,
 55馬賽克,				Chess,		5*5,
 88馬賽克,				Chess,		8*8,
 3232馬賽克,				Chess,		32*32,
@@ -19,24 +21,24 @@ H白漸層,				Gradient,	White,				h-256-1
 ColorBar,				Gradient,	colorbar-h-4.White.Red.Lime.Blue,
 ColorBarV漸層,			Gradient,	colorbar-four-h,	v-256-1
 ColorBarH漸層,			Gradient,	colorbar-four-v,	h-256-1
-pixelonoff,				Mask,		p-2*2,				20.02						
-subpixelonoff,			Mask,		s-2*2-127,			101010.010101			
-2h1v e,					Mask,		p-4*2,				1100.0011					
-2h1v o,					Mask,		p-4*2,				1001.0110					
-1h2v e,					Mask,		p-2*4,				10.10.01.01				
-1h2v o,					Mask,		p-2*4,				10.01.01.10				
-aabbba,					Mask,		s-4*2-127,			101001010110.010110101001	
-v strip sub 127G,		Mask		,s-2*1-127,1		01010					
-v strip dot,			Mask		,p-10*2,			1010101010.1010101010						
-v strip sub KGBKGK,		Mask		,s-4*2-255,			011010011010.011010011010				
-h strip 1line,			Mask		,p-5*2,				11111.00000					
-h strip 2line,			Mask		,p-5*3,				11111.00000.00000				
-K/Gray,					Window,		Gray-Black,			50%c					
-K/dot,					Window,		Gray-Black,			50%c				
+pixelonoff,				Mask,		p-2*2,				20.02
+subpixelonoff,			Mask,		s-2*2-127,			101010.010101
+2h1v e,					Mask,		p-4*2,				1100.0011
+2h1v o,					Mask,		p-4*2,				1001.0110
+1h2v e,					Mask,		p-2*4,				10.10.01.01
+1h2v o,					Mask,		p-2*4,				10.01.01.10	
+aabbba,					Mask,		s-4*2-127,			101001010110.010110101001
+v strip sub 127G,		Mask		,s-2*1-127,			101010
+v strip dot,			Mask		,p-2*2,				10.10
+v strip sub KGBKGK,		Mask		,s-2*2-255,			011010.011010				
+h strip 1line,			Mask		,p-1*2,				1.0
+h strip 2line,			Mask		,p-1*3,				1.0.0
+K/Gray,					Window,		Gray-Black,			50%c
+K/dot,					Window,		Gray-Black,			50%c
 CrossTalkB_1,			Window,		excel1,
-CrossTalkB_2,			Window,		excel2,	
-CrossTalkB_3,			Window,		excel3,	
-CrossTalkB_4,			Window,		excel4,	
-CrossTalkB_5,			Window,		excel5,	
-CrossTalkB_6,			Window,		excel6,	
-CrossTalkB_7,			Window,		excel7,	
+CrossTalkB_2,			Window,		excel2,
+CrossTalkB_3,			Window,		excel3,
+CrossTalkB_4,			Window,		excel4,
+CrossTalkB_5,			Window,		excel5,
+CrossTalkB_6,			Window,		excel6,
+CrossTalkB_7,			Window,		excel7,
