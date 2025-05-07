@@ -19,6 +19,11 @@ namespace Thunder
 {
     public partial class mainWindow : Form
     {
+        private int ballX = 50; // 球體的初始 X 座標
+        private int ballY = 50; // 球體的初始 Y 座標
+        private int ballSpeedX = 5; // 球體的水平移動速度
+        private int ballSpeedY = 3; // 球體的垂直移動速度
+        private int ballRadius = 20; // 球體的半徑
         //全局變數---------------------------------------------------------------------------------------------------------
         private bool _isMouseDown = false;
         private List<ImageItem> imageItems;
@@ -334,8 +339,8 @@ namespace Thunder
                 case "ImageAdjust":
                     type = "adjust";
                     break;
-                case "MassImage":
-                    type = "mass";
+                case "Dynamic":
+                    type = "dynamic";
                     break;
                 default:
                     MessageBox.Show("請選擇一個有效的功能！");
@@ -362,9 +367,13 @@ namespace Thunder
                     showimgPicture_pic.Image.Dispose();
                     showimgPicture_pic.Image = null;
                 }
-                showimgPicture_pic.Image = mypicture.Getpicture();
-                showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
-                showimgSize_btn.Text = $"當前圖片大小：{mnsW_txt.Text} x {mnsH_txt.Text}"; // 更新狀態列顯示當前圖片大小  
+
+                if (type != "dynamic")
+                {
+                    showimgPicture_pic.Image = mypicture.Getpicture();
+                    showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
+                }
+                showimgSize_lbl.Text = $"當前圖片大小：{mnsW_txt.Text} x {mnsH_txt.Text}"; // 更新狀態列顯示當前圖片大小  
             }
             catch (Exception ex)
             {
@@ -1021,8 +1030,23 @@ namespace Thunder
                     case "adjust":
                         // 這裡可以添加調整圖片的邏輯
                         break;
-                    case "mass":
-                        // 這裡可以添加批量處理圖片的邏輯
+                    case "dynamic":
+                        if (mypicture.tag == "image")
+                        {
+                            // 使用圖片
+                            g.DrawImage(mypicture.Getpicture(), 0, 0, width, height);
+                        }
+                        else
+                        {
+                            // 填充背景顏色
+                            g.Clear(tabiedBackImg_pic.BackColor);
+                        }
+
+                        
+                        _pictureWindow = new pictureWindow();
+                        _pictureWindow.Show();
+                        timerDynamic.Start();
+                        //mypicture.Setpicture(CurrentBitmap);
                         break;
                     default:
                         throw new NotSupportedException("不支援的圖片類型！");
@@ -1069,7 +1093,7 @@ namespace Thunder
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
                     pictureBox.Image = showimgPicture_pic.Image;
                     pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-                    showimgSize_btn.Text = $"圖片大小：{mypicture.Getsize()}"; // 更新狀態列顯示圖片大小
+                    showimgSize_lbl.Text = $"圖片大小：{mypicture.Getsize()}"; // 更新狀態列顯示圖片大小
                 }
             }
             catch (Exception ex)
@@ -1113,7 +1137,7 @@ namespace Thunder
             if (_pictureWindow == null || _pictureWindow.IsDisposed)
             {
                 // 如果 _pictureWindow 尚未初始化或已被釋放，則創建新的實例  
-                _pictureWindow = new pictureWindow((Bitmap)showimgPicture_pic.Image);
+                _pictureWindow = new pictureWindow();
             }
 
             _pictureWindow.setBitmap((Bitmap)showimgPicture_pic.Image);
@@ -1191,7 +1215,7 @@ namespace Thunder
                                 showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
 
                                 // 更新圖片大小顯示
-                                showimgSize_btn.Text = $"當前圖片大小：{originalImage.Width} x {originalImage.Height}";
+                                showimgSize_lbl.Text = $"當前圖片大小：{originalImage.Width} x {originalImage.Height}";
                             }
                         }
 
@@ -1590,20 +1614,13 @@ namespace Thunder
 
                         // 計算當前像素所在的分區
                         int position = isH ? y : x;
-                        //int segmentIndex = position / segmentLength;
 
                         // 計算當前像素在分區內的位置
                         int positionInSegment = position % segmentLength;
 
                         // 計算透明度
                         int stepIndex = (int)((float)positionInSegment / segmentLength * (steps));
-                        //// 如果分區是奇數，反向透明度
-                        //if (reverse && segmentIndex % 2 == 1)
-                        //{
-                        //    stepIndex = steps - 1 - stepIndex;
-                        //}
                         byte alpha = (byte)(startAlpha + alphaStep * stepIndex);
-
 
                         // 修改 Alpha 值
                         pixelValues[index + 3] = alpha; // Alpha 通道
@@ -2774,6 +2791,35 @@ namespace Thunder
                 tabiwWin_pic.Image = bitmap;
             }
         }  // Window 自製圖
+        private void AnimationTimer_Tick(object sender, EventArgs e)
+        {
+            // 更新球體位置
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            // 碰撞檢測 (邊界反彈)
+            if (ballX <= 0 || ballX + ballRadius * 2 >= mypicture.Getpicture().Width)
+            {
+                ballSpeedX = -ballSpeedX; // 水平反彈
+            }
+            if (ballY <= 0 || ballY + ballRadius * 2 >= mypicture.Getpicture().Height)
+            {
+                ballSpeedY = -ballSpeedY; // 垂直反彈
+            }
+
+            // 繪製動畫
+            using (Graphics g = Graphics.FromImage(mypicture.Getpicture()))
+            {
+                g.Clear(Color.Black); // 清空畫布，設為黑色背景
+                using (Brush ballBrush = new SolidBrush(Color.Red))
+                {
+                    g.FillEllipse(ballBrush, ballX, ballY, ballRadius * 2, ballRadius * 2); // 繪製球體
+                }
+            }
+
+            // 將 Bitmap 傳遞給 Form2 的 PictureBox
+            _pictureWindow.UpdatePictureBox(mypicture.Getpicture());
+        }
         // mainWindow操控----------------------------------------------------------------------------------------------
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -2837,7 +2883,7 @@ namespace Thunder
                     // 載入圖片並顯示在 PictureBox 中
                     showimgPicture_pic.Image = mypicture.Setpicture(Image.FromFile(filePath));
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
-                    showimgSize_btn.Text = $"圖片大小：{mypicture.Getsize()}"; // 更新狀態列顯示圖片大小
+                    showimgSize_lbl.Text = $"圖片大小：{mypicture.Getsize()}"; // 更新狀態列顯示圖片大小
                 }
                 catch (Exception ex)
                 {

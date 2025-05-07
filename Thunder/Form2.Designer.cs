@@ -53,7 +53,7 @@
             this.cmsClose = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.picwinPicture_pic = new System.Windows.Forms.PictureBox();
-            this.timer = new System.Windows.Forms.Timer(this.components);
+            this.timerSlideshow = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picwinPicture_pic)).BeginInit();
             this.SuspendLayout();
@@ -209,7 +209,6 @@
             // cmsScreenlist
             // 
             this.cmsScreenlist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmsScreenlist.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.cmsScreenlist.Name = "cmsScreenlist";
             this.cmsScreenlist.Size = new System.Drawing.Size(121, 23);
             this.cmsScreenlist.SelectedIndexChanged += new System.EventHandler(this.cmsScreenlist_cmb_SelectedIndexChanged);
@@ -246,9 +245,9 @@
             this.picwinPicture_pic.TabStop = false;
             this.picwinPicture_pic.DoubleClick += new System.EventHandler(this.pictureWindow_DoubleClick);
             // 
-            // timer
+            // timerSlideshow
             // 
-            this.timer.Tick += new System.EventHandler(this.timer_Tick);
+            this.timerSlideshow.Tick += new System.EventHandler(this.timer_Tick);
             // 
             // pictureWindow
             // 
@@ -266,6 +265,7 @@
             this.Name = "pictureWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Form2";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.pictureWindow_FormClosed);
             this.Load += new System.EventHandler(this.pictureWindow_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.pictureWindow_KeyDown);
             this.contextMenuStrip.ResumeLayout(false);
@@ -298,7 +298,7 @@
         private System.Windows.Forms.ToolStripTextBox cmsSlideshowText;
         private System.Windows.Forms.ToolStripMenuItem cmsSlideshowTextButton;
         private System.Windows.Forms.ToolStripMenuItem cmsSlideshowStop;
-        private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.Timer timerSlideshow;
         private System.Windows.Forms.ToolStripMenuItem cmsSlideshow1;
         private System.Windows.Forms.ToolStripMenuItem cmsSlideshow3;
     }

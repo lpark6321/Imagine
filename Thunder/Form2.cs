@@ -10,10 +10,10 @@ namespace Thunder
         //全局變數-----------------------------------------------------------------------------------------------------
         private Bitmap _bitmap;
         //pictureWindow類別--------------------------------------------------------------------------------------------
-        public pictureWindow(Bitmap bitMap)
+        public pictureWindow()
         {
             InitializeComponent();
-            _bitmap = bitMap; // 將接收到的 Bitmap 儲存到類別屬性中
+            //_bitmap = bitMap; // 將接收到的 Bitmap 儲存到類別屬性中
             //this.Paint += Form2_show; // 綁定 Paint 事件  
         }
         private void pictureWindow_Load(object sender, EventArgs e)
@@ -305,7 +305,7 @@ namespace Thunder
                 if (menuItem.Name == "cmsSlideshowStop")
                 {
                     // 停止幻燈片放映  
-                    timer.Stop();
+                    timerSlideshow.Stop();
                 }
                 else
                 {
@@ -313,15 +313,15 @@ namespace Thunder
                     if (menuItem.Name == "cmsSlideshowTextButton" && int.TryParse(cmsSlideshowText.Text, out interval))
                     {
                         // 開始幻燈片放映  
-                        timer.Interval = interval; // 設定間隔時間為 interval毫秒  
+                        timerSlideshow.Interval = interval; // 設定間隔時間為 interval毫秒  
                     }
                     else if (int.TryParse(menuItem.Name.Substring(12), out interval))
                     {
                         // 開始幻燈片放映  
-                        timer.Interval = interval * 1000; // 設定間隔時間秒  
+                        timerSlideshow.Interval = interval * 1000; // 設定間隔時間秒  
                     }
-                    timer.Tag = "KeyRight";
-                    timer.Start();
+                    timerSlideshow.Tag = "KeyRight";
+                    timerSlideshow.Start();
                 }
             }
         }  //開始幻燈片放映
@@ -337,5 +337,19 @@ namespace Thunder
                 }
             }
         } //定時器事件
+        //動態-------------------------------------------------------------------------------------------------
+        public void UpdatePictureBox(Bitmap bitmap)
+        {
+            if (picwinPicture_pic.Image != null)
+            {
+                picwinPicture_pic.Image.Dispose(); // 釋放舊的圖片資源
+            }
+            picwinPicture_pic.Image = (Bitmap)bitmap.Clone(); // 更新 PictureBox 的圖片
+        }
+
+        private void pictureWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mainWindow.Instance.timerDynamic.Stop();
+        }
     }
 }
