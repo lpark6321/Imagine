@@ -340,10 +340,17 @@ namespace Thunder
         //動態-------------------------------------------------------------------------------------------------
         public void UpdatePictureBox(Bitmap bitmap)
         {
+            if (bitmap == null)
+            {
+                throw new ArgumentNullException(nameof(bitmap), "Bitmap 不能為 null。");
+            }
+
             if (picwinPicture_pic.Image != null)
             {
                 picwinPicture_pic.Image.Dispose(); // 釋放舊的圖片資源
             }
+
+            //picwinPicture_pic.Image = bitmap; // 更新 PictureBox 的圖片
             picwinPicture_pic.Image = (Bitmap)bitmap.Clone(); // 更新 PictureBox 的圖片
         }
 
