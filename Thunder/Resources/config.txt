@@ -11,6 +11,8 @@
 6bitXP,					Solid,		14.27.41,
 8bitXP,					Solid,		58.110.165,
 55馬賽克,				Chess,		5*5,
+33馬賽克,				Chess,		3*3,
+77馬賽克,				Chess,		7*7,
 88馬賽克,				Chess,		8*8,
 3232馬賽克,				Chess,		32*32,
 84馬賽克,				Chess,		8*4,

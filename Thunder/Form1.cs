@@ -66,10 +66,10 @@ namespace Thunder
         public MyPicture mypicture { get; private set; }
         public class MyPicture
         {
-            private Bitmap _currentBitmap;
+            public Bitmap _currentBitmap;
             public string tag { get; set; }
-            private int _width;
-            private int _height;
+            public int _width;
+            public int _height;
             public int startX { get; set; } // 球體的初始 X 座標 
             public int startY { get; set; } // 球體的初始 Y 座標
             public int moveSpeedX { get; set; } // 球體的水平移動速度
@@ -197,7 +197,7 @@ namespace Thunder
             }  // 取得圖片大小
             public Bitmap Getpicture()
             {
-                if (_currentBitmap == null)
+                if (_currentBitmap == null || m1.IsImageDisposed(_currentBitmap))
                 {
                     MessageBox.Show("圖片尚未初始化！");
                     return null;
@@ -209,9 +209,12 @@ namespace Thunder
                 if (_currentBitmap != null)
                 {
                     _currentBitmap.Dispose(); // 釋放舊的 Bitmap
+                    _currentBitmap = null;
                 }
 
-                _currentBitmap = new Bitmap(image); // 複製新的 Bitmap
+                _currentBitmap = (Bitmap)image.Clone(); // 複製新的 Bitmap
+                _width = _currentBitmap.Width;
+                _height = _currentBitmap.Height;
                 tag = stringtag;
                 return _currentBitmap; // 回傳圖片
             }  // 設定圖片
@@ -249,22 +252,22 @@ namespace Thunder
                 // 碰撞檢測 (邊界反彈)
                 if (strip)
                 {
-                    if (startX <= 0 || startX + objectSize >= Getpicture().Width)
+                    if (startX <= 0 || startX + objectSize >= _width)
                     {
                         moveSpeedX = -moveSpeedX; // 水平反彈
                     }
-                    if (startY <= 0 || startY + objectSize >= Getpicture().Height)
+                    if (startY <= 0 || startY + objectSize >= _height)
                     {
                         moveSpeedY = -moveSpeedY; // 垂直反彈
                     }
                 }
                 else
                 {
-                    if (startX <= 0 || startX + objectSize * 2 >= Getpicture().Width)
+                    if (startX <= 0 || startX + objectSize * 2 >= _width)
                     {
                         moveSpeedX = -moveSpeedX; // 水平反彈
                     }
-                    if (startY <= 0 || startY + objectSize * 2 >= Getpicture().Height)
+                    if (startY <= 0 || startY + objectSize * 2 >= _height)
                     {
                         moveSpeedY = -moveSpeedY; // 垂直反彈
                     }
@@ -367,7 +370,7 @@ namespace Thunder
             }
         }  // 切換tab
         // 產生圖片----------------------------------------------------------------------------------------------------
-        private void Generate_Click(object sender, EventArgs e)
+        public void Generate_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(mnsW_txt.Text, out int width) || !int.TryParse(mnsH_txt.Text, out int height))
             {
@@ -399,7 +402,7 @@ namespace Thunder
                     type = "dynamic";
                     break;
                 default:
-                    MessageBox.Show("請選擇一個有效的功能！");
+                    //MessageBox.Show("請選擇一個有效的功能！");
                     return;
             }
             // 根據 cmbFunclist 的選擇來決定 type  
@@ -424,11 +427,11 @@ namespace Thunder
                     showimgPicture_pic.Image = null;
                 }
 
-                if (type != "dynamic")
-                {
+                //if (type != "dynamic")
+                //{
                     showimgPicture_pic.Image = mypicture.Getpicture();
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
-                }
+                //}
                 showimgSize_lbl.Text = $"當前圖片大小：{mnsW_txt.Text} x {mnsH_txt.Text}"; // 更新狀態列顯示當前圖片大小  
             }
             catch (Exception ex)
@@ -597,9 +600,9 @@ namespace Thunder
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "chess":
-                        for (int y = 0; y < height; y += height / (int)tabiecVNum_nud.Value)
+                        for (int y = 0; y < height; y += (int)Math.Ceiling((double)height / (int)tabiecVNum_nud.Value))
                         {
-                            for (int x = 0; x < width; x += width / (int)tabiecHNum_nud.Value)
+                            for (int x = 0; x < width; x += (int)Math.Ceiling((double)width / (int)tabiecHNum_nud.Value))
                             {
                                 // 計算顏色深淺
                                 int intensity = tabiecGray_hsc.Value;
@@ -1104,40 +1107,35 @@ namespace Thunder
                         //{
                         //    g.FillEllipse(ballBrush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2); // 繪製球體
                         //}
-                        mypicture.Setpicture(CurrentBitmap);
-
 
                         //if (CurrentBitmap == null)
                         //{
                         //    throw new InvalidOperationException("CurrentBitmap 尚未初始化！");
                         //}
-
-                        //if (showimgPicture_pic.Image != null)
-                        //{
-                        //    showimgPicture_pic.Image.Dispose();
-                        //    showimgPicture_pic.Image = null;
-                        //}
-                        //Bitmap clonedBitmap = (Bitmap)CurrentBitmap.Clone();
-                        //if (clonedBitmap == null)
-                        //{
-                        //    throw new InvalidOperationException("克隆的 Bitmap 無效！");
-                        //}
-                        // 使用 Clone()
-                        //showimgPicture_pic.Image = (Bitmap)CurrentBitmap.Clone();
-
-                        timerDynamic.Start();
+                        mypicture.Setpicture(CurrentBitmap, mypicture.tag);
                         FullScreen(showimgGenerate_btn, EventArgs.Empty);
-
+                        timerDynamic.Start();
                         break;
                     default:
                         throw new NotSupportedException("不支援的圖片類型！");
                 }
                 // 設置圖片的標籤
-                mypicture.tag = tag != "" ? tag : mypicture.tag;
+                //mypicture.tag = tag != "" ? tag : mypicture.tag;
             }
             // 釋放資源
-            CurrentBitmap.Dispose();
+            if (CurrentBitmap != null)
+            {
+                CurrentBitmap.Dispose();
+                CurrentBitmap = null;
+            }
+
         }  // 生成圖片
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         // 圖片控制----------------------------------------------------------------------------------------------------
         private void import_Click(object sender, EventArgs e)
         {
@@ -1221,9 +1219,17 @@ namespace Thunder
                 _pictureWindow = new pictureWindow();
             }
 
-            _pictureWindow.setBitmap((Bitmap)showimgPicture_pic.Image);
-            if (_pictureWindow != null && !_pictureWindow.IsDisposed)
+            //_pictureWindow.setBitmap((Bitmap)showimgPicture_pic.Image);
+            _pictureWindow.setBitmap(mypicture.Getpicture());
+
+            if (_pictureWindow != null && !_pictureWindow.IsDisposed)  //存在才執行
             {
+                if (_pictureWindow.Location != secondScreen.Bounds.Location)
+                {
+                    //currentScreen.DeviceName
+                    _pictureWindow.WindowState = FormWindowState.Normal;
+                    _pictureWindow.Location = secondScreen.Bounds.Location;
+                }
                 _pictureWindow.WindowState = FormWindowState.Maximized;
                 _pictureWindow.FormBorderStyle = FormBorderStyle.None;
                 if (!_pictureWindow.Visible)
@@ -1231,7 +1237,7 @@ namespace Thunder
                     // 設置窗口位置和大小  
                     _pictureWindow.WindowState = FormWindowState.Maximized;
                     _pictureWindow.StartPosition = FormStartPosition.Manual;
-                    _pictureWindow.Location = secondScreen.Bounds.Location;
+                    //_pictureWindow.Location = secondScreen.Bounds.Location;
                     _pictureWindow.Size = secondScreen.Bounds.Size;
 
                     // 顯示窗口  
@@ -1260,6 +1266,7 @@ namespace Thunder
                     break;
                 }
             }
+            Generate_Click(sender, e);
         }  // 螢幕選擇
         private void listView_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -2889,33 +2896,25 @@ namespace Thunder
             }
             mypicture.Move(direction, tabiedObjectStrip_rdo.Checked);
 
-
             // 繪製動畫
-            using (Graphics g = Graphics.FromImage(mypicture.Getpicture()))
+            //Bitmap bitmap = (Bitmap)mypicture.Getpicture().Clone();
+            Bitmap bitmap = new Bitmap(mypicture.Getpicture());
+            using (Graphics g = Graphics.FromImage(bitmap))
             {
-                if (mypicture.tag == "image")
-                {
-                    // 使用圖片
-                    g.DrawImage(mypicture.Getpicture(), 0, 0);
-                }
-                else
-                {
-                    // 填充背景顏色
-                    g.Clear(tabiedBackColor_btn.BackColor);
-                }
-                // 繪製
+                
+                // 繪製其他物件
                 if (tabiedObjectBall_rdo.Checked)
                 {
                     using (Brush ballBrush = new SolidBrush(tabiedObjectColor_btn.BackColor))
                     {
-                        g.FillEllipse(ballBrush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2); // 繪製球體
+                        g.FillEllipse(ballBrush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2);
                     }
                 }
                 else if (tabiedObjectCube_rdo.Checked)
                 {
                     using (Brush cubeBrush = new SolidBrush(tabiedObjectColor_btn.BackColor))
                     {
-                        g.FillRectangle(cubeBrush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2); // 繪製正方形  
+                        g.FillRectangle(cubeBrush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2);
                     }
                 }
                 else if (tabiedObjectStrip_rdo.Checked)
@@ -2924,19 +2923,30 @@ namespace Thunder
                     {
                         if (tabiedMoveH_rdo.Checked)
                         {
-                            g.FillRectangle(stripBrush, mypicture.startX, 0, mypicture.objectSize, mypicture.Getpicture().Height); // 繪製長條型矩形  
+                            g.FillRectangle(stripBrush, mypicture.startX, 0, mypicture.objectSize, mypicture.Getpicture().Height);
                         }
                         else if (tabiedMoveV_rdo.Checked)
                         {
-                            g.FillRectangle(stripBrush, 0, mypicture.startY, mypicture.Getpicture().Width, mypicture.objectSize); // 繪製長條型矩形  
+                            g.FillRectangle(stripBrush, 0, mypicture.startY, mypicture.Getpicture().Width, mypicture.objectSize);
                         }
-                        
                     }
                 }
             }
 
-            // 將 Bitmap 傳遞給 Form2 的 PictureBox
-            _pictureWindow.UpdatePictureBox(mypicture.Getpicture());
+            // 更新到 PictureBox
+            if (_pictureWindow != null)
+            {
+                _pictureWindow.UpdatePictureBox(bitmap);
+            }
+            else
+            {
+                throw new InvalidOperationException("沒有圖片可以顯示！");
+            }
+            if (bitmap != null)
+            {
+                bitmap.Dispose();
+                bitmap = null;
+            }
         }
         // mainWindow操控----------------------------------------------------------------------------------------------
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -3069,10 +3079,14 @@ namespace Thunder
         // 其他--------------------------------------------------------------------------------------------------------
         private void button1_Click(object sender, EventArgs e)
         {
-            //showimgPicture_pic.Image = Resources.run;
-            //showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
+            showimgPicture_pic.Image = Resources.run;
+            showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom; // 設置圖片縮放模式
 
-            MessageBox.Show($"{tabiemPixelGray_vsc.Value}");
+            //mypicture._currentBitmap = new Bitmap(mypicture._currentBitmap);
+            //using (Graphics g = Graphics.FromImage(mypicture._currentBitmap))
+            //{
+            //    g.Clear(Color.Red);
+            //}
         }  //menustripAAA 測試用按鍵
         private bool IsMouseMoveBound(Object targetObject, String targerString)
         {
@@ -3441,5 +3455,44 @@ namespace Thunder
                 }
             }
         }
+        private void testform(Bitmap bitmap)
+        {
+            Form testform = new Form
+            {
+                Size = new Size(400, 400),
+                BackgroundImage = (Bitmap)bitmap.Clone(),
+                BackgroundImageLayout = ImageLayout.Stretch,
+                FormBorderStyle = FormBorderStyle.None,
+                WindowState = FormWindowState.Maximized
+            };
+            testform.KeyDown += (s, args) =>
+            {
+                if (args.KeyCode == Keys.Escape)
+                {
+                    testform.Close();
+                }
+            };
+            testform.Show();
+            testform.TopMost = true; // 設置為最上層窗口
+        }
+        bool IsImageDisposed(Image image)
+        {
+            try
+            {
+                // 嘗試訪問圖片的屬性
+                int width = image.Width;
+                int height = image.Height;
+                return false; // 如果沒有異常，圖片未被處置
+            }
+            catch (ObjectDisposedException)
+            {
+                return true; // 圖片已被處置
+            }
+            catch (ArgumentException)
+            {
+                return true; // 圖片已被處置或無效
+            }
+        }
+
     }
 }

@@ -29,7 +29,12 @@ namespace Thunder
         }
         public void setBitmap(Bitmap bitmap)
         {
-            _bitmap = bitmap;
+            if (_bitmap != null)
+            {
+                _bitmap.Dispose();
+                _bitmap = null;
+            }
+            _bitmap = (Bitmap)bitmap.Clone();
             picwinPicture_pic.Image = _bitmap;
 
         }  //設定_bitmap
@@ -48,7 +53,9 @@ namespace Thunder
                 int newHeight = currentScreen.WorkingArea.Height / 3;
 
                 // 設定 Form 的大小和位置
-                Size = new Size(newWidth, newHeight);
+                Width = newWidth;
+                Height = newHeight;
+                //Size = new Size(newWidth, newHeight);
                 Location = new Point(
                     currentScreen.WorkingArea.Left + (currentScreen.WorkingArea.Width - newWidth) / 3,
                     currentScreen.WorkingArea.Top + (currentScreen.WorkingArea.Height - newHeight) / 3
@@ -56,10 +63,12 @@ namespace Thunder
             }
             else
             {
-                // 進入全螢幕，保留邊框
+                // 進入全螢幕，去除邊框
                 FormBorderStyle = FormBorderStyle.None;
                 WindowState = FormWindowState.Maximized;
-                Size = new Size(Screen.FromControl(this).WorkingArea.Width, Screen.FromControl(this).WorkingArea.Height);
+                Width = Screen.FromControl(this).WorkingArea.Width;
+                Height = Screen.FromControl(this).WorkingArea.Height;
+                //Size = new Size(Screen.FromControl(this).WorkingArea.Width, Screen.FromControl(this).WorkingArea.Height);
             }
         }  //雙擊全螢幕
         private void cmsShowLoc_Click(object sender, EventArgs e)
@@ -254,16 +263,31 @@ namespace Thunder
         private void cmsScreenlist_cmb_SelectedIndexChanged(object sender, EventArgs e)
         {
             mainWindow.Instance.mnsScreenlist_cmb.SelectedText = cmsScreenlist.SelectedItem?.ToString();
-            //cmsScreenlist.
-            // 獲取選擇的螢幕  
+            //// 獲取選擇的螢幕  
             string selectedScreen = cmsScreenlist.SelectedItem?.ToString() ?? Screen.AllScreens[0].DeviceName;
-            Screen secondScreen = Screen.AllScreens.FirstOrDefault(screen => screen.DeviceName == selectedScreen) ??
+            Screen targetScreen = Screen.AllScreens.FirstOrDefault(screen => screen.DeviceName == selectedScreen) ??
                                   Screen.AllScreens[0];
-            // 設置窗口位置和大小  
-            StartPosition = FormStartPosition.Manual;
-            Location = secondScreen.Bounds.Location;
-            Size = secondScreen.Bounds.Size;
-        }  //選擇螢幕
+            mainWindow.Instance.mnsScreenlist_cmb.SelectedItem = selectedScreen;
+            mainWindow.Instance.Generate_Click(sender, e);
+            mainWindow.Instance.FullScreen(sender, e);
+
+            //MessageBox.Show(selectedScreen);
+
+
+            // 設置窗口位置和大小
+            //StartPosition = FormStartPosition.Manual;
+            //Location = targetScreen.Bounds.Location;
+            //Size = targetScreen.Bounds.Size;
+            //WindowState = FormWindowState.Minimized;
+
+            //// 切換到全螢幕模式
+            //FormBorderStyle = FormBorderStyle.None;
+            //WindowState = FormWindowState.Maximized;
+            ////pictureWindow_DoubleClick(sender, e);
+            
+
+            contextMenuStrip.Visible = false;
+        }   //選擇螢幕
         private void cmsAdjust_Click(object sender, EventArgs e)
         {
             if (sender is ToolStripMenuItem menuItem)
