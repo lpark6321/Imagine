@@ -264,7 +264,7 @@
             this.KeyPreview = true;
             this.Name = "pictureWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Form2";
+            this.Text = "PatternShow";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.pictureWindow_FormClosed);
             this.Load += new System.EventHandler(this.pictureWindow_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.pictureWindow_KeyDown);
