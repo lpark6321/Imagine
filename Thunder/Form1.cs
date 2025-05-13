@@ -144,6 +144,10 @@ namespace Thunder
                         }
                     }
                 }
+                else
+                {
+                    _currentBitmap.Save(filename, ImageFormat.Bmp);
+                }
             }  // 儲存圖片
 
             public Image OpenImage()
@@ -342,6 +346,7 @@ namespace Thunder
         {
             if (tabControl.SelectedTab == tabDirList)
             {
+                ssrStatus_lbl.Text = Application.StartupPath;
                 // 當選擇 ImgList 標籤時，執行 PopulateListView 方法
                 PopulateListView();
             }
@@ -1200,10 +1205,44 @@ namespace Thunder
                     }
                 }
             }
+            else if(sender is Button targetbutton && targetbutton.Name == "mnsSave_btn")
+            {
+                if (targetbutton.Name == "mnsSave_btn")
+                {
+                    // 儲存單張圖片
+                    mypicture.SaveImage();
+                }
+            }
             else
             {
-                // 儲存單張圖片
-                mypicture.SaveImage();
+                string fileName = $"{mnsPattername_txt.Text}.bmp"; // 設定檔名
+                string filePath = Path.Combine(Application.StartupPath, fileName); // 儲存路徑
+
+                // 判斷檔案是否存在
+                while (File.Exists(filePath))
+                {
+                    // 判斷檔名是否包含 "_" 並且後面是數字
+                    string nameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+                    string[] parts = nameWithoutExtension.Split('_');
+                    if (parts.Length > 1 && int.TryParse(parts[parts.Length - 1], out int number)) // 修改索引運算子
+                    {
+                        // 如果是數字，遞增
+                        parts[parts.Length - 1] = (number + 1).ToString(); // 修改索引運算子
+                        nameWithoutExtension = string.Join("_", parts);
+                    }
+                    else
+                    {
+                        // 如果不是數字，新增 "_2"
+                        nameWithoutExtension += "_2";
+                    }
+
+                    // 更新檔名與路徑
+                    fileName = $"{nameWithoutExtension}.bmp";
+                    filePath = Path.Combine(Application.StartupPath, fileName);
+                }
+
+                // 儲存圖片
+                mypicture.SaveImage(filePath);
             }
         }  // 儲存圖片
         // 圖片顯示----------------------------------------------------------------------------------------------------
@@ -1303,6 +1342,8 @@ namespace Thunder
 
                                 // 更新圖片大小顯示
                                 showimgSize_lbl.Text = $"當前圖片大小：{originalImage.Width} x {originalImage.Height}";
+
+                                ssrStatus_lbl.Text = imagePath;
                             }
                         }
 
@@ -3493,6 +3534,7 @@ namespace Thunder
                 return true; // 圖片已被處置或無效
             }
         }
+
 
     }
 }
