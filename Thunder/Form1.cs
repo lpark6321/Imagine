@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Thunder.Properties;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using Object = System.Object;
 using String = System.String;
@@ -203,7 +204,7 @@ namespace Thunder
             {
                 if (_currentBitmap == null || m1.IsImageDisposed(_currentBitmap))
                 {
-                    MessageBox.Show("圖片尚未初始化！");
+                    //MessageBox.Show("圖片尚未初始化！");
                     return null;
                 }
                 return _currentBitmap;
@@ -352,25 +353,30 @@ namespace Thunder
             }
             else if (tabControl.SelectedTab == tabImgList)
             {
-                // 當選擇 ImgEditor 標籤時，執行其他邏輯
-                // 獲取程式所在資料夾的 config.txt 檔案
-                string configFilePath = Directory.GetFiles(Application.StartupPath, "config.txt").FirstOrDefault();
+                if (tabilPatternList_lst.Tag == null || tabilPatternList_lst.Tag.ToString() == "")
+                {
+                    // 當選擇 ImgEditor 標籤時，執行其他邏輯
+                    // 獲取程式所在資料夾的 config.txt 檔案
+                    string configFilePath = Directory.GetFiles(Application.StartupPath, "config.txt").FirstOrDefault();
 
-                // 如果找到 config.txt，將其內容讀取為字串並傳入 PopulateListBox 函式
-                if (!string.IsNullOrEmpty(configFilePath))
-                {
-                    try
+                    // 如果找到 config.txt，將其內容讀取為字串並傳入 PopulateListBox 函式
+                    if (!string.IsNullOrEmpty(configFilePath))
                     {
-                        PopulateListBox(File.ReadAllText(configFilePath)); // 將字串傳入 PopulateListBox
+                        try
+                        {
+                            PopulateListBox(File.ReadAllText(configFilePath)); // 將字串傳入 PopulateListBox
+                            tabilPatternList_lst.Tag = configFilePath; // 記錄 config.txt 的路徑
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        PopulateListBox(Resources.config);
+                        tabilPatternList_lst.Tag = Resources.config; // 記錄 config.txt 的路徑
                     }
-                }
-                else
-                {
-                    PopulateListBox(Resources.config);
                 }
             }
         }  // 切換tab
@@ -1167,6 +1173,12 @@ namespace Thunder
                 }
                 else if (sender is PictureBox pictureBox)
                 {
+
+                    if (pictureBox.Name == "tabiedBackImg_pic")
+                    {
+                        timerDynamic.Tag = "openpic";
+                        //timerDynamic.Stop();
+                    }
                     if (showimgPicture_pic.Image != null)
                     {
                         showimgPicture_pic.Image.Dispose();
@@ -1178,6 +1190,14 @@ namespace Thunder
                     pictureBox.Image = showimgPicture_pic.Image;
                     pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
                     showimgSize_lbl.Text = $"圖片大小：{mypicture.Getsize()}"; // 更新狀態列顯示圖片大小
+                    if (pictureBox.Name == "tabiedBackImg_pic")
+                    {
+                        timerDynamic.Tag = "";
+                        //_pictureWindow.Close();
+                        //Generate_Click(showimgGenerate_btn, EventArgs.Empty); // 生成圖片
+                        //GenerateImage("dynamic", int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text));
+                        //timerDynamic.Start();
+                    }
                 }
             }
             catch (Exception ex)
@@ -1505,6 +1525,39 @@ namespace Thunder
                 tabilPatternList_lst.Items.Add(line);
             }
         }  // ListBox載入圖片
+        private void ConfigToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem targetbutton)
+            {
+                if (targetbutton.Name == "openConfigToolStripMenuItem")
+                {
+                    // 使用 OpenFileDialog 選擇配置檔案
+                    using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                    {
+                        openFileDialog.Filter = "Text Files|*.txt";
+                        if (openFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            string configfile = File.ReadAllText(openFileDialog.FileName);
+                            PopulateListBox(configfile);
+                            tabilPatternList_lst.Tag = openFileDialog.FileName; // 儲存檔案路徑
+                        }
+                    }
+                }
+                else if (targetbutton.Name == "saveConfigToolStripMenuItem")
+                {
+                    // 儲存配置檔案
+                    using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+                    {
+                        saveFileDialog.Filter = "Text Files|*.txt";
+                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            string configfile = string.Join(Environment.NewLine, tabilPatternList_lst.Items.Cast<string>());
+                            File.WriteAllText(saveFileDialog.FileName, configfile);
+                        }
+                    }
+                }
+            }
+        }  // 設定檔案載入與儲存
         // 圖片處理 groupbox 功能--------------------------------------------------------------------------------------
         private void SetButtonBackgroundColor(object sender, EventArgs e)
         {
@@ -1520,10 +1573,10 @@ namespace Thunder
                         // 將選擇的顏色設置為目標按鈕的背景顏色  
                         targetButton.BackColor = colorDialog.Color;
                         targetButton.Image = null; // 清除按鈕上的圖片
-                        if (targetButton.Name.Contains("tabiefBack_btn"))
-                        {
-                            mypicture.tag = "color";
-                        }
+                        mypicture.tag = "color";
+                        //if (targetButton.Name.Contains("tabiefBack_btn"))
+                        //{
+                        //}
                     }
                 }
             }
@@ -2919,6 +2972,39 @@ namespace Thunder
                 tabiwWin_pic.Image = bitmap;
             }
         }  // Window 自製圖
+        private void tabiwDiagonal_btn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox targetchk)
+            {
+                if (targetchk.Checked)
+                {
+                    tabiwWinLoc_grp.Enabled = false;
+                    tabiwWinImg_rdo.Enabled = false;
+                    tabiwWinCustom_rdo.Enabled = false;
+                }
+                else
+                {
+                    tabiwWinLoc_grp.Enabled = true;
+                    tabiwWinImg_rdo.Enabled = true;
+                    tabiwWinCustom_rdo.Enabled = true;
+                }
+            }
+        }  // Window對角線選擇
+        private void tabiedObjectStrip_rdo_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is RadioButton targetRdo)
+            {
+                if (targetRdo.Checked)
+                {
+                    tabiedMoveH_rdo.Checked = true;
+                    tabiedMoveBevel_rdo.Enabled = false;
+                }
+                else
+                {
+                    tabiedMoveBevel_rdo.Enabled = true;
+                }
+            }
+        }  //Dymenic物件移動方式選擇
         private void AnimationTimer_Tick(object sender, EventArgs e)
         {
             // 更新球體位置
@@ -2937,12 +3023,34 @@ namespace Thunder
             }
             mypicture.Move(direction, tabiedObjectStrip_rdo.Checked);
 
-            // 繪製動畫
-            //Bitmap bitmap = (Bitmap)mypicture.Getpicture().Clone();
-            Bitmap bitmap = new Bitmap(mypicture.Getpicture());
+            Bitmap bitmap;
+            if (timerDynamic.Tag != null && timerDynamic.Tag.ToString() == "openpic")
+            {
+                if (showimgPicture_pic.Image == null)
+                {
+                    mainWindow.Instance.timerDynamic.Stop();
+                    return;
+                }
+                bitmap = new Bitmap(showimgPicture_pic.Image);
+            }
+            else
+            {
+                if (mypicture.Getpicture() != null)
+                {
+                    // 繪製動畫
+                    //Bitmap bitmap = (Bitmap)mypicture.Getpicture().Clone();
+                    bitmap = new Bitmap(mypicture.Getpicture());
+                    //bitmap = _pictureWindow.getpicturebox();
+                }
+                else
+                { 
+                    bitmap = new Bitmap(int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text));
+                }
+            }
+
             using (Graphics g = Graphics.FromImage(bitmap))
             {
-                
+
                 // 繪製其他物件
                 if (tabiedObjectBall_rdo.Checked)
                 {
@@ -2978,6 +3086,7 @@ namespace Thunder
             if (_pictureWindow != null)
             {
                 _pictureWindow.UpdatePictureBox(bitmap);
+                timerDynamic.Tag = "run";
             }
             else
             {
@@ -2988,24 +3097,46 @@ namespace Thunder
                 bitmap.Dispose();
                 bitmap = null;
             }
-        }
+        }  // AnimationTimer_Tick
         // mainWindow操控----------------------------------------------------------------------------------------------
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Escape)
+            // 判斷是否按下鍵
+            switch (e.KeyCode)
             {
-                FullScreen(sender, e);
-                //// 切換全螢幕模式
-                //if (this.FormBorderStyle == FormBorderStyle.None)
-                //{
-                //    this.FormBorderStyle = FormBorderStyle.Sizable;
-                //    this.WindowState = FormWindowState.Normal;
-                //}
-                //else
-                //{
-                //    this.FormBorderStyle = FormBorderStyle.None;
-                //    this.WindowState = FormWindowState.Maximized;
-                //}
+                case Keys.Escape:
+                    FullScreen(sender, e);
+                    break;
+                case Keys.F1:
+                    tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
+                    tabimgeFuncList.SelectedIndex = 0; // 選擇第一個功能
+                    break;
+                case Keys.F2:
+                    tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
+                    tabimgeFuncList.SelectedIndex = 1; // 選擇第一個功能
+                    break;
+                case Keys.F3:
+                    tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
+                    tabimgeFuncList.SelectedIndex = 2; // 選擇第一個功能
+                    break;
+                case Keys.F4:
+                    tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
+                    tabimgeFuncList.SelectedIndex = 3; // 選擇第一個功能
+                    break;
+                case Keys.F5:
+                    tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
+                    tabimgeFuncList.SelectedIndex = 4; // 選擇第一個功能
+                    break;
+                case Keys.F6:
+                    tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
+                    tabimgeFuncList.SelectedIndex = 5; // 選擇第一個功能
+                    break;
+                case Keys.F7:
+                    tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
+                    tabimgeFuncList.SelectedIndex = 6; // 選擇第一個功能
+                    break;
+                default:
+                    break;
             }
         }  //mainWindow_KeyDown
         // 拖放事件--------------------------------------------------------------------------------------------------------
@@ -3075,8 +3206,24 @@ namespace Thunder
                     {
                         try
                         {
-                            MessageBox.Show(filePath);
-                            // 在這裡處理 config.txt 檔案的邏輯  
+                            //MessageBox.Show(filePath);
+                            // 在這裡處理 config.txt 檔案的邏輯 
+                            // 如果找到 config.txt，將其內容讀取為字串並傳入 PopulateListBox 函式
+                            if (!string.IsNullOrEmpty(filePath))
+                            {
+                                try
+                                {
+                                    PopulateListBox(File.ReadAllText(filePath)); // 將字串傳入 PopulateListBox
+                                }
+                                catch (Exception ex)
+                                {
+                                    MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                            }
+                            else
+                            {
+                                PopulateListBox(Resources.config);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -3096,7 +3243,7 @@ namespace Thunder
             bool IsSupportedFile(string filePath)
             {
                 string filename = Path.GetFileName(filePath).ToLower();
-                return filename == "config.txt" || filename.EndsWith(".json") || filename.EndsWith(".xml");
+                return filename == "config.txt";// || filename.EndsWith(".json") || filename.EndsWith(".xml");
             }
 
             // 檢查拖入的資料是否包含檔案，並且是支援的 config.txt  
@@ -3144,7 +3291,45 @@ namespace Thunder
                 }
             }
             return false;
-        }
+        }  // 測試用
+        private void testform(Bitmap bitmap)
+        {
+            Form testform = new Form
+            {
+                Size = new Size(400, 400),
+                BackgroundImage = (Bitmap)bitmap.Clone(),
+                BackgroundImageLayout = ImageLayout.Stretch,
+                FormBorderStyle = FormBorderStyle.None,
+                WindowState = FormWindowState.Maximized
+            };
+            testform.KeyDown += (s, args) =>
+            {
+                if (args.KeyCode == Keys.Escape)
+                {
+                    testform.Close();
+                }
+            };
+            testform.Show();
+            testform.TopMost = true; // 設置為最上層窗口
+        }  // 測試用
+        bool IsImageDisposed(Image image)
+        {
+            try
+            {
+                // 嘗試訪問圖片的屬性
+                int width = image.Width;
+                int height = image.Height;
+                return false; // 如果沒有異常，圖片未被處置
+            }
+            catch (ObjectDisposedException)
+            {
+                return true; // 圖片已被處置
+            }
+            catch (ArgumentException)
+            {
+                return true; // 圖片已被處置或無效
+            }
+        }  // 測試用
         // listbox功能-----------------------------------------------------------------------------------
         private Color switchcolor(string sc)
         {
@@ -3216,30 +3401,36 @@ namespace Thunder
         }  // listbox控制棋盤格
         private void funcGrad(string color, string hv)
         {
-            if (hv.StartsWith("h"))
+            string[] hvs = hv.Split('-');
+            if (hvs.Length >= 2)
             {
-                tabigHWay_rdo.Checked = true;
-            }
-            else if (hv.StartsWith("v"))
-            {
-                tabigVWay_rdo.Checked = true;
+                tabigHWay_rdo.Checked = hvs[0].Contains("h") ? true : false;
+                tabigVWay_rdo.Checked = hvs[0].Contains("v") ? true : false;
+                tabigStep_cmb.Text = hvs[1];
+                tabigDivid_cmb.Text = hvs[2];
             }
             else
             {
+                tabigHWay_rdo.Checked = false;
+                tabigVWay_rdo.Checked = false;
                 tabigColorBar_rdo.Checked = true;
+                tabigStep_cmb.Text = "256";
+                tabigDivid_cmb.Text = "1";
             }
+
             if (color.StartsWith("colorbar"))
             {
                 tabigOther_chk.Checked = true;
-                if (color.EndsWith("h"))
+                if (color.Contains("-h"))
                 {
                     tabigOtherHSplit_rdo.Checked = true;
                 }
-                else if (color.EndsWith("v"))
+                else if (color.Contains("-v"))
                 {
                     tabigOtherVSplit_rdo.Checked = true;
                 }
                 SplitPanelCreat(tabigOtherSplit_nud, EventArgs.Empty); // 修正 'e' 為 'EventArgs.Empty'
+
                 if (color.Contains("four"))
                 {
                     ColorBar_btn_Click(tabigFourColor_btn, EventArgs.Empty); // 修正 'e' 為 'EventArgs.Empty'  
@@ -3353,7 +3544,7 @@ namespace Thunder
                 tabiwBack_pic.BackColor = Color.Gray;
                 int wnum = 2;
                 int hnum = 2;
-                string onoff = "1010";
+                string onoff = "10.01";
                 switch (color)
                 {
                     case "excel1":
@@ -3432,6 +3623,194 @@ namespace Thunder
                 }
                 Custom_btn_Click(tabiwCustom_btn, EventArgs.Empty);
             }
+            else if (color.Contains("custom"))
+            {
+                string[] colorParts = color.Split('-');
+                if (colorParts.Length >= 3)
+                {
+                    int wnum = 0;
+                    int hnum = 0;
+                    string onoff = "";
+                    if (colorParts[2] == "black")
+                    {
+                        tabiwWinColor_rdo.Checked = true;
+                        tabiwWin_pic.Image = null;
+                        tabiwWin_pic.BackColor = Color.Black; // 修改 Form1 的背景顏色
+                    }
+                    else if (colorParts[2] == "gray")
+                    {
+                        tabiwWinColor_rdo.Checked = true;
+                        tabiwWin_pic.Image = null;
+                        tabiwWin_pic.BackColor = Color.Gray; // 修改 Form1 的背景顏色
+                    }
+                    else if (colorParts[2] == "dotw")
+                    {
+                        tabiwWinCustom_rdo.Checked = true;
+                        tabiwWin_pic.Image = null;
+                        windowPictureBox_Click(tabiwWinCustom_rdo, EventArgs.Empty);
+                        tabiwCustom_cmb.SelectedIndex = 0;
+                        wnum = 2;
+                        hnum = 2;
+                        onoff = "10.01";
+
+                        onoff = onoff.Replace(".", "");
+                        tabiwCMaskWNum_nud.Value = wnum;
+                        tabiwCMaskHNum_nud.Value = hnum;
+                        MaskPanelCreat(tabiwCMaskPixelClear_btn, EventArgs.Empty);
+                        for (int i = 0; i < hnum; i++)
+                        {
+                            for (int j = 0; j < wnum; j++)
+                            {
+                                Panel targetPanel =
+                                    tabiwCMaskPixelPanel_pnl.Controls[i * wnum + j] as Panel;
+                                if (targetPanel != null)
+                                {
+                                    if (i == 1)
+                                    {
+                                        i = i;
+                                    }
+                                    // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                                    string[] coordinates = targetPanel.Tag.ToString().Split(',');
+                                    // 計算在 onoff 字符串中的索引
+                                    int index = (int.Parse(coordinates[1]) * wnum + int.Parse(coordinates[0]));
+                                    // 設置 Panel 的顏色
+                                    if (onoff[index] == '1')
+                                    {
+                                        targetPanel.BackColor = Color.White;
+                                    }
+                                    else
+                                    {
+                                        targetPanel.BackColor = Color.Black;
+                                    }
+                                }
+                            }
+                        }
+                        Custom_btn_Click(tabiwCustom_btn, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        tabiwWinColor_rdo.Checked = true;
+                        tabiwWin_pic.Image = null;
+                        tabiwWin_pic.BackColor = switchcolor(colorParts[0]); // 修改 Form1 的背景顏色
+                    }
+
+
+                    if (colorParts[1] == "dotg")
+                    {
+                        tabiwBackCustom_rdo.Checked = true;
+                        tabiwBack_pic.Image = null;
+                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
+                        tabiwCustom_cmb.SelectedIndex = 0;
+                        wnum = 2;
+                        hnum = 2;
+                        onoff = "20.02";
+                    }
+                    else if(colorParts[1] == "vstripeg")
+                    {
+                        tabiwBackCustom_rdo.Checked = true;
+                        tabiwBack_pic.Image = null;
+                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
+                        tabiwCustom_cmb.SelectedIndex = 0;
+                        wnum = 2;
+                        hnum = 2;
+                        onoff = "45.54";
+                    }
+                    else if(colorParts[1] == "vstripew")
+                    {
+                        tabiwBackCustom_rdo.Checked = true;
+                        tabiwBack_pic.Image = null;
+                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
+                        tabiwCustom_cmb.SelectedIndex = 0;
+                        wnum = 2;
+                        hnum = 2;
+                        onoff = "67.76";
+                    }
+                    else if (colorParts[1] == "dotdell")
+                    {
+                        tabiwBackCustom_rdo.Checked = true;
+                        tabiwBack_pic.Image = null;
+                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
+                        tabiwCustom_cmb.SelectedIndex = 0;
+                        wnum = 2;
+                        hnum = 2;
+                        onoff = "30.03";
+                    }
+                    else if (colorParts[1] == "roww")
+                    {
+                        tabiwBackCustom_rdo.Checked = true;
+                        tabiwBack_pic.Image = null;
+                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
+                        tabiwCustom_cmb.SelectedIndex = 0;
+                        wnum = 2;
+                        hnum = 2;
+                        onoff = "11.00";
+                    }
+                    else
+                    {
+                        tabiwBackColor_rdo.Checked = true;
+                        tabiwBack_pic.Image = null;
+                        tabiwBack_pic.BackColor = switchcolor(colorParts[0]); // 修改 Form1 的背景顏色
+                    }
+                    if (tabiwBackCustom_rdo.Checked == true && onoff != "")
+                    {
+                        onoff = onoff.Replace(".", "");
+                        tabiwCMaskWNum_nud.Value = wnum;
+                        tabiwCMaskHNum_nud.Value = hnum;
+                        MaskPanelCreat(tabiwCMaskPixelClear_btn, EventArgs.Empty);
+                        for (int i = 0; i < hnum; i++)
+                        {
+                            for (int j = 0; j < wnum; j++)
+                            {
+                                Panel targetPanel =
+                                    tabiwCMaskPixelPanel_pnl.Controls[i * wnum + j] as Panel;
+                                if (targetPanel != null)
+                                {
+                                    if (i == 1)
+                                    {
+                                        i = i;
+                                    }
+                                    // 解析 Panel 的座標 (Tag 格式為 "x,y")
+                                    string[] coordinates = targetPanel.Tag.ToString().Split(',');
+                                    // 計算在 onoff 字符串中的索引
+                                    int index = (int.Parse(coordinates[1]) * wnum + int.Parse(coordinates[0]));
+                                    // 設置 Panel 的顏色
+                                    switch (onoff[index])
+                                    {
+                                        case '0':
+                                            targetPanel.BackColor = Color.Black;
+                                            break;
+                                        case '1':
+                                            targetPanel.BackColor = Color.White;
+                                            break;
+                                        case '2':
+                                            targetPanel.BackColor = Color.Gray;
+                                            break;
+                                        case '3':
+                                            targetPanel.BackColor = Color.FromArgb(0, 127, 127);
+                                            break;
+                                        case '4':
+                                            targetPanel.BackColor = Color.FromArgb(127, 0, 127);
+                                            break;
+                                        case '5':
+                                            targetPanel.BackColor = Color.FromArgb(0, 127, 0);
+                                            break;
+                                        case '6':
+                                            targetPanel.BackColor = Color.FromArgb(255, 0, 255);
+                                            break;
+                                        case '7':
+                                            targetPanel.BackColor = Color.FromArgb(0, 255, 0);
+                                            break;
+                                        default:
+                                            targetPanel.BackColor = Color.Black;
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        Custom_btn_Click(tabiwCustom_btn, EventArgs.Empty);
+                    }
+                }
+            }
             else
             {
                 string[] colorParts = color.Split('-');
@@ -3439,102 +3818,70 @@ namespace Thunder
                 {
                     tabiwBackColor_rdo.Checked = true;
                     tabiwWinColor_rdo.Checked = true;
-                    tabiwBack_pic.BackColor = switchcolor(colorParts[0]); // 修改 Form1 的背景顏色
                     tabiwBack_pic.Image = null;
-                    tabiwWin_pic.BackColor = switchcolor(colorParts[1]); // 修改 Form1 的背景顏色
+                    tabiwBack_pic.BackColor = switchcolor(colorParts[0]); // 修改 Form1 的背景顏色
                     tabiwWin_pic.Image = null;
+                    tabiwWin_pic.BackColor = switchcolor(colorParts[1]); // 修改 Form1 的背景顏色
                 }
             }
 
-            if (sizeloc.Contains("c"))
+            if (sizeloc.Contains("xy"))  //loc center
+            {
+                tabiwWinLocPixcel_rdo.Checked = true;
+                int x = 0;
+                int y = 0;
+                if (sizeloc.Contains("q"))  //loc center
+                {
+                    if (sizeloc.Contains("++"))
+                    {
+                        x = int.Parse(mnsW_txt.Text) / 2;
+                        y = 0;
+                    }
+                    else if (sizeloc.Contains("-+"))
+                    {
+                        x = 0;
+                        y = 0;
+                    }
+                    else if (sizeloc.Contains("--"))
+                    {
+                        x = 0;
+                        y = int.Parse(mnsH_txt.Text) / 2;
+                    }
+                    else if (sizeloc.Contains("+-"))
+                    {
+                        x = int.Parse(mnsW_txt.Text) / 2;
+                        y = int.Parse(mnsH_txt.Text) / 2;
+                    }
+                } 
+                else
+                {
+                    x = int.Parse(sizeloc.Split('_')[1].Split('.')[0]);
+                    y = int.Parse(sizeloc.Split('_')[1].Split('.')[1]);
+                }
+                tabiwWinLocPixcelX_nud.Value = x;
+                tabiwWinLocPixcelY_nud.Value = y;
+            }
+            else if(sizeloc.Contains("two"))  //loc outside
+            {
+                tabiwWinLocTwo_rdo.Checked = true;
+            }
+            else  //loc center
             {
                 tabiwWinLocCenter_rdo.Checked = true;
             }
 
-            if (sizeloc.Contains("%"))
+
+            if (sizeloc.Contains("%"))  //size
             {
                 tabiwWinSizePercent_rdo.Checked = true;
                 tabiwWinSizePercent_nud.Value = int.Parse(sizeloc.Split('%')[0]);
             }
-            else 
+            else
             {
                 tabiwWinSizePercent_rdo.Checked = true;
                 tabiwWinSizePercent_nud.Value = 50;
             }
         } // listbox控制窗口
-        private void tabiwDiagonal_btn_CheckedChanged(object sender, EventArgs e)
-        {
-            if (sender is CheckBox targetchk)
-            {
-                if (targetchk.Checked)
-                {
-                    tabiwWinLoc_grp.Enabled = false;
-                    tabiwWinImg_rdo.Enabled = false;
-                    tabiwWinCustom_rdo.Enabled = false;
-                }
-                else
-                {
-                    tabiwWinLoc_grp.Enabled = true;
-                    tabiwWinImg_rdo.Enabled = true;
-                    tabiwWinCustom_rdo.Enabled = true;
-                }
-            }
-        }  // Window對角線選擇
-
-        private void tabiedObjectStrip_rdo_CheckedChanged(object sender, EventArgs e)
-        {
-            if (sender is RadioButton targetRdo)
-            {
-                if (targetRdo.Checked)
-                {
-                    tabiedMoveH_rdo.Checked = true;
-                    tabiedMoveBevel_rdo.Enabled = false;
-                }
-                else
-                {
-                    tabiedMoveBevel_rdo.Enabled = true;
-                }
-            }
-        }
-        private void testform(Bitmap bitmap)
-        {
-            Form testform = new Form
-            {
-                Size = new Size(400, 400),
-                BackgroundImage = (Bitmap)bitmap.Clone(),
-                BackgroundImageLayout = ImageLayout.Stretch,
-                FormBorderStyle = FormBorderStyle.None,
-                WindowState = FormWindowState.Maximized
-            };
-            testform.KeyDown += (s, args) =>
-            {
-                if (args.KeyCode == Keys.Escape)
-                {
-                    testform.Close();
-                }
-            };
-            testform.Show();
-            testform.TopMost = true; // 設置為最上層窗口
-        }
-        bool IsImageDisposed(Image image)
-        {
-            try
-            {
-                // 嘗試訪問圖片的屬性
-                int width = image.Width;
-                int height = image.Height;
-                return false; // 如果沒有異常，圖片未被處置
-            }
-            catch (ObjectDisposedException)
-            {
-                return true; // 圖片已被處置
-            }
-            catch (ArgumentException)
-            {
-                return true; // 圖片已被處置或無效
-            }
-        }
-
 
     }
 }
