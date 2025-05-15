@@ -104,135 +104,145 @@ namespace Thunder
         {
             if (sender is Form targetform)
             {
-                if (e.KeyCode == Keys.F1)
+                Point currentPosition = Cursor.Position;
+                switch (e.KeyCode)
                 {
-                    //Close();
-                    pictureWindow_DoubleClick(sender, e);
-                }
-                else if (e.KeyCode == Keys.Escape)// 按下 ESC 鍵退出全螢幕 
-                {
-                    Close();
-                    //pictureWindow_DoubleClick(sender, e);
-                }
-                else if (e.KeyCode == Keys.Right)
-                {
-                    if (mainWindow.Instance != null)
-                    {
-                        TabControl tabControl = mainWindow.Instance.MainTabControl;
-                        //切換到 DirList 分頁 (index = 1)
-                        if (tabControl.SelectedIndex == 1)
+                    case Keys.F1:
+                        //MessageBox.Show("F1 鍵被按下");
+                        pictureWindow_DoubleClick(sender, e);
+                        break;
+                    case Keys.Escape:
+                        //MessageBox.Show("ESC 鍵被按下");
+                        Close();
+                        break;
+                    case Keys.Right:
+                        //MessageBox.Show("Right 鍵被按下");
+                        if (mainWindow.Instance != null)
                         {
-                            // 確保 DirList 分頁下有 ListView 並切換選項  
-                            if (tabControl.TabPages[1].Controls["tabdlPatternList_lvw"] is System.Windows.Forms.ListView
-                                    listView && listView.Items.Count > 0)
+                            TabControl tabControl = mainWindow.Instance.MainTabControl;
+                            //切換到 DirList 分頁 (index = 1)
+                            if (tabControl.SelectedIndex == 1)
                             {
-                                int currentIndex = listView.SelectedIndices.Count > 0
-                                    ? listView.SelectedIndices[0]
-                                    : -1;
-                                //MessageBox.Show($"{currentIndex}");
-                                if (currentIndex != -1)
+                                // 確保 DirList 分頁下有 ListView 並切換選項  
+                                if (tabControl.TabPages[1].Controls["tabdlPatternList_lvw"] is System.Windows.Forms.ListView
+                                        listView && listView.Items.Count > 0)
                                 {
-                                    listView.Items[currentIndex].Selected = false;
-                                    listView.Items[currentIndex].Focused = false;
+                                    int currentIndex = listView.SelectedIndices.Count > 0
+                                        ? listView.SelectedIndices[0]
+                                        : -1;
+                                    //MessageBox.Show($"{currentIndex}");
+                                    if (currentIndex != -1)
+                                    {
+                                        listView.Items[currentIndex].Selected = false;
+                                        listView.Items[currentIndex].Focused = false;
+                                    }
+
+                                    int nextIndex = (currentIndex + 1) % listView.Items.Count;
+                                    listView.Items[nextIndex].Selected = true;
+                                    listView.Items[nextIndex].Focused = true;
+                                    mainWindow.Instance.FullScreen(sender, e);
                                 }
 
-                                int nextIndex = (currentIndex + 1) % listView.Items.Count;
-                                listView.Items[nextIndex].Selected = true;
-                                listView.Items[nextIndex].Focused = true;
-                                mainWindow.Instance.FullScreen(sender, e);
                             }
-
-                        }
-                        else if (tabControl.SelectedIndex == 2) //切換到 ImgList 分頁 (index = 2)
-                        {
-                            // 確保 ImgList 分頁下有 ListBox 並切換選項  
-                            if (tabControl.TabPages[2].Controls["tabilPatternList_lst"] is ListBox
-                                    listBox && listBox.Items.Count > 0)
+                            else if (tabControl.SelectedIndex == 2) //切換到 ImgList 分頁 (index = 2)
                             {
-                                int currentIndex = listBox.SelectedIndex;
-                                if (currentIndex != -1)
+                                // 確保 ImgList 分頁下有 ListBox 並切換選項  
+                                if (tabControl.TabPages[2].Controls["tabilPatternList_lst"] is ListBox
+                                        listBox && listBox.Items.Count > 0)
                                 {
-                                    listBox.SelectedIndex = -1; // 取消目前選擇
-                                }
+                                    int currentIndex = listBox.SelectedIndex;
+                                    if (currentIndex != -1)
+                                    {
+                                        listBox.SelectedIndex = -1; // 取消目前選擇
+                                    }
 
-                                int nextIndex = (currentIndex + 1) % listBox.Items.Count;
-                                listBox.SelectedIndex = nextIndex; // 選擇下一個項目
-                                mainWindow.Instance.FullScreen(sender, e);
+                                    int nextIndex = (currentIndex + 1) % listBox.Items.Count;
+                                    listBox.SelectedIndex = nextIndex; // 選擇下一個項目
+                                    mainWindow.Instance.FullScreen(sender, e);
+                                }
                             }
                         }
-                    }
-                }
-                else if (e.KeyCode == Keys.Left)
-                {
-                    if (mainWindow.Instance != null)
-                    {
-                        TabControl tabControl = mainWindow.Instance.MainTabControl;
-                        // 切換到 DirList 分頁 (index = 1)  
-                        if (tabControl.SelectedIndex == 1)
+                        break;
+                    case Keys.Left:
+                        //MessageBox.Show("Left 鍵被按下");
+                        if (mainWindow.Instance != null)
                         {
-                            // 確保 DirList 分頁下有 ListView 並切換選項  
-                            if (tabControl.TabPages[1].Controls["tabdlPatternList_lvw"] is System.Windows.Forms.ListView
-                                    listView && listView.Items.Count > 0)
+                            TabControl tabControl = mainWindow.Instance.MainTabControl;
+                            // 切換到 DirList 分頁 (index = 1)  
+                            if (tabControl.SelectedIndex == 1)
                             {
-                                int currentIndex = listView.SelectedIndices.Count > 0
-                                    ? listView.SelectedIndices[0]
-                                    : listView.Items.Count;
-                                if (currentIndex != -1)
+                                // 確保 DirList 分頁下有 ListView 並切換選項  
+                                if (tabControl.TabPages[1].Controls["tabdlPatternList_lvw"] is System.Windows.Forms.ListView
+                                        listView && listView.Items.Count > 0)
                                 {
-                                    listView.Items[currentIndex].Selected = false;
-                                    listView.Items[currentIndex].Focused = false;
-                                }
+                                    int currentIndex = listView.SelectedIndices.Count > 0
+                                        ? listView.SelectedIndices[0]
+                                        : listView.Items.Count;
+                                    if (currentIndex != -1)
+                                    {
+                                        listView.Items[currentIndex].Selected = false;
+                                        listView.Items[currentIndex].Focused = false;
+                                    }
 
-                                int prevIndex = (currentIndex - 1 + listView.Items.Count) % listView.Items.Count;
-                                listView.Items[prevIndex].Selected = true;
-                                listView.Items[prevIndex].Focused = true;
-                                mainWindow.Instance.FullScreen(sender, e);
+                                    int prevIndex = (currentIndex - 1 + listView.Items.Count) % listView.Items.Count;
+                                    listView.Items[prevIndex].Selected = true;
+                                    listView.Items[prevIndex].Focused = true;
+                                    mainWindow.Instance.FullScreen(sender, e);
+                                }
+                            }
+                            else if (tabControl.SelectedIndex == 2) //切換到 ImgList 分頁 (index = 2)
+                            {
+                                // 確保 ImgList 分頁下有 ListBox 並切換選項  
+                                if (tabControl.TabPages[2].Controls["tabilPatternList_lst"] is ListBox
+                                        listBox && listBox.Items.Count > 0)
+                                {
+                                    int currentIndex = listBox.SelectedIndex;
+                                    if (currentIndex != -1)
+                                    {
+                                        listBox.SelectedIndex = -1; // 取消目前選擇
+                                    }
+
+                                    int nextIndex = (currentIndex - 1 + listBox.Items.Count) % listBox.Items.Count % listBox.Items.Count;
+                                    listBox.SelectedIndex = nextIndex; // 選擇下一個項目
+                                    mainWindow.Instance.FullScreen(sender, e);
+                                }
                             }
                         }
-                        else if (tabControl.SelectedIndex == 2) //切換到 ImgList 分頁 (index = 2)
+                        break;
+                    case Keys.W:
+                        //MessageBox.Show("W 鍵被按下");
+                        // 使用 Point 結構來修改游標位置  
+                        Cursor.Position = new Point(currentPosition.X, currentPosition.Y - 1);
+                        break;
+                    case Keys.A:
+                        //MessageBox.Show("A 鍵被按下");
+                        // 使用 Point 結構來修改游標位置  
+                        Cursor.Position = new Point(currentPosition.X - 1, currentPosition.Y);
+                        break;
+                    case Keys.S:
+                        //MessageBox.Show("S 鍵被按下");
+                        // 使用 Point 結構來修改游標位置  
+                        Cursor.Position = new Point(currentPosition.X, currentPosition.Y + 1);
+                        break;
+                    case Keys.D:
+                        //MessageBox.Show("D 鍵被按下");
+                        // 使用 Point 結構來修改游標位置  
+                        Cursor.Position = new Point(currentPosition.X + 1, currentPosition.Y);
+                        break;
+                    case Keys.Space:
+                        if (mainWindow.Instance.timerDynamic.Tag.ToString() == "stop")
                         {
-                            // 確保 ImgList 分頁下有 ListBox 並切換選項  
-                            if (tabControl.TabPages[2].Controls["tabilPatternList_lst"] is ListBox
-                                    listBox && listBox.Items.Count > 0)
-                            {
-                                int currentIndex = listBox.SelectedIndex;
-                                if (currentIndex != -1)
-                                {
-                                    listBox.SelectedIndex = -1; // 取消目前選擇
-                                }
-
-                                int nextIndex = (currentIndex - 1 + listBox.Items.Count) % listBox.Items.Count % listBox.Items.Count;
-                                listBox.SelectedIndex = nextIndex; // 選擇下一個項目
-                                mainWindow.Instance.FullScreen(sender, e);
-                            }
+                            mainWindow.Instance.timerDynamic.Start();
+                            mainWindow.Instance.timerDynamic.Tag = "run";
                         }
-
-                    }
+                        else
+                        {
+                            mainWindow.Instance.timerDynamic.Stop();
+                            mainWindow.Instance.timerDynamic.Tag = "stop";
+                        }
+                        break;
                 }
-                else if (e.KeyCode == Keys.W)
-                {
-                    // 使用 Point 結構來修改游標位置  
-                    Point currentPosition = Cursor.Position;
-                    Cursor.Position = new Point(currentPosition.X, currentPosition.Y - 1);
-                }
-                else if (e.KeyCode == Keys.A)
-                {
-                    // 使用 Point 結構來修改游標位置  
-                    Point currentPosition = Cursor.Position;
-                    Cursor.Position = new Point(currentPosition.X - 1, currentPosition.Y);
-                }
-                else if (e.KeyCode == Keys.S)
-                {
-                    // 使用 Point 結構來修改游標位置  
-                    Point currentPosition = Cursor.Position;
-                    Cursor.Position = new Point(currentPosition.X, currentPosition.Y + 1);
-                }
-                else if (e.KeyCode == Keys.D)
-                {
-                    // 使用 Point 結構來修改游標位置  
-                    Point currentPosition = Cursor.Position;
-                    Cursor.Position = new Point(currentPosition.X + 1, currentPosition.Y);
-                }
+               
             }
         }  //鍵盤事件
         //右鍵選單-----------------------------------------------------------------------------------------------------
@@ -376,11 +386,22 @@ namespace Thunder
 
             //picwinPicture_pic.Image = bitmap; // 更新 PictureBox 的圖片
             picwinPicture_pic.Image = (Bitmap)bitmap.Clone(); // 更新 PictureBox 的圖片
-        }
-
+        }  //更新圖片
+        public Bitmap getpicturebox()
+        {
+            if (picwinPicture_pic.Image != null)
+            {
+                return (Bitmap)picwinPicture_pic.Image.Clone();
+            }
+            else
+            {
+                return null;
+            }
+        }  //取得picturebox圖片
         private void pictureWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             mainWindow.Instance.timerDynamic.Stop();
-        }
+            mainWindow.Instance.timerDynamic.Tag = "stop";
+        }  //關閉視窗執行
     }
 }

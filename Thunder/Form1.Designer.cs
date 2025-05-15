@@ -267,6 +267,8 @@ namespace Thunder
             this.tabdlPatternList_lvw = new System.Windows.Forms.ListView();
             this.tabImgList = new System.Windows.Forms.TabPage();
             this.tabilPatternList_lst = new System.Windows.Forms.ListBox();
+            this.tabilPatternList_cms = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.saveConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Showimage_flp = new System.Windows.Forms.FlowLayoutPanel();
             this.showimgSave_btn = new System.Windows.Forms.Button();
             this.showimgGenerate_btn = new System.Windows.Forms.Button();
@@ -276,6 +278,7 @@ namespace Thunder
             this.ssrStatus_lbl = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssrProgressbar_prg = new System.Windows.Forms.ToolStripProgressBar();
             this.timerDynamic = new System.Windows.Forms.Timer(this.components);
+            this.openConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -335,6 +338,7 @@ namespace Thunder
             ((System.ComponentModel.ISupportInitialize)(this.tabieaUpDownU_pic)).BeginInit();
             this.tabDirList.SuspendLayout();
             this.tabImgList.SuspendLayout();
+            this.tabilPatternList_cms.SuspendLayout();
             this.Showimage_flp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.showimgPicture_pic)).BeginInit();
             this.statusStrip.SuspendLayout();
@@ -483,7 +487,7 @@ namespace Thunder
             // 
             // tabimgeFuncList
             // 
-            this.tabimgeFuncList.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.tabimgeFuncList.BackColor = System.Drawing.SystemColors.Control;
             this.tabimgeFuncList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tabimgeFuncList.FormattingEnabled = true;
             this.tabimgeFuncList.Items.AddRange(new object[] {
@@ -530,11 +534,11 @@ namespace Thunder
             this.tabimgeWindow.Controls.Add(this.tabiwLineOutside_btn);
             this.tabimgeWindow.Controls.Add(this.tabiwWinLoc_grp);
             this.tabimgeWindow.Controls.Add(this.tabiwWinSize_grp);
-            this.tabimgeWindow.Location = new System.Drawing.Point(8, 8);
+            this.tabimgeWindow.Location = new System.Drawing.Point(26, 8);
             this.tabimgeWindow.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeWindow.Name = "tabimgeWindow";
             this.tabimgeWindow.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeWindow.Size = new System.Drawing.Size(613, 379);
+            this.tabimgeWindow.Size = new System.Drawing.Size(83, 67);
             this.tabimgeWindow.TabIndex = 0;
             this.tabimgeWindow.TabStop = false;
             this.tabimgeWindow.Text = "Window";
@@ -1642,11 +1646,11 @@ namespace Thunder
             this.tabimgeDynamic.Controls.Add(this.tabiedBackImg_pic);
             this.tabimgeDynamic.Controls.Add(this.tabiedObjectColor_btn);
             this.tabimgeDynamic.Controls.Add(this.tabiedBack_lbl);
-            this.tabimgeDynamic.Location = new System.Drawing.Point(133, 245);
+            this.tabimgeDynamic.Location = new System.Drawing.Point(133, 38);
             this.tabimgeDynamic.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeDynamic.Name = "tabimgeDynamic";
             this.tabimgeDynamic.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeDynamic.Size = new System.Drawing.Size(87, 58);
+            this.tabimgeDynamic.Size = new System.Drawing.Size(74, 35);
             this.tabimgeDynamic.TabIndex = 11;
             this.tabimgeDynamic.TabStop = false;
             this.tabimgeDynamic.Text = "Dynamic";
@@ -1681,7 +1685,7 @@ namespace Thunder
             this.tabiedMoveSpeed_nud.Size = new System.Drawing.Size(88, 22);
             this.tabiedMoveSpeed_nud.TabIndex = 45;
             this.tabiedMoveSpeed_nud.Value = new decimal(new int[] {
-            10,
+            50,
             0,
             0,
             0});
@@ -1860,11 +1864,11 @@ namespace Thunder
             this.tabimgeGradient.Controls.Add(this.tabigHWay_rdo);
             this.tabimgeGradient.Controls.Add(this.tabigFirstLevel_cmb);
             this.tabimgeGradient.Controls.Add(this.tabigLastLevel_cmb);
-            this.tabimgeGradient.Location = new System.Drawing.Point(131, 105);
+            this.tabimgeGradient.Location = new System.Drawing.Point(136, 88);
             this.tabimgeGradient.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeGradient.Name = "tabimgeGradient";
             this.tabimgeGradient.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeGradient.Size = new System.Drawing.Size(93, 64);
+            this.tabimgeGradient.Size = new System.Drawing.Size(88, 49);
             this.tabimgeGradient.TabIndex = 10;
             this.tabimgeGradient.TabStop = false;
             this.tabimgeGradient.Text = "Gradient";
@@ -3353,6 +3357,7 @@ namespace Thunder
             // tabilPatternList_lst
             // 
             this.tabilPatternList_lst.AllowDrop = true;
+            this.tabilPatternList_lst.ContextMenuStrip = this.tabilPatternList_cms;
             this.tabilPatternList_lst.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabilPatternList_lst.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.tabilPatternList_lst.FormattingEnabled = true;
@@ -3365,6 +3370,21 @@ namespace Thunder
             this.tabilPatternList_lst.SelectedIndexChanged += new System.EventHandler(this.tabilPatternList_lst_SelectedIndexChanged);
             this.tabilPatternList_lst.DragDrop += new System.Windows.Forms.DragEventHandler(this.tabilPatternList_lst_DragDrop);
             this.tabilPatternList_lst.DragEnter += new System.Windows.Forms.DragEventHandler(this.tabilPatternList_lst_DragEnter);
+            // 
+            // tabilPatternList_cms
+            // 
+            this.tabilPatternList_cms.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveConfigToolStripMenuItem,
+            this.openConfigToolStripMenuItem});
+            this.tabilPatternList_cms.Name = "tabilPatternList_cms";
+            this.tabilPatternList_cms.Size = new System.Drawing.Size(181, 70);
+            // 
+            // saveConfigToolStripMenuItem
+            // 
+            this.saveConfigToolStripMenuItem.Name = "saveConfigToolStripMenuItem";
+            this.saveConfigToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveConfigToolStripMenuItem.Text = "SaveConfig";
+            this.saveConfigToolStripMenuItem.Click += new System.EventHandler(this.ConfigToolStripMenuItem_Click);
             // 
             // Showimage_flp
             // 
@@ -3462,8 +3482,15 @@ namespace Thunder
             // 
             // timerDynamic
             // 
-            this.timerDynamic.Interval = 1;
+            this.timerDynamic.Interval = 5;
             this.timerDynamic.Tick += new System.EventHandler(this.AnimationTimer_Tick);
+            // 
+            // openConfigToolStripMenuItem
+            // 
+            this.openConfigToolStripMenuItem.Name = "openConfigToolStripMenuItem";
+            this.openConfigToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openConfigToolStripMenuItem.Text = "OpenConfig";
+            this.openConfigToolStripMenuItem.Click += new System.EventHandler(this.ConfigToolStripMenuItem_Click);
             // 
             // imageItemBindingSource
             // 
@@ -3570,6 +3597,7 @@ namespace Thunder
             ((System.ComponentModel.ISupportInitialize)(this.tabieaUpDownU_pic)).EndInit();
             this.tabDirList.ResumeLayout(false);
             this.tabImgList.ResumeLayout(false);
+            this.tabilPatternList_cms.ResumeLayout(false);
             this.Showimage_flp.ResumeLayout(false);
             this.Showimage_flp.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.showimgPicture_pic)).EndInit();
@@ -3825,5 +3853,8 @@ namespace Thunder
         private NumericUpDown tabiedMoveSpeed_nud;
         public Timer timerDynamic;
         private TableLayoutPanel tabimgeTableLayoutPanel;
+        private ContextMenuStrip tabilPatternList_cms;
+        private ToolStripMenuItem saveConfigToolStripMenuItem;
+        private ToolStripMenuItem openConfigToolStripMenuItem;
     }
 }

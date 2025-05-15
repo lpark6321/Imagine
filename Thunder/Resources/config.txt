@@ -20,7 +20,12 @@
 上黑下白,				Chess,		1*2,				v
 V白漸層,				Gradient,	White,				v-256-1
 H白漸層,				Gradient,	White,				h-256-1
-ColorBar,				Gradient,	colorbar-h-4.White.Red.Lime.Blue,
+V白漸層8,				Gradient,	White,				v-8-1
+H白漸層8,				Gradient,	White,				h-8-1
+ColorBar4H,				Gradient,	colorbar-h-4.White.Red.Lime.Blue,
+ColorBar4V,				Gradient,	colorbar-four-v,
+ColorBar8H,				Gradient,	colorbar-eight-h,
+ColorBar8V,				Gradient,	colorbar-eight-v,
 ColorBarV漸層,			Gradient,	colorbar-four-h,	v-256-1
 ColorBarH漸層,			Gradient,	colorbar-four-v,	h-256-1
 pixelonoff,				Mask,		p-2*2,				20.02
@@ -35,8 +40,16 @@ v strip dot,			Mask		,p-2*2,				10.10
 v strip sub KGBKGK,		Mask		,s-2*2-255,			011010.011010				
 h strip 1line,			Mask		,p-1*2,				1.0
 h strip 2line,			Mask		,p-1*3,				1.0.0
-K/Gray,					Window,		Gray-Black,			50%c
-K/dot,					Window,		Gray-Black,			50%c
+Gray/Black,					Window,		Gray-Black,			50%c
+第一象限白,				Window,		Black-White,		50%xyq_++
+第二象限白,				Window,		Black-White,		50%xy_0.0
+第三象限白,				Window,		Black-White,		50%xyq_--
+第四象限白,				Window,		Black-White,		50%xyq_+-
+dot/Black,				Window,		Custom-dotG-Black,			50%c
+Vstripe50%/Black,			Window,		Custom-vstripeG-Black,			50%c
+Vstripe100%/Gray,			Window,		Custom-vstripeW-Gray,			50%c
+DellCrossTalk,			Window,		Custom-dotDell-dotW,			50%c
+zebra/Gray,				Window,		Custom-rowW-Gray,			50%c
 CrossTalkB_1,			Window,		excel1,
 CrossTalkB_2,			Window,		excel2,
 CrossTalkB_3,			Window,		excel3,
