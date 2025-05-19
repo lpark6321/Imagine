@@ -269,6 +269,7 @@ namespace Thunder
             this.tabilPatternList_lst = new System.Windows.Forms.ListBox();
             this.tabilPatternList_cms = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.saveConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Showimage_flp = new System.Windows.Forms.FlowLayoutPanel();
             this.showimgSave_btn = new System.Windows.Forms.Button();
             this.showimgGenerate_btn = new System.Windows.Forms.Button();
@@ -278,7 +279,7 @@ namespace Thunder
             this.ssrStatus_lbl = new System.Windows.Forms.ToolStripStatusLabel();
             this.ssrProgressbar_prg = new System.Windows.Forms.ToolStripProgressBar();
             this.timerDynamic = new System.Windows.Forms.Timer(this.components);
-            this.openConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.imageItemBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.menuStrip.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -367,10 +368,12 @@ namespace Thunder
             // 
             // mnsFullscreen_btn
             // 
+            this.mnsFullscreen_btn.AutoToolTip = true;
             this.mnsFullscreen_btn.Name = "mnsFullscreen_btn";
             this.mnsFullscreen_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Z)));
             this.mnsFullscreen_btn.Size = new System.Drawing.Size(76, 23);
             this.mnsFullscreen_btn.Text = "FullScreen";
+            this.mnsFullscreen_btn.ToolTipText = "Alt+Z";
             this.mnsFullscreen_btn.Click += new System.EventHandler(this.FullScreen);
             // 
             // mnsH_txt
@@ -413,6 +416,7 @@ namespace Thunder
             this.mnsGenerate_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Space)));
             this.mnsGenerate_btn.Size = new System.Drawing.Size(71, 23);
             this.mnsGenerate_btn.Text = "Generate";
+            this.mnsGenerate_btn.ToolTipText = "Alt+Space";
             this.mnsGenerate_btn.Click += new System.EventHandler(this.Generate_Click);
             // 
             // mnsPattername_txt
@@ -422,6 +426,7 @@ namespace Thunder
             this.mnsPattername_txt.Name = "mnsPattername_txt";
             this.mnsPattername_txt.Size = new System.Drawing.Size(129, 23);
             this.mnsPattername_txt.Text = "PatternName";
+            this.mnsPattername_txt.ToolTipText = "使用AutoSave才會使用這裡";
             // 
             // mnsAAA_btn
             // 
@@ -429,6 +434,7 @@ namespace Thunder
             this.mnsAAA_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
             this.mnsAAA_btn.Size = new System.Drawing.Size(43, 23);
             this.mnsAAA_btn.Text = "AAA";
+            this.mnsAAA_btn.ToolTipText = "Ctrl+P";
             this.mnsAAA_btn.Visible = false;
             this.mnsAAA_btn.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -439,6 +445,7 @@ namespace Thunder
             this.mnsSave_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.mnsSave_btn.Size = new System.Drawing.Size(73, 23);
             this.mnsSave_btn.Text = "AutoSave";
+            this.mnsSave_btn.ToolTipText = "Ctrl+S";
             this.mnsSave_btn.Click += new System.EventHandler(this.Save_Click);
             // 
             // tabControl
@@ -503,15 +510,16 @@ namespace Thunder
             this.tabimgeFuncList.Name = "tabimgeFuncList";
             this.tabimgeFuncList.Size = new System.Drawing.Size(250, 20);
             this.tabimgeFuncList.TabIndex = 5;
+            this.toolTip.SetToolTip(this.tabimgeFuncList, "F1~F7可以快速切換");
             this.tabimgeFuncList.SelectedIndexChanged += new System.EventHandler(this.cmbFunclist_SelectedIndexChanged);
             // 
             // tabimgePanel
             // 
             this.tabimgePanel.AutoScroll = true;
+            this.tabimgePanel.Controls.Add(this.tabimgeFrame);
             this.tabimgePanel.Controls.Add(this.tabimgeWindow);
             this.tabimgePanel.Controls.Add(this.tabimgeDynamic);
             this.tabimgePanel.Controls.Add(this.tabimgeGradient);
-            this.tabimgePanel.Controls.Add(this.tabimgeFrame);
             this.tabimgePanel.Controls.Add(this.tabimgeMask);
             this.tabimgePanel.Controls.Add(this.tabimgeChess);
             this.tabimgePanel.Controls.Add(this.tabimgeAdjust);
@@ -2364,11 +2372,11 @@ namespace Thunder
             this.tabimgeFrame.Controls.Add(this.tabiefLineColor_btn);
             this.tabimgeFrame.Controls.Add(this.tabiefBack_lbl);
             this.tabimgeFrame.ImeMode = System.Windows.Forms.ImeMode.On;
-            this.tabimgeFrame.Location = new System.Drawing.Point(24, 170);
+            this.tabimgeFrame.Location = new System.Drawing.Point(24, 167);
             this.tabimgeFrame.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeFrame.Name = "tabimgeFrame";
             this.tabimgeFrame.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabimgeFrame.Size = new System.Drawing.Size(75, 61);
+            this.tabimgeFrame.Size = new System.Drawing.Size(91, 60);
             this.tabimgeFrame.TabIndex = 10;
             this.tabimgeFrame.TabStop = false;
             this.tabimgeFrame.Text = "Frame&&CrossLine&&Border";
@@ -3377,14 +3385,21 @@ namespace Thunder
             this.saveConfigToolStripMenuItem,
             this.openConfigToolStripMenuItem});
             this.tabilPatternList_cms.Name = "tabilPatternList_cms";
-            this.tabilPatternList_cms.Size = new System.Drawing.Size(181, 70);
+            this.tabilPatternList_cms.Size = new System.Drawing.Size(145, 48);
             // 
             // saveConfigToolStripMenuItem
             // 
             this.saveConfigToolStripMenuItem.Name = "saveConfigToolStripMenuItem";
-            this.saveConfigToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveConfigToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.saveConfigToolStripMenuItem.Text = "SaveConfig";
             this.saveConfigToolStripMenuItem.Click += new System.EventHandler(this.ConfigToolStripMenuItem_Click);
+            // 
+            // openConfigToolStripMenuItem
+            // 
+            this.openConfigToolStripMenuItem.Name = "openConfigToolStripMenuItem";
+            this.openConfigToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.openConfigToolStripMenuItem.Text = "OpenConfig";
+            this.openConfigToolStripMenuItem.Click += new System.EventHandler(this.ConfigToolStripMenuItem_Click);
             // 
             // Showimage_flp
             // 
@@ -3406,12 +3421,13 @@ namespace Thunder
             // 
             this.showimgSave_btn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.showimgSave_btn.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.showimgSave_btn.Location = new System.Drawing.Point(199, 423);
+            this.showimgSave_btn.Location = new System.Drawing.Point(211, 423);
             this.showimgSave_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.showimgSave_btn.Name = "showimgSave_btn";
-            this.showimgSave_btn.Size = new System.Drawing.Size(60, 24);
+            this.showimgSave_btn.Size = new System.Drawing.Size(48, 24);
             this.showimgSave_btn.TabIndex = 0;
-            this.showimgSave_btn.Text = "Save";
+            this.showimgSave_btn.Text = "Save_&S";
+            this.toolTip.SetToolTip(this.showimgSave_btn, "AutoSave :Ctrl+S\r\nSaveAs      :Alt+S");
             this.showimgSave_btn.UseVisualStyleBackColor = true;
             this.showimgSave_btn.Click += new System.EventHandler(this.Save_Click);
             // 
@@ -3424,6 +3440,7 @@ namespace Thunder
             this.showimgGenerate_btn.Size = new System.Drawing.Size(100, 24);
             this.showimgGenerate_btn.TabIndex = 1;
             this.showimgGenerate_btn.Text = "Generate";
+            this.toolTip.SetToolTip(this.showimgGenerate_btn, "Alt+Space");
             this.showimgGenerate_btn.UseVisualStyleBackColor = true;
             this.showimgGenerate_btn.Click += new System.EventHandler(this.Generate_Click);
             // 
@@ -3440,6 +3457,7 @@ namespace Thunder
             this.showimgPicture_pic.Size = new System.Drawing.Size(256, 144);
             this.showimgPicture_pic.TabIndex = 7;
             this.showimgPicture_pic.TabStop = false;
+            this.toolTip.SetToolTip(this.showimgPicture_pic, "雙擊圖片或Esc或Alt+Z可全螢幕");
             this.showimgPicture_pic.DragDrop += new System.Windows.Forms.DragEventHandler(this.pictureBox_DragDrop);
             this.showimgPicture_pic.DragEnter += new System.Windows.Forms.DragEventHandler(this.pictureBox_DragEnter);
             this.showimgPicture_pic.DoubleClick += new System.EventHandler(this.FullScreen);
@@ -3484,13 +3502,6 @@ namespace Thunder
             // 
             this.timerDynamic.Interval = 5;
             this.timerDynamic.Tick += new System.EventHandler(this.AnimationTimer_Tick);
-            // 
-            // openConfigToolStripMenuItem
-            // 
-            this.openConfigToolStripMenuItem.Name = "openConfigToolStripMenuItem";
-            this.openConfigToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.openConfigToolStripMenuItem.Text = "OpenConfig";
-            this.openConfigToolStripMenuItem.Click += new System.EventHandler(this.ConfigToolStripMenuItem_Click);
             // 
             // imageItemBindingSource
             // 
@@ -3856,5 +3867,6 @@ namespace Thunder
         private ContextMenuStrip tabilPatternList_cms;
         private ToolStripMenuItem saveConfigToolStripMenuItem;
         private ToolStripMenuItem openConfigToolStripMenuItem;
+        private ToolTip toolTip;
     }
 }

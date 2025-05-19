@@ -1225,13 +1225,10 @@ namespace Thunder
                     }
                 }
             }
-            else if(sender is Button targetbutton && targetbutton.Name == "mnsSave_btn")
+            else if(sender is Button targetbutton && targetbutton.Name == "showimgSave_btn")
             {
-                if (targetbutton.Name == "mnsSave_btn")
-                {
-                    // 儲存單張圖片
-                    mypicture.SaveImage();
-                }
+                // 儲存單張圖片
+                mypicture.SaveImage();
             }
             else
             {
@@ -3101,6 +3098,7 @@ namespace Thunder
         // mainWindow操控----------------------------------------------------------------------------------------------
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
         {
+            //MessageBox.Show($"按下了其他鍵：{e.KeyCode}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             // 判斷是否按下鍵
             switch (e.KeyCode)
             {
@@ -3109,33 +3107,76 @@ namespace Thunder
                     break;
                 case Keys.F1:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
-                    tabimgeFuncList.SelectedIndex = 0; // 選擇第一個功能
+                    tabimgeFuncList.SelectedIndex = 0; // 選擇第1個功能
                     break;
                 case Keys.F2:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
-                    tabimgeFuncList.SelectedIndex = 1; // 選擇第一個功能
+                    tabimgeFuncList.SelectedIndex = 1; // 選擇第2個功能
                     break;
                 case Keys.F3:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
-                    tabimgeFuncList.SelectedIndex = 2; // 選擇第一個功能
+                    tabimgeFuncList.SelectedIndex = 2; // 選擇第3個功能
                     break;
                 case Keys.F4:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
-                    tabimgeFuncList.SelectedIndex = 3; // 選擇第一個功能
+                    tabimgeFuncList.SelectedIndex = 3; // 選擇第4個功能
                     break;
                 case Keys.F5:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
-                    tabimgeFuncList.SelectedIndex = 4; // 選擇第一個功能
+                    tabimgeFuncList.SelectedIndex = 4; // 選擇第5個功能
                     break;
                 case Keys.F6:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
-                    tabimgeFuncList.SelectedIndex = 5; // 選擇第一個功能
+                    tabimgeFuncList.SelectedIndex = 5; // 選擇第6個功能
                     break;
                 case Keys.F7:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
-                    tabimgeFuncList.SelectedIndex = 6; // 選擇第一個功能
+                    tabimgeFuncList.SelectedIndex = 6; // 選擇第7個功能
+                    break;
+                case Keys.F11:
+                    tabControl.SelectedTab = tabDirList; // 切換到第二個 Tab 頁面
+                    break;
+                case Keys.F12:
+                    tabControl.SelectedTab = tabImgList; // 切換到第三個 Tab 頁面
+                    break;
+                case Keys.Add: // 數字鍵盤的加號
+                case Keys.Oemplus: // 主鍵盤的加號
+                    if (mnsScreenlist_cmb.SelectedIndex < mnsScreenlist_cmb.Items.Count - 1)
+                    {
+                        mnsScreenlist_cmb.SelectedIndex += 1;
+                    }
+                    else
+                    {
+                        mnsScreenlist_cmb.SelectedIndex = 0;
+                    }
+                    break;
+                case Keys.Subtract: // 數字鍵盤的減號
+                case Keys.OemMinus: // 主鍵盤的減號
+                    if (mnsScreenlist_cmb.SelectedIndex == 0)
+                    {
+                        mnsScreenlist_cmb.SelectedIndex = mnsScreenlist_cmb.Items.Count - 1;
+                    }
+                    else
+                    {
+                        mnsScreenlist_cmb.SelectedIndex -= 1;
+                    }
                     break;
                 default:
+                    //switch (e.KeyValue)
+                    //{
+                    //    case 229:
+                    //        if (mnsScreenlist_cmb.SelectedIndex < mnsScreenlist_cmb.Items.Count - 1)
+                    //        {
+                    //            mnsScreenlist_cmb.SelectedIndex += 1;
+                    //        }
+                    //        else
+                    //        {
+                    //            mnsScreenlist_cmb.SelectedIndex = 0;
+                    //        }
+                    //        break;
+                    //    default:
+                    //        break;
+                    //}
                     break;
             }
         }  //mainWindow_KeyDown
@@ -3330,6 +3371,27 @@ namespace Thunder
                 return true; // 圖片已被處置或無效
             }
         }  // 測試用
+        protected override bool ProcessKeyPreview(ref Message m)
+        {
+            if (m.Msg == 0x100 || m.Msg == 0x104) // WM_KEYDOWN 或 WM_SYSKEYDOWN
+            {
+                Keys keyData = (Keys)m.WParam.ToInt32();
+                if (keyData == Keys.Add || keyData == Keys.Subtract)
+                {
+                    // 如果攔截了，返回 true
+                    return true;
+                }
+            }
+            return base.ProcessKeyPreview(ref m);
+        }  // 檢查是否覆寫了 ProcessKeyPreview 或 ProcessCmdKey
+        private void Form_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Add || e.KeyCode == Keys.Subtract)
+            {
+                // 檢查是否有攔截邏輯
+            }
+        }  // 檢查是否有其他事件處理邏輯攔截了鍵盤事件
+
         // listbox功能-----------------------------------------------------------------------------------
         private Color switchcolor(string sc)
         {
