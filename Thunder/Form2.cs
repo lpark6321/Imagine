@@ -241,6 +241,31 @@ namespace Thunder
                             mainWindow.Instance.timerDynamic.Tag = "stop";
                         }
                         break;
+                    case Keys.Add:
+                        if (mainWindow.Instance.mnsScreenlist_cmb.SelectedIndex < mainWindow.Instance.mnsScreenlist_cmb.Items.Count - 1)
+                        {
+                            mainWindow.Instance.mnsScreenlist_cmb.SelectedIndex += 1;
+                        }
+                        else
+                        {
+                            mainWindow.Instance.mnsScreenlist_cmb.SelectedIndex = 0;
+                        }
+                        mainWindow.Instance.Generate_Click(sender, e);
+                        mainWindow.Instance.FullScreen(sender, e);
+                        break;
+                    case Keys.Subtract:
+                        if (mainWindow.Instance.mnsScreenlist_cmb.SelectedIndex == 0)
+                        {
+                            mainWindow.Instance.mnsScreenlist_cmb.SelectedIndex = mainWindow.Instance.mnsScreenlist_cmb.Items.Count - 1;
+
+                        }
+                        else
+                        {
+                            mainWindow.Instance.mnsScreenlist_cmb.SelectedIndex -= 1;
+                        }
+                        mainWindow.Instance.Generate_Click(sender, e);
+                        mainWindow.Instance.FullScreen(sender, e);
+                        break;
                 }
                
             }
