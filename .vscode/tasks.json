@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Thunder",
+            "type": "shell",
+            "command": "powershell",
+            "args": ["-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/.vscode/run-thunder.ps1"],
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Release exe",
+            "type": "shell",
+            "command": "powershell",
+            "args": ["-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/.vscode/build-release.ps1"],
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

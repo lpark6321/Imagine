@@ -41,6 +41,8 @@ namespace Thunder
             this.mnsW_txt = new System.Windows.Forms.ToolStripTextBox();
             this.mnsScreenlist_cmb = new System.Windows.Forms.ToolStripComboBox();
             this.mnsGenerate_btn = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnsEdid_btn = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnsAbout_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsPattername_txt = new System.Windows.Forms.ToolStripTextBox();
             this.mnsAAA_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsSave_btn = new System.Windows.Forms.ToolStripMenuItem();
@@ -266,7 +268,7 @@ namespace Thunder
             this.tabDirList = new System.Windows.Forms.TabPage();
             this.tabdlPatternList_lvw = new System.Windows.Forms.ListView();
             this.tabImgList = new System.Windows.Forms.TabPage();
-            this.tabilPatternList_lst = new System.Windows.Forms.ListBox();
+            this.tabilPatternList_lst = new System.Windows.Forms.ListView();
             this.tabilPatternList_cms = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.saveConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -356,11 +358,14 @@ namespace Thunder
             this.mnsW_txt,
             this.mnsScreenlist_cmb,
             this.mnsGenerate_btn,
+            this.mnsEdid_btn,
+            this.mnsAbout_btn,
             this.mnsPattername_txt,
             this.mnsAAA_btn,
             this.mnsSave_btn});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
+            this.menuStrip.ShowItemToolTips = true;
             this.menuStrip.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
             this.menuStrip.Size = new System.Drawing.Size(919, 27);
             this.menuStrip.TabIndex = 12;
@@ -381,6 +386,7 @@ namespace Thunder
             this.mnsH_txt.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.mnsH_txt.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.mnsH_txt.Name = "mnsH_txt";
+            this.mnsH_txt.ToolTipText = "輸入高度";
             this.mnsH_txt.Size = new System.Drawing.Size(86, 23);
             this.mnsH_txt.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -392,12 +398,14 @@ namespace Thunder
             this.mnsX_lbl.ShowShortcutKeys = false;
             this.mnsX_lbl.Size = new System.Drawing.Size(25, 23);
             this.mnsX_lbl.Text = "x";
+
             // 
             // mnsW_txt
             // 
             this.mnsW_txt.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.mnsW_txt.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F);
             this.mnsW_txt.Name = "mnsW_txt";
+            this.mnsW_txt.ToolTipText = "輸入寬度";
             this.mnsW_txt.Size = new System.Drawing.Size(86, 23);
             this.mnsW_txt.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -406,6 +414,7 @@ namespace Thunder
             this.mnsScreenlist_cmb.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.mnsScreenlist_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.mnsScreenlist_cmb.Name = "mnsScreenlist_cmb";
+            this.mnsScreenlist_cmb.ToolTipText = "選擇螢幕";
             this.mnsScreenlist_cmb.Size = new System.Drawing.Size(104, 23);
             this.mnsScreenlist_cmb.SelectedIndexChanged += new System.EventHandler(this.menuToolStripCmb_SelectedIndexChanged);
             this.mnsScreenlist_cmb.Click += new System.EventHandler(this.Screenlist);
@@ -418,7 +427,23 @@ namespace Thunder
             this.mnsGenerate_btn.Text = "Generate";
             this.mnsGenerate_btn.ToolTipText = "Alt+Space";
             this.mnsGenerate_btn.Click += new System.EventHandler(this.Generate_Click);
-            // 
+            //
+            // mnsEdid_btn
+            //
+            this.mnsEdid_btn.Name = "mnsEdid_btn";
+            this.mnsEdid_btn.Size = new System.Drawing.Size(47, 23);
+            this.mnsEdid_btn.Text = "EDID";
+            this.mnsEdid_btn.ToolTipText = "讀取目前選擇螢幕的 EDID";
+            this.mnsEdid_btn.Click += new System.EventHandler(this.Edid_Click);
+            //
+            // mnsAbout_btn
+            //
+            this.mnsAbout_btn.Name = "mnsAbout_btn";
+            this.mnsAbout_btn.Size = new System.Drawing.Size(55, 23);
+            this.mnsAbout_btn.Text = "About";
+            this.mnsAbout_btn.ToolTipText = "版本與快捷鍵說明";
+            this.mnsAbout_btn.Click += new System.EventHandler(this.About_Click);
+            //
             // mnsPattername_txt
             // 
             this.mnsPattername_txt.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -554,7 +579,7 @@ namespace Thunder
             // tabiwDiagonal_btn
             // 
             this.tabiwDiagonal_btn.AutoSize = true;
-            this.tabiwDiagonal_btn.Location = new System.Drawing.Point(85, 270);
+            this.tabiwDiagonal_btn.Location = new System.Drawing.Point(10, 310);
             this.tabiwDiagonal_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabiwDiagonal_btn.Name = "tabiwDiagonal_btn";
             this.tabiwDiagonal_btn.Size = new System.Drawing.Size(48, 16);
@@ -1448,7 +1473,7 @@ namespace Thunder
             // tabiwLineColor_lbl
             // 
             this.tabiwLineColor_lbl.AutoSize = true;
-            this.tabiwLineColor_lbl.Location = new System.Drawing.Point(15, 310);
+            this.tabiwLineColor_lbl.Location = new System.Drawing.Point(10, 332);
             this.tabiwLineColor_lbl.Name = "tabiwLineColor_lbl";
             this.tabiwLineColor_lbl.Size = new System.Drawing.Size(41, 12);
             this.tabiwLineColor_lbl.TabIndex = 13;
@@ -1457,7 +1482,7 @@ namespace Thunder
             // tabiwLineColor_btn
             // 
             this.tabiwLineColor_btn.BackColor = System.Drawing.Color.White;
-            this.tabiwLineColor_btn.Location = new System.Drawing.Point(25, 325);
+            this.tabiwLineColor_btn.Location = new System.Drawing.Point(18, 348);
             this.tabiwLineColor_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabiwLineColor_btn.Name = "tabiwLineColor_btn";
             this.tabiwLineColor_btn.Size = new System.Drawing.Size(24, 24);
@@ -2371,7 +2396,6 @@ namespace Thunder
             this.tabimgeFrame.Controls.Add(this.tabiefCenter_chk);
             this.tabimgeFrame.Controls.Add(this.tabiefLineColor_btn);
             this.tabimgeFrame.Controls.Add(this.tabiefBack_lbl);
-            this.tabimgeFrame.ImeMode = System.Windows.Forms.ImeMode.On;
             this.tabimgeFrame.Location = new System.Drawing.Point(24, 167);
             this.tabimgeFrame.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabimgeFrame.Name = "tabimgeFrame";
@@ -2416,7 +2440,7 @@ namespace Thunder
             this.tabiefOther_pnl.Enabled = false;
             this.tabiefOther_pnl.Location = new System.Drawing.Point(10, 105);
             this.tabiefOther_pnl.Name = "tabiefOther_pnl";
-            this.tabiefOther_pnl.Size = new System.Drawing.Size(344, 189);
+            this.tabiefOther_pnl.Size = new System.Drawing.Size(320, 189);
             this.tabiefOther_pnl.TabIndex = 33;
             // 
             // tabiefOther_cmb
@@ -2572,7 +2596,7 @@ namespace Thunder
             this.tabiefMass_chk.Name = "tabiefMass_chk";
             this.tabiefMass_chk.Size = new System.Drawing.Size(182, 28);
             this.tabiefMass_chk.TabIndex = 29;
-            this.tabiefMass_chk.Text = "大量建圖\r\n(從0開始，每                階生成)";
+            this.tabiefMass_chk.Text = "大量建圖\r\n(從0開始，每                階生成，背景請選最亮的那張圖)";
             this.tabiefMass_chk.UseVisualStyleBackColor = true;
             // 
             // tabiefOther_chk
@@ -3368,8 +3392,12 @@ namespace Thunder
             this.tabilPatternList_lst.ContextMenuStrip = this.tabilPatternList_cms;
             this.tabilPatternList_lst.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabilPatternList_lst.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.tabilPatternList_lst.FormattingEnabled = true;
-            this.tabilPatternList_lst.ItemHeight = 16;
+            this.tabilPatternList_lst.View = System.Windows.Forms.View.Details;
+            this.tabilPatternList_lst.FullRowSelect = true;
+            this.tabilPatternList_lst.GridLines = true;
+            this.tabilPatternList_lst.HideSelection = false;
+            this.tabilPatternList_lst.MultiSelect = false;
+            this.tabilPatternList_lst.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.tabilPatternList_lst.Location = new System.Drawing.Point(3, 2);
             this.tabilPatternList_lst.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabilPatternList_lst.Name = "tabilPatternList_lst";
@@ -3480,16 +3508,20 @@ namespace Thunder
             this.statusStrip.Location = new System.Drawing.Point(0, 476);
             this.statusStrip.MinimumSize = new System.Drawing.Size(257, 0);
             this.statusStrip.Name = "statusStrip";
+            this.statusStrip.ShowItemToolTips = true;
             this.statusStrip.Padding = new System.Windows.Forms.Padding(1, 0, 12, 0);
             this.statusStrip.Size = new System.Drawing.Size(919, 20);
             this.statusStrip.TabIndex = 14;
             this.statusStrip.Text = "statusStrip1";
+            this.statusStrip.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.statusStrip.Click += new System.EventHandler(this.statusStrip_Click);
             // 
             // ssrStatus_lbl
             // 
             this.ssrStatus_lbl.Name = "ssrStatus_lbl";
             this.ssrStatus_lbl.Size = new System.Drawing.Size(41, 15);
             this.ssrStatus_lbl.Text = "Status";
+            this.ssrStatus_lbl.ToolTipText = "點擊開啟程式資料夾";
             // 
             // ssrProgressbar_prg
             // 
@@ -3519,6 +3551,7 @@ namespace Thunder
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -3744,8 +3777,10 @@ namespace Thunder
         private CheckBox tabiefMass_chk;
         private NumericUpDown tabiefMassNum_nud;
         private ToolStripTextBox mnsPattername_txt;
+        private ToolStripMenuItem mnsEdid_btn;
+        private ToolStripMenuItem mnsAbout_btn;
         private TabPage tabImgList;
-        private ListBox tabilPatternList_lst;
+        private ListView tabilPatternList_lst;
         private RadioButton tabieaResize_rdo;
         private RadioButton tabieaVFlip_rdo;
         private RadioButton tabieaHFlip_rdo;

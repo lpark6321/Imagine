@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Deployment.Application;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Thunder.Properties;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
@@ -27,14 +30,85 @@ namespace Thunder
         private pictureWindow _pictureWindow;
         public static mainWindow Instance { get; private set; }
         public TabControl MainTabControl => tabControl; // 提供 TabControl 的訪問
+        public bool IsDynamicMode => tabimgeFuncList.Text == "Dynamic"; // 目前功能是否為 Dynamic
+        public string PatternName => mnsPattername_txt.Text; // 上方檔名欄位
         //mainWindow---------------------------------------------------------------------------------------------------
         public mainWindow()
         {
             InitializeComponent();
+            // 停用輸入法，否則中文輸入法會把空白鍵、=、- 等快捷鍵攔截成 ProcessKey；
+            // 只設 Form.ImeMode 不會套用到子控制項，必須逐一設定。檔名欄位保留輸入法可打中文
+            DisableIme(this);
+            mnsPattername_txt.TextBox.ImeMode = ImeMode.NoControl;
+            SetupPatternList();
+            InitConfigEditor();
+            InitWindowOverlayList();
+            InitEditorToConfig();
+            InitMaskQuickButtons();
+            InitFrameTextMode();
+            InitFrameRedBlue();
+            InitGradientReverse();
+            InitWindowDiagonal();
+            InitWindowTabs();
+            InitQuickButtons();
+            InitResizeMode();
+            InitPreviewPanel();
+            InitDirListReload();
             //Mainwindow_Load(this, EventArgs.Empty);
             mypicture = new MyPicture(this);
             Instance = this; // 初始化 Singleton 實例
         }
+        [DllImport("imm32.dll")]
+        private static extern int ImmGetVirtualKey(IntPtr hWnd);
+        [DllImport("imm32.dll")]
+        private static extern IntPtr ImmGetContext(IntPtr hWnd);
+        [DllImport("imm32.dll")]
+        private static extern bool ImmNotifyIME(IntPtr hIMC, int dwAction, int dwIndex, int dwValue);
+        [DllImport("imm32.dll")]
+        private static extern bool ImmReleaseContext(IntPtr hWnd, IntPtr hIMC);
+        [DllImport("user32.dll")]
+        private static extern int MapVirtualKey(int uCode, int uMapType);
+        internal static Keys GetImeOriginalKey(ref Message msg)
+        {
+            // 輸入法攔截的按鍵 wParam 會變成 VK_PROCESSKEY (229)；需在 ProcessCmdKey 階段（TranslateMessage 之前）呼叫
+            if ((msg.Msg != 0x100 && msg.Msg != 0x104) || (int)msg.WParam != (int)Keys.ProcessKey) return Keys.None;
+            int vk = ImmGetVirtualKey(msg.HWnd);
+            if (vk == 0 || vk == (int)Keys.ProcessKey)
+            {
+                int scanCode = (int)((long)msg.LParam >> 16) & 0xFF;
+                vk = MapVirtualKey(scanCode, 1);  // MAPVK_VSC_TO_VK：由掃描碼換回按鍵
+            }
+            if (vk == 0) return Keys.None;
+            IntPtr context = ImmGetContext(msg.HWnd);
+            if (context != IntPtr.Zero)
+            {
+                ImmNotifyIME(context, 0x15, 0x4, 0);  // NI_COMPOSITIONSTR, CPS_CANCEL：取消輸入法組字
+                ImmReleaseContext(msg.HWnd, context);
+            }
+            return (Keys)vk;
+        }  // 還原被輸入法攔截的按鍵
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // 輸入法攔截的快捷鍵在這裡還原處理，並回傳 true 讓輸入法收不到（文字欄位除外）
+            if ((keyData & Keys.KeyCode) == Keys.ProcessKey && !IsTextInputFocused())
+            {
+                Keys realKey = GetImeOriginalKey(ref msg);
+                if (realKey != Keys.None)
+                {
+                    mainWindow_KeyDown(this, new KeyEventArgs(realKey | ModifierKeys));
+                    return true;
+                }
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }  // 處理被輸入法攔截的快捷鍵
+        private static void DisableIme(Control parent)
+        {
+            foreach (Control child in parent.Controls)
+            {
+                child.ImeMode = ImeMode.Disable;
+                DisableIme(child);
+            }
+        }  // 停用所有子控制項的輸入法
         private void Mainwindow_Load(object sender, EventArgs e)
         {
             //var numericUpDownItem = new ToolStripNumericUpDown();
@@ -45,6 +119,7 @@ namespace Thunder
             //menuStrip.Items.Add(numericUpDownItem);
             //AddNumericUpDownToMenuStrip();
 
+            LoadDefaultConfig();  // 啟動時自動載入程式資料夾的 config.txt
             Screenlist(this, EventArgs.Empty);
             if (mnsScreenlist_cmb.Items.Count > 1)
             {
@@ -291,6 +366,7 @@ namespace Thunder
             {
                 mnsScreenlist_cmb.Items.Add(screen.DeviceName);
             }
+            UpdateRefreshRate();
         }
         private void cmbFunclist_SelectedIndexChanged(object sender, EventArgs e)  // 切換功能時，顯示對應的 GroupBox
         {
@@ -345,44 +421,31 @@ namespace Thunder
         }
         private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
+            _configDraftFocused = false;
+            _shownItem = null;  // 換分頁後空白鍵依新分頁重新產生
             if (tabControl.SelectedTab == tabDirList)
             {
                 ssrStatus_lbl.Text = Application.StartupPath;
-                // 當選擇 ImgList 標籤時，執行 PopulateListView 方法
-                PopulateListView();
+                // 只在第一次切換時讀取資料夾，之後按「重新讀取」更新
+                if (!_dirListLoaded)
+                {
+                    _dirListLoaded = true;
+                    PopulateListView();
+                }
             }
             else if (tabControl.SelectedTab == tabImgList)
             {
-                if (tabilPatternList_lst.Tag == null || tabilPatternList_lst.Tag.ToString() == "")
-                {
-                    // 當選擇 ImgEditor 標籤時，執行其他邏輯
-                    // 獲取程式所在資料夾的 config.txt 檔案
-                    string configFilePath = Directory.GetFiles(Application.StartupPath, "config.txt").FirstOrDefault();
-
-                    // 如果找到 config.txt，將其內容讀取為字串並傳入 PopulateListBox 函式
-                    if (!string.IsNullOrEmpty(configFilePath))
-                    {
-                        try
-                        {
-                            PopulateListBox(File.ReadAllText(configFilePath)); // 將字串傳入 PopulateListBox
-                            tabilPatternList_lst.Tag = configFilePath; // 記錄 config.txt 的路徑
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                    else
-                    {
-                        PopulateListBox(Resources.config);
-                        tabilPatternList_lst.Tag = Resources.config; // 記錄 config.txt 的路徑
-                    }
-                }
+                ssrStatus_lbl.Text = $"Config：{tabilPatternList_lst.Tag}";  // 顯示目前 config 來源（啟動時已載入）
             }
         }  // 切換tab
         // 產生圖片----------------------------------------------------------------------------------------------------
         public void Generate_Click(object sender, EventArgs e)
         {
+            if (tabControl.SelectedTab == tabImgList && _configDraftFocused)
+            {
+                PreviewConfigDraft();  // 正在撰寫 config：預覽編輯區的內容
+                return;
+            }
             if (!int.TryParse(mnsW_txt.Text, out int width) || !int.TryParse(mnsH_txt.Text, out int height))
             {
                 MessageBox.Show("請輸入有效的寬度與高度！");
@@ -443,15 +506,29 @@ namespace Thunder
                     showimgPicture_pic.Image = mypicture.Getpicture();
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
                 //}
-                showimgSize_lbl.Text = $"當前圖片大小：{mnsW_txt.Text} x {mnsH_txt.Text}"; // 更新狀態列顯示當前圖片大小  
+                ShowPreviewInfo(width, height, null);  // ImgEditor 產生的圖不顯示 config
+                _shownItem = null;
+                if (tabControl.SelectedTab == tabImgEditor)
+                {
+                    // 最近使用記錄成加入 config 時的名稱（無法轉成 config 的設定不記錄）
+                    string line = EditorToConfigLine(new List<string>(), out string error);
+                    if (line != null) AddRecent(RecentItem.FromConfig(line));
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"圖片生成失敗：{ex.Message}");
             }
         }  // 按下生成圖片
+        private Bitmap _dynamicBackground;  // Dynamic 產生的背景（mypicture 內的同一張圖），FullScreen 時據此開始動畫
+        private bool _generatingFromConfig; // true：由 ImgList 的 config 產生（Dynamic 只預覽不自動全螢幕、Window 不疊加 ImgEditor 清單）
         public void GenerateImage(string type, int width, int height, string tag="")
         {
+            // 產生非動態圖片時停止動畫，避免小球繼續畫在新圖上
+            if (type != "dynamic")
+            {
+                timerDynamic.Stop();
+            }
             Bitmap CurrentBitmap = new Bitmap(width, height);
             using (Graphics g = Graphics.FromImage(CurrentBitmap))
             {
@@ -472,6 +549,16 @@ namespace Thunder
                         {
                             // 填充背景顏色
                             g.Clear(tabiefBack_btn.BackColor);
+                        }
+                        // 文字模式：文字依格狀座標鋪滿畫面（畫在框線之下）
+                        if (tabiefText_chk.Checked && tabiefText_txt.Text.Trim() != "")
+                        {
+                            string tileText = tabiefText_txt.Text.Trim();
+                            using (Font tileFont = new Font("Microsoft JhengHei", (float)tabiefTextSize_nud.Value, FontStyle.Bold, GraphicsUnit.Pixel))
+                            {
+                                DrawTiledText(g, tileText.Length > 10 ? tileText.Substring(0, 10) : tileText, tileFont, tabiefTextColor_btn.BackColor,
+                                    (float)tabiefTextCharGap_nud.Value, (float)tabiefTextLineGap_nud.Value, (float)tabiefTextStringGap_nud.Value, width, height);
+                            }
                         }
                         // 繪製框線
                         if (tabiefOther_chk.Checked)
@@ -518,6 +605,14 @@ namespace Thunder
                             {
                                 g.DrawRectangle(borderPen, 0, 0, width - 1, height - 1);
                             }
+                        }
+                        // 左紅右藍：上下白線、左紅線、右藍線，固定 1 pixel（左右畫滿整個高度，角落為紅 / 藍）
+                        if (tabiefRedBlue_chk.Checked)
+                        {
+                            g.FillRectangle(Brushes.White, 0, 0, width, 1);
+                            g.FillRectangle(Brushes.White, 0, height - 1, width, 1);
+                            g.FillRectangle(Brushes.Red, 0, 0, 1, height);
+                            g.FillRectangle(Brushes.Blue, width - 1, 0, 1, height);
                         }
 
                         // 繪製中心對位線（如果選中）
@@ -670,16 +765,16 @@ namespace Thunder
                         {
                             using (Brush brush = new SolidBrush(tabiwWin_pic.BackColor))
                             {
-
-                                // 定義三角形的三個頂點  
-                                Point[] trianglePoints =
+                                // 依斜角下拉選單畫出包含該角落的三角形（以對角線切開畫面）
+                                Point topLeft = new Point(0, 0), topRight = new Point(width, 0), bottomRight = new Point(width, height), bottomLeft = new Point(0, height);
+                                Point[] trianglePoints;
+                                switch (tabiwDiagonal_cmb.SelectedIndex)
                                 {
-                                   new Point(width, 0), // 右上角  
-                                   new Point(width, height), // 右下角  
-                                   new Point(0, 0) // 左上角  
-                               };
-
-                                // 繪製右上角的三角形  
+                                    case 1: trianglePoints = new[] { topLeft, topRight, bottomLeft }; break;      // 左上
+                                    case 3: trianglePoints = new[] { topRight, bottomRight, bottomLeft }; break;  // 右下
+                                    case 4: trianglePoints = new[] { topLeft, bottomRight, bottomLeft }; break;   // 左下
+                                    default: trianglePoints = new[] { topLeft, topRight, bottomRight }; break;    // 右上
+                                }
                                 g.FillPolygon(brush, trianglePoints);
                             }
                         }
@@ -749,6 +844,14 @@ namespace Thunder
                             {
                                 g.DrawLine(centerPen, width / 2, 0, width / 2, height); // 垂直中心線
                                 g.DrawLine(centerPen, 0, height / 2, width, height / 2); // 水平中心線
+                            }
+                        }
+                        // 疊加清單中的窗口與線條（依清單順序，config 產生時不使用）
+                        if (!_generatingFromConfig)
+                        {
+                            foreach (ListViewItem overlayItem in tabiwOverlay_lvw.Items)
+                            {
+                                ((WindowOverlay)overlayItem.Tag).Draw(g, width, height);
                             }
                         }
                         mypicture.Setpicture(CurrentBitmap);
@@ -1124,8 +1227,11 @@ namespace Thunder
                         //    throw new InvalidOperationException("CurrentBitmap 尚未初始化！");
                         //}
                         mypicture.Setpicture(CurrentBitmap, mypicture.tag);
-                        FullScreen(showimgGenerate_btn, EventArgs.Empty);
-                        timerDynamic.Start();
+                        _dynamicBackground = mypicture.Getpicture();  // 記住動態背景，FullScreen 時才開始播放
+                        if (!_generatingFromConfig)
+                        {
+                            FullScreen(showimgGenerate_btn, EventArgs.Empty);
+                        }
                         break;
                     default:
                         throw new NotSupportedException("不支援的圖片類型！");
@@ -1207,28 +1313,37 @@ namespace Thunder
         }  // 圖片導入
         private void Save_Click(object sender, EventArgs e)
         {
-            if (tabiefMass_chk.Checked && tabimgeFuncList.Text == "Frame&CrossLine&Border")
+            if (sender is Button targetbutton && targetbutton.Name == "showimgSave_btn")
             {
-                // 批量儲存圖片
+                // Save 按鈕：一律跳出視窗選擇存檔名稱
+                mypicture.SaveImage();
+            }
+            else if (tabiefMass_chk.Checked && tabimgeFuncList.Text == "Frame&CrossLine&Border")
+            {
+                // AutoSave + 批量：依步進輸出各灰階，最後一階補到最大值
                 Color co = tabiefBack_btn.BackColor;
-                for (int i = 0; i <= Math.Max(tabiefBack_btn.BackColor.R, Math.Max(tabiefBack_btn.BackColor.G, tabiefBack_btn.BackColor.B)); i += (int)tabiefMassNum_nud.Value)
+                int max = Math.Max(co.R, Math.Max(co.G, co.B));
+                int step = Math.Max(1, (int)tabiefMassNum_nud.Value);
+                for (int i = 0; ; i += step)
                 {
-                    string fileName = $"{mnsPattername_txt.Text}_{i}.png"; // 設定檔名
-                    string filePath = Path.Combine(Application.StartupPath, fileName); // 儲存路徑
+                    int level = Math.Min(i, max);
+                    string baseName = $"{mnsPattername_txt.Text}_{level}";
+                    string filePath = Path.Combine(Application.StartupPath, $"{baseName}.png"); // 儲存路徑
+                    // 檔案已存在時加上 (2)、(3)…，避免覆蓋
+                    for (int n = 2; File.Exists(filePath); n++)
+                    {
+                        filePath = Path.Combine(Application.StartupPath, $"{baseName}({n}).png");
+                    }
                     using (Bitmap bitmap = new Bitmap(int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text)))
                     {
                         using (Graphics g = Graphics.FromImage(bitmap))
                         {
-                            g.Clear(Color.FromArgb(i <= co.R ? i : co.R, i <= co.G ? i : co.G, i <= co.B ? i : co.B)); // 填充背景顏色)); // 填充背景顏色
+                            g.Clear(Color.FromArgb(Math.Min(level, co.R), Math.Min(level, co.G), Math.Min(level, co.B))); // 填充背景顏色
                         }
                         bitmap.Save(filePath, ImageFormat.Png); // 儲存圖片
                     }
+                    if (level == max) break;
                 }
-            }
-            else if(sender is Button targetbutton && targetbutton.Name == "showimgSave_btn")
-            {
-                // 儲存單張圖片
-                mypicture.SaveImage();
             }
             else
             {
@@ -1260,6 +1375,8 @@ namespace Thunder
 
                 // 儲存圖片
                 mypicture.SaveImage(filePath);
+                // 檔名欄位跟著顯示這次存檔的編號
+                mnsPattername_txt.Text = Path.GetFileNameWithoutExtension(fileName);
             }
         }  // 儲存圖片
         // 圖片顯示----------------------------------------------------------------------------------------------------
@@ -1277,6 +1394,7 @@ namespace Thunder
 
             //_pictureWindow.setBitmap((Bitmap)showimgPicture_pic.Image);
             _pictureWindow.setBitmap(mypicture.Getpicture());
+            _pictureWindow.Caption = CurrentImageName();  // 全螢幕左上角顯示的名稱
 
             if (_pictureWindow != null && !_pictureWindow.IsDisposed)  //存在才執行
             {
@@ -1296,10 +1414,15 @@ namespace Thunder
                     //_pictureWindow.Location = secondScreen.Bounds.Location;
                     _pictureWindow.Size = secondScreen.Bounds.Size;
 
-                    // 顯示窗口  
+                    // 顯示窗口
                     _pictureWindow.Show();
                     _pictureWindow.BringToFront();
                     //MessageBox.Show("Form 未顯示！");
+                }
+                // 目前圖片是 Dynamic 產生的背景時，全螢幕才開始播放動畫
+                if (_dynamicBackground != null && ReferenceEquals(mypicture.Getpicture(), _dynamicBackground) && !timerDynamic.Enabled)
+                {
+                    timerDynamic.Start();
                 }
             }
             else
@@ -1307,6 +1430,36 @@ namespace Thunder
                 MessageBox.Show("Form 尚未初始化或已被釋放！");
             }
         }  // 全螢幕顯示
+        private string CurrentImageName()
+        {
+            // DirList 顯示檔名、ImgList 顯示 config 名稱；ImgEditor 不顯示；最近使用 / 草稿顯示其名稱
+            if (_shownItem != null)
+            {
+                return _shownItem.Name;
+            }
+            if (tabControl.SelectedTab == tabDirList && tabdlPatternList_lvw.SelectedItems.Count > 0)
+            {
+                return tabdlPatternList_lvw.SelectedItems[0].Text;
+            }
+            if (tabControl.SelectedTab == tabImgList && tabilPatternList_lst.SelectedItems.Count > 0)
+            {
+                return tabilPatternList_lst.SelectedItems[0].SubItems[1].Text;
+            }
+            return null;
+        }  // 目前圖片名稱
+        private void Edid_Click(object sender, EventArgs e)
+        {
+            // 與全螢幕相同，讀取目前選擇的螢幕
+            string selectedScreen = mnsScreenlist_cmb.SelectedItem?.ToString() ?? Screen.AllScreens[0].DeviceName;
+            new EdidWindow(selectedScreen).Show(this);
+        }  // 讀取 EDID
+        private void About_Click(object sender, EventArgs e)
+        {
+            using (AboutWindow about = new AboutWindow())
+            {
+                about.ShowDialog(this);
+            }
+        }  // 版本與快捷鍵說明
         private void menuToolStripCmb_SelectedIndexChanged(object sender, EventArgs e)
         {
             // 獲取選擇的螢幕
@@ -1322,65 +1475,103 @@ namespace Thunder
                     break;
                 }
             }
-            Generate_Click(sender, e);
+            UpdateRefreshRate();
+            RegenerateCurrent();
         }  // 螢幕選擇
+        public void SwitchScreen(int step)
+        {
+            int count = mnsScreenlist_cmb.Items.Count;
+            if (count == 0) return;
+            // 循環切換，觸發 menuToolStripCmb_SelectedIndexChanged 更新寬高並重新產生圖片
+            mnsScreenlist_cmb.SelectedIndex = ((mnsScreenlist_cmb.SelectedIndex + step) % count + count) % count;
+        }  // 切換輸出螢幕（step = +1 下一個、-1 上一個）
+        public void RegenerateCurrent()
+        {
+            // 依目前分頁用最新的寬高重新產生圖片
+            if (_shownItem != null)
+            {
+                // 目前顯示的是最近使用 / 編輯區草稿：重新套用同一行 config（圖檔不重新產生）
+                if (_shownItem.Line != null) ApplyConfigLine(_shownItem.Line);
+                return;
+            }
+            if (tabControl.SelectedTab == tabImgList)
+            {
+                if (tabilPatternList_lst.SelectedItems.Count > 0)
+                {
+                    tabilPatternList_lst_SelectedIndexChanged(tabilPatternList_lst, EventArgs.Empty);
+                }
+            }
+            else if (tabControl.SelectedTab == tabImgEditor)
+            {
+                Generate_Click(showimgGenerate_btn, EventArgs.Empty);
+            }
+            // DirList 顯示的是圖檔，不重新產生
+        }  // 依分頁重新產生目前圖片
         private void listView_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tabdlPatternList_lvw.SelectedItems.Count > 0)
             {
-                ListViewItem selectedItem = tabdlPatternList_lvw.SelectedItems[0]; // 獲取選中的 ListViewItem  
-                string imagePath = selectedItem.Tag as string; // 從 Tag 中取出圖片路徑  
-
-                if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
+                ListViewItem selectedItem = tabdlPatternList_lvw.SelectedItems[0]; // 獲取選中的 ListViewItem
+                string imagePath = selectedItem.Tag as string; // 從 Tag 中取出圖片路徑
+                if (LoadImageFile(imagePath))
                 {
-                    try
+                    _shownItem = null;
+                    AddRecent(RecentItem.FromFile(imagePath));
+                    // 如果需要全屏顯示，更新 _pictureWindow
+                    if (_pictureWindow != null && !_pictureWindow.IsDisposed)
                     {
-                        // 釋放舊圖片
-                        if (showimgPicture_pic.Image != null)
-                        {
-                            showimgPicture_pic.Image.Dispose();
-                            showimgPicture_pic.Image = null;
-                        }
-
-                        // 使用 FileStream 加載圖片，並生成縮圖
-                        using (FileStream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
-                        {
-                            using (Image originalImage = Image.FromStream(fs))
-                            {
-                                ////// 生成縮圖
-                                //int thumbnailWidth = 800; // 設定縮圖寬度
-                                //int thumbnailHeight = 600; // 設定縮圖高度
-                                //Image thumbnail = originalImage.GetThumbnailImage(thumbnailWidth, thumbnailHeight, null, IntPtr.Zero);
-
-                                //// 設定縮圖到 PictureBox
-                                //showimgPicture_pic.Image = thumbnail;
-                                showimgPicture_pic.Image = mypicture.Setpicture(originalImage, "image");
-                                showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
-
-                                // 更新圖片大小顯示
-                                showimgSize_lbl.Text = $"當前圖片大小：{originalImage.Width} x {originalImage.Height}";
-
-                                ssrStatus_lbl.Text = imagePath;
-                            }
-                        }
-
-                        // 如果需要全屏顯示，更新 _pictureWindow
-                        if (_pictureWindow != null && !_pictureWindow.IsDisposed)
-                        {
-                            FullScreen(sender, e);
-                        }
+                        FullScreen(sender, e);
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"無法載入圖片：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show($"找不到圖片：{imagePath}");
                 }
             }
         }  // listview圖片選擇
+        private bool LoadImageFile(string imagePath)
+        {
+            if (string.IsNullOrEmpty(imagePath) || !File.Exists(imagePath))
+            {
+                MessageBox.Show($"找不到圖片：{imagePath}");
+                return false;
+            }
+            try
+            {
+                // 釋放舊圖片
+                if (showimgPicture_pic.Image != null)
+                {
+                    showimgPicture_pic.Image.Dispose();
+                    showimgPicture_pic.Image = null;
+                }
+                // 使用 FileStream 加載圖片
+                using (FileStream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (Image originalImage = Image.FromStream(fs))
+                    {
+                        showimgPicture_pic.Image = mypicture.Setpicture(originalImage, "image");
+                        showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
+                        ShowPreviewInfo(originalImage.Width, originalImage.Height, null);  // 圖檔沒有 config
+                        ssrStatus_lbl.Text = imagePath;
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"無法載入圖片：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }  // 載入圖檔到預覽
+        private void statusStrip_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Process.Start("explorer.exe", $"\"{Application.StartupPath}\"");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"無法開啟資料夾：{ex.Message}");
+            }
+        }  // 狀態列點擊開啟程式資料夾
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+        private static extern int StrCmpLogicalW(string x, string y);  // 與檔案總管相同的自然排序 (1,2,...,9,10)
         private void PopulateListView()
         {
             // 清空現有項目
@@ -1409,6 +1600,14 @@ namespace Thunder
                                                            file.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
                                                            file.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase))
                                             .ToArray();
+            // 依分組 (JPG→PNG→BMP) 再依檔名自然排序，讓全螢幕左右切換的順序與畫面一致
+            string[] groupOrder = { ".jpg", ".png", ".bmp" };
+            Array.Sort(imageFiles, (a, b) =>
+            {
+                int byGroup = Array.IndexOf(groupOrder, Path.GetExtension(a).ToLower())
+                    .CompareTo(Array.IndexOf(groupOrder, Path.GetExtension(b).ToLower()));
+                return byGroup != 0 ? byGroup : StrCmpLogicalW(Path.GetFileName(a), Path.GetFileName(b));
+            });
 
             // 添加圖片到 ListView
             foreach (string imagePath in imageFiles)
@@ -1465,63 +1664,1121 @@ namespace Thunder
         }  // listview圖片導入列表
         private void tabilPatternList_lst_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (sender is ListView targetList && !_movingConfigLine)
+            {
+                if (targetList.SelectedItems.Count > 0)
+                {
+                    FillConfigEditor(targetList.SelectedItems[0]);  // 帶入下方編輯區
+                    _configDraftFocused = false;  // 選清單後 Generate 不再預覽編輯區草稿
+                    _shownItem = null;
+                    string line = targetList.SelectedItems[0].Tag.ToString();
+                    if (ApplyConfigLine(line))
+                    {
+                        AddRecent(RecentItem.FromConfig(line));
+                    }
+                }
+            }
+        }  // ImgList選擇圖片
+        private bool ApplyConfigLine(string line)
+        {
+            // 套用一行 config 並產生預覽圖（ImgList 選取、編輯區預覽、最近使用共用）；成功回傳 true
             string trimlower(string st)
             {
                 return st.Trim().ToLower();
             }
-            if (sender is ListBox targetList)
+            string[] patternVar = line.Split(',');
+            if (patternVar.Length < 4)
             {
-                if (targetList.SelectedItem != null)
+                // 選項欄可省略
+                int oldLength = patternVar.Length;
+                Array.Resize(ref patternVar, 4);
+                for (int i = oldLength; i < 4; i++) patternVar[i] = "";
+            }
+            if (!int.TryParse(mnsW_txt.Text, out int width) || !int.TryParse(mnsH_txt.Text, out int height))
+            {
+                MessageBox.Show("請輸入有效的寬度與高度！");
+                return false;
+            }
+            try
+            {
+                string type = trimlower(patternVar[1]);
+                //char[] TrimChars = { '\t', '\n', ' ' };
+                switch (type)
                 {
-                    // 這裡可以根據選中的項目來顯示圖片  
-                    string[] patternVar = targetList.SelectedItem.ToString().Split(',');
-                    if (patternVar.Length >= 3)
+                    case "solid":
+                        tabimgeFuncList.SelectedIndex = 0;
+                        funcFrame(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        break;
+                    case "gradient":
+                        tabimgeFuncList.SelectedIndex = 1;
+                        funcGrad(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        break;
+                    case "chess":
+                        tabimgeFuncList.SelectedIndex = 2;
+                        funcChess(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        break;
+                    case "window":
+                        tabimgeFuncList.SelectedIndex = 3;
+                        funcWind(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        break;
+                    case "mask":
+                        tabimgeFuncList.SelectedIndex = 4;
+                        funcMask(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        break;
+                    case "dynamic":
+                        tabimgeFuncList.SelectedIndex = tabimgeFuncList.Items.IndexOf("Dynamic");
+                        funcDynamic(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        break;
+                    case "text":
+                        tabimgeFuncList.SelectedIndex = 0;  // 文字模式屬於 Frame
+                        funcText(trimlower(patternVar[2]), patternVar[3].Trim());  // 文字保留大小寫
+                        break;
+                    default:
+                        MessageBox.Show($"「{patternVar[0].Trim()}」的類型「{patternVar[1].Trim()}」不支援！");
+                        return false;
+                }
+                string tag = patternVar[0];
+                _generatingFromConfig = true;  // Dynamic 只預覽（空白鍵 / Esc 全螢幕時才播放）；Window 不疊加 ImgEditor 的清單
+                try
+                {
+                    GenerateImage(type == "text" ? "solid" : type, width, height, tag); // 重新生成圖片（Text 由 Frame 產生）
+                }
+                finally
+                {
+                    _generatingFromConfig = false;
+                }
+                if (type == "dynamic")
+                {
+                    // 預覽圖另外複製一份畫上物件起始位置，不影響動畫用的背景
+                    Bitmap preview = new Bitmap(mypicture.Getpicture());
+                    using (Graphics g = Graphics.FromImage(preview))
                     {
-                        string type = trimlower(patternVar[1]);
-                        //char[] TrimChars = { '\t', '\n', ' ' };
-                        switch (type)
-                        {
-                            case "solid":
-                                tabimgeFuncList.SelectedIndex = 0;
-                                funcFrame(trimlower(patternVar[2]), trimlower(patternVar[3]));
-                                break;
-                            case "gradient":
-                                tabimgeFuncList.SelectedIndex = 1;
-                                funcGrad(trimlower(patternVar[2]), trimlower(patternVar[3]));
-                                break;
-                            case "chess":
-                                tabimgeFuncList.SelectedIndex = 2;
-                                funcChess(trimlower(patternVar[2]), trimlower(patternVar[3]));
-                                break;
-                            case "window":
-                                tabimgeFuncList.SelectedIndex = 3;
-                                funcWind(trimlower(patternVar[2]), trimlower(patternVar[3]));
-                                break;
-                            case "mask":
-                                tabimgeFuncList.SelectedIndex = 4;
-                                funcMask(trimlower(patternVar[2]), trimlower(patternVar[3]));
-                                break;
-                            default:
-                                MessageBox.Show("不支援的圖片類型！");
-                                break;
-                        }
-                        string tag = patternVar[0];
-                        GenerateImage(type, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text), tag); // 重新生成圖片
+                        DrawDynamicObject(g, preview.Width, preview.Height);
                     }
-                    showimgPicture_pic.Image = mypicture.Getpicture();
+                    showimgPicture_pic.Image = preview;
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
+                    ShowPreviewInfo(width, height, line);
+                    return true;
                 }
             }
-        }  // ListBox選擇圖片
+            catch (Exception ex)
+            {
+                // config 格式錯誤時提示，不讓程式當掉
+                MessageBox.Show($"「{patternVar[0].Trim()}」的設定有誤：{ex.Message}", "Config 錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            showimgPicture_pic.Image = mypicture.Getpicture();
+            showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
+            ShowPreviewInfo(width, height, line);
+            return true;
+        }  // 套用一行 config
+        private static readonly string[] ConfigColumns = { "名稱", "類型", "參數", "選項" };
+        private void SetupPatternList()
+        {
+            // 第一欄為編號（等同 index，不寫入 config），其後為 config 的各欄
+            tabilPatternList_lst.Columns.Add("編號", 50, HorizontalAlignment.Right);
+            int[] widths = { 160, 90, 210, 190 };
+            for (int i = 0; i < ConfigColumns.Length; i++)
+            {
+                tabilPatternList_lst.Columns.Add(ConfigColumns[i], widths[i]);
+            }
+        }  // ImgList 欄名
+        private void RenumberPatternList()
+        {
+            for (int i = 0; i < tabilPatternList_lst.Items.Count; i++)
+            {
+                tabilPatternList_lst.Items[i].Text = (i + 1).ToString();
+            }
+        }  // 重新編號
+        private static string ReadConfigText(string path)
+        {
+            // 匯出的 config 為 UTF-8，舊版 config.txt 為 Big5：先用 UTF-8 嚴格解碼，失敗再改用 Big5
+            byte[] bytes = File.ReadAllBytes(path);
+            try
+            {
+                return new UTF8Encoding(false, true).GetString(bytes).TrimStart((char)0xFEFF);  // 去掉 UTF-8 BOM
+            }
+            catch (DecoderFallbackException)
+            {
+                return Encoding.GetEncoding(950).GetString(bytes);
+            }
+        }  // 讀取 config（自動判斷編碼）
+        private void LoadConfig(string configText, string source)
+        {
+            PopulateListBox(configText);
+            tabilPatternList_lst.Tag = source;  // 記錄 config 來源
+            if (cfgFile_cmb != null) RefreshConfigFiles();  // 檔案下拉選單顯示目前來源
+        }  // 載入 config
+        private void LoadDefaultConfig()
+        {
+            // 啟動時優先讀取程式資料夾的 config.txt，沒有則用內建設定
+            string configFilePath = Path.Combine(Application.StartupPath, "config.txt");
+            if (File.Exists(configFilePath))
+            {
+                try
+                {
+                    LoadConfig(ReadConfigText(configFilePath), configFilePath);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"讀取 config.txt 失敗，改用內建設定：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            LoadConfig(Resources.config, "內建設定");
+        }  // 載入預設 config
         private void PopulateListBox(string configfile)
         {
-            //byte[] config = Resources.config;
+            tabilPatternList_lst.BeginUpdate();
             tabilPatternList_lst.Items.Clear();
-            foreach (string line in configfile.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (string rawLine in configfile.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
             {
-                tabilPatternList_lst.Items.Add(line);
+                ListViewItem item = CreateConfigItem(rawLine);
+                if (item != null)
+                {
+                    tabilPatternList_lst.Items.Add(item);
+                }
             }
-        }  // ListBox載入圖片
+            RenumberPatternList();
+            tabilPatternList_lst.EndUpdate();
+        }  // ImgList 載入 config
+        private static ListViewItem CreateConfigItem(string rawLine)
+        {
+            string line = rawLine.TrimEnd();
+            if (line.Trim().Length == 0 || line.TrimStart().StartsWith("#")) return null;  // 空行與註解
+            string[] fields = line.Split(',');
+            if (fields[0].Trim() == ConfigColumns[0]) return null;  // 欄名列
+            ListViewItem item = new ListViewItem("") { Tag = line };  // 第一欄編號由 RenumberPatternList 填入；Tag 保留原始內容，匯出時原樣寫回
+            item.SubItems.Add(fields[0].Trim());
+            for (int i = 1; i < ConfigColumns.Length; i++)
+            {
+                // 最後一欄收納剩下的所有欄位
+                string value = i < ConfigColumns.Length - 1
+                    ? (fields.Length > i ? fields[i] : "")
+                    : string.Join(",", fields.Skip(i));
+                item.SubItems.Add(value.Trim().Trim(',').Trim());
+            }
+            return item;
+        }  // 一行 config 轉成 ImgList 項目（空行、註解、欄名列回傳 null）
+        public void SelectImgListRelative(int step)
+        {
+            int count = tabilPatternList_lst.Items.Count;
+            if (count == 0) return;
+            int current = tabilPatternList_lst.SelectedIndices.Count > 0 ? tabilPatternList_lst.SelectedIndices[0] : (step > 0 ? -1 : 0);
+            int next = ((current + step) % count + count) % count;
+            tabilPatternList_lst.Items[next].Selected = true;
+            tabilPatternList_lst.Items[next].Focused = true;
+            tabilPatternList_lst.EnsureVisible(next);
+        }  // ImgList 上一個 / 下一個（全螢幕左右鍵使用）
+        // ImgEditor 設定加入 ImgList------------------------------------------------------------------------------
+        private Button tabimgeAddToList_btn;
+        private void InitEditorToConfig()
+        {
+            // 放在 ImgEditor 右上角：版面加一欄，功能下拉選單同一列的右側；ImageAdjust 時隱藏
+            tabimgeAddToList_btn = new Button { Text = "新增至 ImgList", AutoSize = true, Anchor = AnchorStyles.Top | AnchorStyles.Right, Margin = new Padding(3, 0, 3, 0) };
+            tabimgeAddToList_btn.Click += (s, e) => AddEditorSettingToList();
+            toolTip.SetToolTip(tabimgeAddToList_btn, "把目前頁面的設定轉成一行 config，加到 ImgList 最後一列");
+            tabimgeTableLayoutPanel.ColumnCount = 2;
+            tabimgeTableLayoutPanel.ColumnStyles[0] = new ColumnStyle(SizeType.Percent, 100);  // 第一欄填滿，按鈕靠右
+            tabimgeTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            tabimgeTableLayoutPanel.Controls.Add(tabimgeAddToList_btn, 1, 0);
+            tabimgeTableLayoutPanel.SetColumnSpan(tabimgePanel, 2);
+            tabimgeFuncList.SelectedIndexChanged += (s, e) => tabimgeAddToList_btn.Visible = tabimgeFuncList.Text != "ImageAdjust";
+
+            // Window 頁：背景與方塊一鍵設成同一純色
+            var presets = new (string text, Color color, Color fore)[]
+            {
+                ("黑", Color.Black, Color.White), ("白", Color.White, Color.Black), ("灰", Color.FromArgb(127, 127, 127), Color.White),
+            };
+            for (int i = 0; i < presets.Length; i++)
+            {
+                var (text, color, fore) = presets[i];
+                var button = new Button { Text = text, BackColor = color, ForeColor = fore, FlatStyle = FlatStyle.Flat, Location = new Point(167, 90 + i * 30), Size = new Size(46, 26) };
+                button.Click += (s, e) => SetWindowSolidColor(color);
+                toolTip.SetToolTip(button, $"背景與方塊都設成{text}色（純色）");
+                tabimgeWindow.Controls.Add(button);
+            }
+        }  // 建立「新增至 ImgList」與 Window 顏色按鈕
+        private void InitMaskQuickButtons()
+        {
+            // Pixel：格子下方快速選色（設定「選擇顏色」，之後點格子即填入）
+            var colors = new (string text, Color color)[]
+            {
+                ("黑", Color.Black), ("白", Color.White), ("紅", Color.Red), ("綠", Color.Lime), ("藍", Color.Blue),
+                ("64", Color.FromArgb(64, 64, 64)), ("127", Color.FromArgb(127, 127, 127)),
+            };
+            var pixelButtons = new List<Button>();
+            for (int i = 0; i < colors.Length; i++)
+            {
+                var (text, color) = colors[i];
+                bool dark = color.R * 0.299 + color.G * 0.587 + color.B * 0.114 < 128;  // 依亮度決定字色
+                var button = new Button
+                {
+                    Text = text, BackColor = color, ForeColor = dark ? Color.White : Color.Black, FlatStyle = FlatStyle.Flat,
+                    Location = new Point(10 + i * 35, 322), Size = new Size(34, 24), Margin = Padding.Empty,
+                };
+                button.Click += (s, e) => tabiemPixelColor_btn.BackColor = color;
+                toolTip.SetToolTip(button, $"選擇顏色設為{(text.All(char.IsDigit) ? text + " 灰" : text)}（{color.R},{color.G},{color.B}）");
+                pixelButtons.Add(button);
+            }
+            // Sub Pixel：灰階捲軸右側快速設定亮度（捲軸值 = 255 - 亮度）
+            int[] levels = { 255, 192, 127, 64, 0 };
+            var subPixelButtons = new List<Button>();
+            for (int i = 0; i < levels.Length; i++)
+            {
+                int level = levels[i];
+                var button = new Button { Text = level.ToString(), Location = new Point(266, 70 + i * 49), Size = new Size(40, 24) };
+                button.Click += (s, e) => tabiemPixelGray_vsc.Value = 255 - level;
+                toolTip.SetToolTip(button, $"子像素亮度設為 {level}");
+                subPixelButtons.Add(button);
+            }
+            tabimgeMask.Controls.AddRange(pixelButtons.Concat(subPixelButtons).ToArray<Control>());
+            void UpdateVisible()
+            {
+                bool subPixel = tabiemSubPixel_rdo.Checked;
+                pixelButtons.ForEach(b => b.Visible = !subPixel);
+                subPixelButtons.ForEach(b => b.Visible = subPixel);
+            }
+            tabiemPixel_rdo.CheckedChanged += (s, e) => UpdateVisible();
+            tabiemSubPixel_rdo.CheckedChanged += (s, e) => UpdateVisible();
+            UpdateVisible();
+        }  // Mask 快速選色與亮度按鈕
+        private void InitGradientReverse()
+        {
+            // 反向是讓奇數等分反轉漸層方向，畫面等分 < 2 時沒有作用，停用並取消勾選
+            void Update()
+            {
+                bool usable = int.TryParse(tabigDivid_cmb.Text, out int divisions) && divisions >= 2;
+                tabigReverse_chk.Enabled = usable;
+                if (!usable) tabigReverse_chk.Checked = false;
+            }
+            tabigDivid_cmb.TextChanged += (s, e) => Update();
+            toolTip.SetToolTip(tabigReverse_chk, "奇數等分反轉漸層方向（畫面幾等分 ≥ 2 才能使用）");
+            Update();
+        }  // 漸層反向的啟用條件
+        private void InitWindowTabs()
+        {
+            // 自製圖與窗口 / 線條清單合併成分頁，放在原自製圖的位置
+            var tabs = new TabControl { Location = new Point(tabiwCustom_grp.Left, 8), Size = new Size(tabiwCustom_grp.Width + 5, tabiwCustom_grp.Bottom - 8 + 14) };
+            var customPage = new TabPage("自製圖") { UseVisualStyleBackColor = true };
+            var overlayPage = new TabPage("窗口 / 線條") { UseVisualStyleBackColor = true };
+            tabs.TabPages.AddRange(new[] { customPage, overlayPage });
+            tabimgeWindow.Controls.Add(tabs);
+            tabimgeWindow.Controls.Remove(tabiwCustom_grp);
+            tabiwCustom_grp.Dock = DockStyle.Fill;
+            customPage.Controls.Add(tabiwCustom_grp);
+            // 窗口 / 線條清單與按鈕移入第二頁
+            var overlayButtons = tabimgeWindow.Controls.OfType<Button>().Where(b => b.Text == "新增" || b.Text == "修改" || b.Text == "移除").OrderBy(b => b.Left).ToList();
+            // 用 Dock 排版：清單填滿，按鈕列在底部（不依賴分頁當下的尺寸）
+            overlayPage.Padding = new Padding(6);
+            tabimgeWindow.Controls.Remove(tabiwOverlay_lvw);
+            tabiwOverlay_lvw.Dock = DockStyle.Fill;
+            tabiwOverlay_lvw.Columns[0].Width = 70;
+            tabiwOverlay_lvw.Columns[1].Width = 280;
+            var buttonBar = new FlowLayoutPanel { Dock = DockStyle.Bottom, Height = 34, Padding = new Padding(0, 4, 0, 0) };
+            foreach (Button button in overlayButtons)
+            {
+                tabimgeWindow.Controls.Remove(button);
+                button.Size = new Size(70, 26);
+                buttonBar.Controls.Add(button);
+            }
+            overlayPage.Controls.Add(tabiwOverlay_lvw);
+            overlayPage.Controls.Add(buttonBar);  // 後加入的先 Dock，按鈕列先佔底部，清單填滿其餘
+        }  // Window 自製圖與窗口 / 線條分頁
+        private ComboBox tabiwDiagonal_cmb;
+        private void InitWindowDiagonal()
+        {
+            // 斜角改為下拉選單；原勾選框隱藏保留，作為「有斜角」的狀態（沿用其停用視窗位置等邏輯）
+            tabiwDiagonal_btn.Visible = false;
+            var label = new Label { Text = "斜角", AutoSize = true, Location = new Point(10, 312) };
+            tabiwDiagonal_cmb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(10, 327), Width = 58, ImeMode = ImeMode.Disable };
+            tabiwDiagonal_cmb.Items.AddRange(new object[] { "無", "左上", "右上", "右下", "左下" });
+            tabiwDiagonal_cmb.SelectedIndexChanged += (s, e) => tabiwDiagonal_btn.Checked = tabiwDiagonal_cmb.SelectedIndex > 0;
+            tabiwDiagonal_cmb.SelectedIndex = tabiwDiagonal_btn.Checked ? 2 : 0;
+            toolTip.SetToolTip(tabiwDiagonal_cmb, "以對角線切開畫面，在選擇的角落畫出方塊顏色的三角形");
+            tabimgeWindow.Controls.AddRange(new Control[] { label, tabiwDiagonal_cmb });
+            // 騰出空間：線顏色按鈕移到標籤右側（窗口 / 線條清單已移到右側分頁）
+            tabiwLineColor_lbl.Location = new Point(10, 357);
+            tabiwLineColor_btn.Location = new Point(54, 352);
+        }  // 建立斜角下拉選單
+        private CheckBox tabiefRedBlue_chk;
+        private void InitFrameRedBlue()
+        {
+            // 「其他(H&V)」右側
+            tabiefRedBlue_chk = new CheckBox { Text = "左紅右藍", AutoSize = true, Location = new Point(tabiefOther_chk.Right + 8, tabiefOther_chk.Top) };
+            toolTip.SetToolTip(tabiefRedBlue_chk, "畫面四邊：上下白線、左紅線、右藍線（固定 1 pixel）");
+            tabimgeFrame.Controls.Add(tabiefRedBlue_chk);
+            tabiefRedBlue_chk.BringToFront();
+        }  // 建立左紅右藍
+        private CheckBox tabiefText_chk;
+        private TextBox tabiefText_txt;
+        private NumericUpDown tabiefTextSize_nud, tabiefTextCharGap_nud, tabiefTextLineGap_nud, tabiefTextStringGap_nud;
+        private Button tabiefTextColor_btn;
+        private Control[] _frameTextSettings;  // 未勾選文字模式時停用的設定
+        private void InitFrameTextMode()
+        {
+            // Frame 頁：框線顏色 / 粗細右側
+            const int x = 340;
+            Label Caption(string text) => new Label { Text = text, AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 3, 3, 3) };
+            NumericUpDown Nud(decimal min, decimal max, int decimals) => new NumericUpDown
+            {
+                Width = 60, Minimum = min, Maximum = max, DecimalPlaces = decimals, Increment = decimals > 0 ? 0.5m : 1m,
+                ImeMode = ImeMode.Disable, Anchor = AnchorStyles.Left, Margin = new Padding(0, 2, 6, 2),
+            };
+            tabiefText_chk = new CheckBox { Text = "文字模式", AutoSize = true, Location = new Point(x, 57) };
+            tabiefText_txt = new TextBox { MaxLength = 10, Width = 150, Location = new Point(x, 80), ImeMode = ImeMode.NoControl };  // 最多 10 個字，可打中文
+            tabiefTextSize_nud = Nud(1, 500, 0);            // 大小 1~500 px
+            tabiefTextCharGap_nud = Nud(0, 500, 1);         // 間距 0~500 px（以筆畫邊緣計算，0 = 貼齊）
+            tabiefTextLineGap_nud = Nud(0, 500, 1);
+            tabiefTextStringGap_nud = Nud(0, 500, 1);
+            tabiefTextColor_btn = new Button { Size = new Size(24, 24), BackColor = Color.White, FlatStyle = FlatStyle.Flat, Anchor = AnchorStyles.Left, Margin = new Padding(0, 2, 0, 2) };
+            var labels = new[] { Caption("大小"), Caption("顏色"), Caption("字距"), Caption("行距"), Caption("串距") };
+            // 用表格自動排版，不同縮放比例下標籤也不會被擋住
+            var grid = new TableLayoutPanel { Location = new Point(x, 105), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, ColumnCount = 4, RowCount = 4, Padding = Padding.Empty, Margin = Padding.Empty };
+            grid.Controls.Add(labels[0], 0, 0); grid.Controls.Add(tabiefTextSize_nud, 1, 0); grid.Controls.Add(labels[1], 2, 0); grid.Controls.Add(tabiefTextColor_btn, 3, 0);
+            grid.Controls.Add(labels[2], 0, 1); grid.Controls.Add(tabiefTextCharGap_nud, 1, 1);
+            grid.Controls.Add(labels[3], 0, 2); grid.Controls.Add(tabiefTextLineGap_nud, 1, 2);
+            grid.Controls.Add(labels[4], 0, 3); grid.Controls.Add(tabiefTextStringGap_nud, 1, 3);
+            tabiefTextSize_nud.Value = 12;
+            ResetFrameTextGaps();
+            // 改大小時間距依比例重設為預設值（之後仍可個別調整）
+            tabiefTextSize_nud.ValueChanged += (s, e) => ResetFrameTextGaps();
+            tabiefTextColor_btn.Click += (s, e) =>
+            {
+                using (ColorDialog dialog = new ColorDialog { Color = tabiefTextColor_btn.BackColor, FullOpen = true })
+                {
+                    if (dialog.ShowDialog(this) == DialogResult.OK) tabiefTextColor_btn.BackColor = dialog.Color;
+                }
+            };
+            _frameTextSettings = new Control[] {tabiefText_txt, tabiefTextSize_nud, tabiefTextColor_btn, tabiefTextCharGap_nud, tabiefTextLineGap_nud, tabiefTextStringGap_nud }.Concat(labels).ToArray();
+            tabiefText_chk.CheckedChanged += (s, e) => UpdateFrameTextEnabled();
+            UpdateFrameTextEnabled();
+            toolTip.SetToolTip(tabiefText_chk, "勾選後以文字依座標重複鋪滿整個畫面");
+            toolTip.SetToolTip(tabiefText_txt, "最多 10 個字（不能有逗號 , 與斜線 /）");
+            toolTip.SetToolTip(tabiefTextSize_nud, "字的大小（像素），改變時間距會依比例重設");
+            toolTip.SetToolTip(tabiefTextCharGap_nud, "字與字筆畫之間的空白，0 = 貼齊（預設 大小/5）");
+            toolTip.SetToolTip(tabiefTextLineGap_nud, "上下兩行筆畫之間的空白，0 = 貼齊（預設 大小/3）");
+            toolTip.SetToolTip(tabiefTextStringGap_nud, "重複字串之間的空白，0 = 貼齊（預設 大小/2）");
+            tabimgeFrame.Controls.AddRange(new Control[] { tabiefText_chk, tabiefText_txt, grid });
+            foreach (Control control in new Control[] { tabiefText_chk, tabiefText_txt, grid }) control.BringToFront();  // 避免被其他控制項蓋住
+            // 逗號是 config 欄位分隔、/ 是 Text 選項分隔，文字裡不能有
+            tabiefText_txt.KeyPress += (s, e) => { if (e.KeyChar == ',' || e.KeyChar == '/') e.Handled = true; };
+            tabiefText_txt.TextChanged += (s, e) =>
+            {
+                string clean = tabiefText_txt.Text.Replace(",", "").Replace("/", "");
+                if (clean != tabiefText_txt.Text) tabiefText_txt.Text = clean;  // 貼上時移除
+            };
+        }  // 建立 Frame 文字模式
+        private void ResetFrameTextGaps()
+        {
+            decimal size = tabiefTextSize_nud.Value;
+            tabiefTextCharGap_nud.Value = Math.Round(size / 5, 1);
+            tabiefTextLineGap_nud.Value = Math.Round(size / 3, 1);
+            tabiefTextStringGap_nud.Value = Math.Round(size / 2, 1);
+        }  // 間距預設值
+        private void UpdateFrameTextEnabled()
+        {
+            foreach (Control control in _frameTextSettings) control.Enabled = tabiefText_chk.Checked;
+        }  // 未勾選時停用設定
+        private static void DrawTiledText(Graphics g, string text, Font font, Color color, float charGap, float lineGap, float stringGap, int width, int height)
+        {
+            // 間距以「筆畫實際範圍」計算：字型本身左右留白與行高預留都不算，間距 0 即筆畫貼齊
+            // 不做反鋸齒，畫面只有背景色與文字色
+            var textHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+            using (Brush brush = new SolidBrush(color))
+            using (StringFormat format = (StringFormat)StringFormat.GenericTypographic.Clone())
+            {
+                format.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;  // 空白字元也要算寬度
+                g.TextRenderingHint = textHint;
+                // 量每個字的筆畫範圍（相對於繪製原點）；空白字元沒有筆畫，用字寬
+                int pad = (int)Math.Ceiling(font.GetHeight(g));
+                var ink = new Rectangle[text.Length];
+                var advance = new float[text.Length];
+                for (int i = 0; i < text.Length; i++)
+                {
+                    string ch = text[i].ToString();
+                    advance[i] = g.MeasureString(ch, font, PointF.Empty, format).Width;
+                    using (Bitmap probe = new Bitmap((int)Math.Ceiling(advance[i]) + pad * 2, pad * 3))
+                    using (Graphics pg = Graphics.FromImage(probe))
+                    {
+                        pg.Clear(Color.White);
+                        pg.TextRenderingHint = textHint;
+                        pg.DrawString(ch, font, Brushes.Black, pad, pad, format);
+                        ink[i] = InkBounds(probe, pad);
+                    }
+                }
+                var drawn = ink.Where(r => !r.IsEmpty).ToList();
+                if (drawn.Count == 0) return;  // 只有空白
+                int inkTop = drawn.Min(r => r.Top), inkBottom = drawn.Max(r => r.Bottom);
+                float stepY = Math.Max(1f, inkBottom - inkTop + lineGap);  // 行與行：筆畫高度 + 行距
+                // 一個字串內各字的 X 位置（以筆畫左緣對齊游標）
+                var charX = new float[text.Length];
+                float cursor = 0;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (ink[i].IsEmpty) { charX[i] = cursor; cursor += advance[i] + charGap; continue; }
+                    charX[i] = cursor - ink[i].Left;
+                    cursor += ink[i].Width + charGap;
+                }
+                float stepX = Math.Max(1f, cursor - charGap + stringGap);  // 字串與字串：最後一字筆畫右緣 + 串距
+                for (float y = 0; y < height; y += stepY)
+                {
+                    for (float x = 0; x < width; x += stepX)
+                    {
+                        for (int i = 0; i < text.Length; i++)
+                        {
+                            if (ink[i].IsEmpty) continue;
+                            // 取整數座標，筆畫點陣與量測時一致
+                            g.DrawString(text[i].ToString(), font, brush, (float)Math.Round(x + charX[i]), (float)Math.Round(y - inkTop), format);
+                        }
+                    }
+                }
+            }
+        }  // 文字鋪滿畫面
+        private static Rectangle InkBounds(Bitmap probe, int origin)
+        {
+            // 找出非白色像素的範圍，回傳相對於繪製原點 (origin, origin) 的矩形；沒有筆畫回傳 Empty
+            int left = int.MaxValue, top = int.MaxValue, right = -1, bottom = -1;
+            for (int y = 0; y < probe.Height; y++)
+            {
+                for (int x = 0; x < probe.Width; x++)
+                {
+                    if (probe.GetPixel(x, y).R < 128)
+                    {
+                        if (x < left) left = x;
+                        if (x > right) right = x;
+                        if (y < top) top = y;
+                        if (y > bottom) bottom = y;
+                    }
+                }
+            }
+            return right < 0 ? Rectangle.Empty : Rectangle.FromLTRB(left - origin, top - origin, right - origin + 1, bottom - origin + 1);
+        }  // 量測筆畫範圍
+        private void SetWindowSolidColor(Color color)
+        {
+            tabiwBackColor_rdo.Checked = true;
+            tabiwBack_pic.Image = null;
+            tabiwBack_pic.BackColor = color;
+            tabiwWinColor_rdo.Checked = true;
+            tabiwWin_pic.Image = null;
+            tabiwWin_pic.BackColor = color;
+        }  // Window 背景與方塊設成同一純色
+        private static string ConfigColorText(Color c)
+        {
+            // 一般顏色名稱直接寫名稱，其餘寫 R.G.B（系統色如 Control 也寫成 R.G.B）
+            return c.IsKnownColor && !c.IsSystemColor ? c.Name : $"{c.R}.{c.G}.{c.B}";
+        }  // 顏色轉 config 寫法
+        private void AddEditorSettingToList()
+        {
+            var ignored = new List<string>();
+            string line = EditorToConfigLine(ignored, out string error);
+            if (line == null && error == null) return;  // ImageAdjust 等不支援的功能
+            if (error != null)
+            {
+                MessageBox.Show($"無法加入 ImgList：{error}", "新增至 ImgList", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (ignored.Count > 0 &&
+                MessageBox.Show("以下設定 config 無法描述，加入後會被忽略：\r\n\r\n・" + string.Join("\r\n・", ignored) + "\r\n\r\n仍要加入嗎？",
+                    "新增至 ImgList", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+            ListViewItem item = CreateConfigItem(line);
+            tabilPatternList_lst.Items.Add(item);
+            RenumberPatternList();
+            item.EnsureVisible();
+            ssrStatus_lbl.Text = $"已加入 ImgList 第 {item.Index + 1} 列：{item.SubItems[1].Text}";
+        }  // 目前 ImgEditor 設定加入 ImgList
+        private string EditorToConfigLine(List<string> ignored, out string error)
+        {
+            // 目前 ImgEditor 設定轉成一行 config（名稱為預設名稱）；不支援的功能回傳 null 且 error 為 null
+            string type, param, option;
+            switch (tabimgeFuncList.Text)
+            {
+                case "Frame&CrossLine&Border":
+                    // 勾選文字模式時存成 Text 類型
+                    if (tabiefText_chk.Checked) { type = "Text"; error = TextToConfig(ignored, out param, out option); }
+                    else { type = "Solid"; error = FrameToConfig(ignored, out param, out option); }
+                    break;
+                case "Gradient&ColorBar": type = "Gradient"; error = GradientToConfig(ignored, out param, out option); break;
+                case "Chess": type = "Chess"; error = ChessToConfig(out param, out option); break;
+                case "Window": type = "Window"; error = WindowToConfig(ignored, out param, out option); break;
+                case "Mask(FlickerPattern)": type = "Mask"; error = MaskToConfig(out param, out option); break;
+                case "Dynamic": type = "Dynamic"; error = DynamicToConfig(out param, out option); break;
+                default: error = null; return null;
+            }
+            if (error != null) return null;
+            string name = $"{type} {param}{(option != "" ? " " + option : "")}";  // 預設名稱，可在 ImgList 編輯區修改
+            return string.Join(",", name, type, param, option);
+        }  // ImgEditor 設定轉 config
+        private string FrameToConfig(List<string> ignored, out string param, out string option)
+        {
+            param = option = "";
+            if (mypicture.tag == "image") return "背景使用匯入的截圖，config 只能描述純色背景";
+            if (tabiefOther_chk.Checked) ignored.Add("其他(H&V) 線條");
+            if (tabiefLineSize_nud.Value != 1) ignored.Add($"框線粗細 {tabiefLineSize_nud.Value}（config 固定為 1）");
+            param = ConfigColorText(tabiefBack_btn.BackColor);
+            string lines = (tabiefCenter_chk.Checked ? "c" : "") + (tabiefOutside_chk.Checked ? "o" : "") + (tabiefNine_chk.Checked ? "n" : "");
+            if (lines != "") option = $"{lines}{(tabiefRedBlue_chk.Checked ? "r" : "")}-{ConfigColorText(tabiefLineColor_btn.BackColor)}";
+            else if (tabiefRedBlue_chk.Checked) option = "r";  // 左紅右藍不需要線色
+            return null;
+        }  // Frame 轉 config
+        private string TextToConfig(List<string> ignored, out string param, out string option)
+        {
+            param = option = "";
+            if (mypicture.tag == "image") return "背景使用匯入的截圖，config 只能描述純色背景";
+            string text = tabiefText_txt.Text.Trim();
+            if (text == "") return "文字模式沒有輸入文字";
+            if (tabiefCenter_chk.Checked || tabiefOutside_chk.Checked || tabiefNine_chk.Checked || tabiefRedBlue_chk.Checked) ignored.Add("中心對位 / 外框線 / 九點對位 / 左紅右藍");
+            if (tabiefOther_chk.Checked) ignored.Add("其他(H&V) 線條");
+            string Num(NumericUpDown nud) => nud.Value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+            param = $"{ConfigColorText(tabiefBack_btn.BackColor)}-{ConfigColorText(tabiefTextColor_btn.BackColor)}";
+            option = $"{text}/{Num(tabiefTextSize_nud)}/{Num(tabiefTextCharGap_nud)}/{Num(tabiefTextLineGap_nud)}/{Num(tabiefTextStringGap_nud)}";
+            return null;
+        }  // Frame 文字模式轉 config
+        private string GradientToConfig(List<string> ignored, out string param, out string option)
+        {
+            param = option = "";
+            if (tabigOther_chk.Checked)
+            {
+                // 自訂 ColorBar：colorbar-方向-數量.色1.色2…（依 Tag 的序號排列）
+                var panels = tabigOtherSplit_pnl.Controls.OfType<Panel>()
+                    .Select(p => new { Panel = p, Tag = p.Tag?.ToString().Split(',') })
+                    .Where(p => p.Tag != null && p.Tag.Length == 2)
+                    .OrderBy(p => int.Parse(p.Tag[1]))
+                    .ToList();
+                if (panels.Count == 0) return "ColorBar 沒有任何色塊";
+                if (panels.Any(p => p.Panel.BackColor == Color.Transparent)) return "ColorBar 有透明（未設定）的色塊";
+                string direction = panels[0].Tag[0] == "H" ? "h" : "v";
+                param = $"colorbar-{direction}-{panels.Count}." + string.Join(".", panels.Select(p => ConfigColorText(p.Panel.BackColor)));
+            }
+            else
+            {
+                param = ConfigColorText(tabigBaseColor_lbl.BackColor);
+            }
+            if (!tabigColorBar_rdo.Checked)
+            {
+                option = $"{(tabigReverse_chk.Checked && tabigReverse_chk.Enabled ? "r-" : "")}{(tabigHWay_rdo.Checked ? "h" : "v")}-{tabigStep_cmb.Text}-{tabigDivid_cmb.Text}";
+                // 起始.結束灰階不是預設 0.255 時才寫（例：255.0 由亮到暗）
+                if (tabigFirstLevel_cmb.Text.Trim() != "0" || tabigLastLevel_cmb.Text.Trim() != "255")
+                {
+                    option += $"-{tabigFirstLevel_cmb.Text.Trim()}.{tabigLastLevel_cmb.Text.Trim()}";
+                }
+            }
+            return null;
+        }  // Gradient 轉 config
+        private string ChessToConfig(out string param, out string option)
+        {
+            // 實際格子顏色 = 顏色與灰階捲軸取較小值
+            Color baseColor = tabiecGray_lbl.BackColor;
+            int intensity = tabiecGray_hsc.Value;
+            Color color = Color.FromArgb(Math.Min(baseColor.R, intensity), Math.Min(baseColor.G, intensity), Math.Min(baseColor.B, intensity));
+            param = $"{tabiecHNum_nud.Value}*{tabiecVNum_nud.Value}";
+            string flip = (tabiecHFlip_chk.Checked ? "h" : "") + (tabiecVFlip_chk.Checked ? "v" : "");
+            option = color.ToArgb() == Color.White.ToArgb() ? flip : ConfigColorText(color) + (flip != "" ? "-" + flip : "");
+            return null;
+        }  // Chess 轉 config
+        private string WindowToConfig(List<string> ignored, out string param, out string option)
+        {
+            param = option = "";
+            if (!tabiwBackColor_rdo.Checked) return "背景使用截圖或自製圖，config 只能描述純色背景與方塊（自製圖請改用 Window 的 Custom / excel 寫法手動輸入）";
+            if (!tabiwWinColor_rdo.Checked) return "方塊使用截圖或自製圖，config 只能描述純色背景與方塊";
+            if (!tabiwWinSizePercent_rdo.Checked) return "視窗大小使用指定 Pixel，config 只支援百分比";
+            if (tabiwLineOutside_btn.Checked) ignored.Add("外框");
+            if (tabiwLineCross_btn.Checked) ignored.Add("十字");
+            if (tabiwDiagonal_btn.Checked) ignored.Add($"斜角（{tabiwDiagonal_cmb.Text}）");
+            if (tabiwOverlay_lvw.Items.Count > 0) ignored.Add($"右側疊加清單的 {tabiwOverlay_lvw.Items.Count} 個窗口 / 線條");
+            param = $"{ConfigColorText(tabiwBack_pic.BackColor)}-{ConfigColorText(tabiwWin_pic.BackColor)}";
+            string location = tabiwWinLocPixcel_rdo.Checked ? $"xy_{tabiwWinLocPixcelX_nud.Value}.{tabiwWinLocPixcelY_nud.Value}"
+                : tabiwWinLocTwo_rdo.Checked ? "two" : "c";
+            option = $"{tabiwWinSizePercent_nud.Value}%{location}";
+            return null;
+        }  // Window 轉 config
+        private string MaskToConfig(out string param, out string option)
+        {
+            param = option = "";
+            int w = (int)tabiemWNum_nud.Value, h = (int)tabiemHNum_nud.Value;
+            bool subPixel = tabiemSubPixel_rdo.Checked;
+            int columns = subPixel ? w * 3 : w;
+            var colors = new Color[columns * h];
+            for (int i = 0; i < colors.Length; i++) colors[i] = Color.Black;
+            foreach (Panel panel in tabiemPixelPanel_pnl.Controls.OfType<Panel>())
+            {
+                string[] xy = panel.Tag?.ToString().Split(',');
+                if (xy == null || xy.Length != 2 || !int.TryParse(xy[0], out int x) || !int.TryParse(xy[1], out int y) || x >= columns || y >= h) continue;
+                colors[y * columns + x] = panel.BackColor;
+            }
+            param = subPixel ? $"s-{w}*{h}-{255 - tabiemPixelGray_vsc.Value}" : $"p-{w}*{h}";
+            if (subPixel)
+            {
+                // 子像素：非黑即亮
+                option = string.Join(".", Enumerable.Range(0, h).Select(row =>
+                    new string(colors.Skip(row * columns).Take(columns).Select(c => c.ToArgb() == Color.Black.ToArgb() ? '0' : '1').ToArray())));
+                return null;
+            }
+            char Code(Color c) => c.ToArgb() == Color.Black.ToArgb() ? '0' : c.ToArgb() == Color.White.ToArgb() ? '1' : c.ToArgb() == Color.Gray.ToArgb() ? '2' : '?';
+            if (colors.All(c => Code(c) != '?'))
+            {
+                // 只有黑、白、灰時用精簡寫法，例：10.01
+                option = string.Join(".", Enumerable.Range(0, h).Select(row => new string(colors.Skip(row * w).Take(w).Select(Code).ToArray())));
+            }
+            else
+            {
+                // 其他顏色用顏色寫法，例：red lime/blue 127.127.127
+                option = string.Join("/", Enumerable.Range(0, h).Select(row => string.Join(" ", colors.Skip(row * w).Take(w).Select(ConfigColorText))));
+                if (!IsColorMaskOption(option)) option += "/";  // 只有 1 格且為 R.G.B 時補 /，避免被當成精簡寫法
+            }
+            return null;
+        }  // Mask 轉 config
+        private string DynamicToConfig(out string param, out string option)
+        {
+            param = option = "";
+            if (mypicture.tag == "image") return "背景使用匯入的截圖，config 只能描述純色背景";
+            param = $"{ConfigColorText(tabiedBackColor_btn.BackColor)}-{ConfigColorText(tabiedObjectColor_btn.BackColor)}";
+            string shape = tabiedObjectCube_rdo.Checked ? "cube" : tabiedObjectStrip_rdo.Checked ? "strip" : "ball";
+            string direction = tabiedMoveH_rdo.Checked ? "h" : tabiedMoveV_rdo.Checked ? "v" : "b";
+            option = $"{shape}-{direction}-size{tabiedObjectSize_nud.Value}-speed{tabiedMoveSpeed_nud.Value}";
+            return null;
+        }  // Dynamic 轉 config
+        // Window 疊加清單--------------------------------------------------------------------------------------------
+        private ListView tabiwOverlay_lvw;
+        private void InitWindowOverlayList()
+        {
+            // 放在線條選項（外框、十字、斜角、線顏色）右側
+            tabiwOverlay_lvw = new ListView
+            {
+                View = View.Details,
+                FullRowSelect = true,
+                GridLines = true,
+                HideSelection = false,
+                MultiSelect = false,
+                HeaderStyle = ColumnHeaderStyle.Nonclickable,
+                Location = new Point(68, 268),
+                Size = new Size(147, 86),
+                ImeMode = ImeMode.Disable,
+                ShowItemToolTips = true,
+            };
+            tabiwOverlay_lvw.Columns.Add("類型", 44);
+            tabiwOverlay_lvw.Columns.Add("設定", 99);  // 剛好填滿清單寬度，完整內容用 tooltip 顯示
+            var add = new Button { Text = "新增", Location = new Point(68, 357), Size = new Size(47, 23) };
+            var edit = new Button { Text = "修改", Location = new Point(118, 357), Size = new Size(47, 23) };
+            var remove = new Button { Text = "移除", Location = new Point(168, 357), Size = new Size(47, 23) };
+            add.Click += (s, e) => EditWindowOverlay(null);
+            edit.Click += (s, e) => { if (tabiwOverlay_lvw.SelectedItems.Count > 0) EditWindowOverlay(tabiwOverlay_lvw.SelectedItems[0]); };
+            remove.Click += (s, e) => RemoveWindowOverlay();
+            tabiwOverlay_lvw.DoubleClick += (s, e) => { if (tabiwOverlay_lvw.SelectedItems.Count > 0) EditWindowOverlay(tabiwOverlay_lvw.SelectedItems[0]); };
+            tabiwOverlay_lvw.KeyDown += (s, e) => { if (e.KeyCode == Keys.Delete) { RemoveWindowOverlay(); e.Handled = true; } };
+            toolTip.SetToolTip(add, "新增額外疊加的窗口或線條，按 Generate 時依清單順序畫上（雙擊項目修改、Delete 移除）");
+            tabimgeWindow.Controls.AddRange(new Control[] { tabiwOverlay_lvw, add, edit, remove });
+        }  // 建立 Window 疊加清單
+        private void EditWindowOverlay(ListViewItem item)
+        {
+            int imageW = int.TryParse(mnsW_txt.Text, out int w) ? w : 1920;
+            int imageH = int.TryParse(mnsH_txt.Text, out int h) ? h : 1080;
+            // 新增時預設：窗口在畫面中央、四分之一大小，白色
+            WindowOverlay initial = item?.Tag as WindowOverlay ?? new WindowOverlay
+            {
+                Kind = OverlayKind.Window,
+                X = imageW / 4, Y = imageH / 4, Width = imageW / 2, Height = imageH / 2,
+                Color = Color.White,
+            };
+            using (WindowOverlayDialog dialog = new WindowOverlayDialog(initial))
+            {
+                if (dialog.ShowDialog(this) != DialogResult.OK || dialog.Result == null) return;
+                WindowOverlay result = dialog.Result;
+                if (item == null)
+                {
+                    item = new ListViewItem(new[] { "", "" });
+                    tabiwOverlay_lvw.Items.Add(item);
+                }
+                item.Tag = result;
+                item.SubItems[0].Text = WindowOverlay.KindText(result.Kind);
+                item.SubItems[1].Text = result.Description();
+                item.ToolTipText = $"{item.SubItems[0].Text} {item.SubItems[1].Text}";
+                item.Selected = true;
+                item.EnsureVisible();
+            }
+        }  // 新增 / 修改疊加項目
+        private void RemoveWindowOverlay()
+        {
+            if (tabiwOverlay_lvw.SelectedItems.Count == 0) return;
+            int index = tabiwOverlay_lvw.SelectedIndices[0];
+            tabiwOverlay_lvw.Items.RemoveAt(index);
+            if (tabiwOverlay_lvw.Items.Count > 0)
+            {
+                tabiwOverlay_lvw.Items[Math.Min(index, tabiwOverlay_lvw.Items.Count - 1)].Selected = true;
+            }
+        }  // 移除疊加項目
+        // ImgList 編輯區--------------------------------------------------------------------------------------------
+        private const string ConfigColorHelp = "顏色寫法：名稱（White、Red、Lime、Blue、Yellow、Aqua、Magenta…）、R.G.B（58.110.165）、灰階（50%Gray）";
+        private static readonly Dictionary<string, (string param, string option)> ConfigHelp = new Dictionary<string, (string, string)>
+        {
+            ["Solid"] = (
+                "參數：底色\r\n" + ConfigColorHelp + "\r\n例：White、58.110.165、50%Gray",
+                "選項：框線（可省略）\r\n格式：線種-線色\r\n線種可組合：c 中心十字、o 外框、n 九點、r 左紅右藍（上下白線）\r\nr 不使用線色，只有 r 時可省略線色\r\n例：con-white、c-red、r、cr-yellow"),
+            ["Gradient"] = (
+                "參數：漸層顏色或 ColorBar\r\n單色：White（" + ConfigColorHelp + "）\r\n四色 ColorBar：colorbar-four-h、colorbar-four-v\r\n八色 ColorBar：colorbar-eight-h、colorbar-eight-v\r\n自訂 ColorBar：colorbar-h-數量.色1.色2…\r\n　例：colorbar-h-4.White.Red.Lime.Blue",
+                "選項：漸層（省略則不漸層，只畫 ColorBar）\r\n格式：[r-]方向-階數-分割[-起始.結束]\r\nr-：反向，奇數等分反轉漸層方向（分割需 ≥ 2）\r\n方向：v（Vertical 漸層）、h（Horizontal 漸層）\r\n起始.結束：灰階 0~255，用 . 連接，省略為 0.255\r\n例：v-256-1、h-8-1、h-256-1-255.0（由亮到暗）、r-h-256-2"),
+            ["Chess"] = (
+                "參數：格數  寬*高\r\n例：8*8、5*5、1*2",
+                "選項：可省略，多項用 - 連接\r\n顏色：格子顏色，另一色固定黑色，預設白色\r\n" + ConfigColorHelp + "\r\n翻轉：h 水平、v 垂直、hv 兩者\r\n例：Red、255.255.0-hv、v"),
+            ["Window"] = (
+                "參數：背景與窗口\r\n純色：背景色-窗口色，例：Gray-Black、Black-White\r\n自製圖：Custom-背景-窗口\r\n　背景：dotG、vstripeG、vstripeW、dotDell、rowW 或顏色\r\n　窗口：Black、Gray、dotW 或顏色\r\n　例：Custom-dotG-Black\r\nCrossTalk：excel1 ~ excel7",
+                "選項：窗口大小%＋位置\r\nc：置中，例：50%c\r\nxy_X.Y：窗口左上角像素，例：50%xy_0.0\r\nxyq_象限：++ 右上、-+ 左上、-- 左下、+- 右下，例：50%xyq_++\r\ntwo：兩組窗口，例：50%two"),
+            ["Mask"] = (
+                "參數：單位與大小\r\np-寬*高：以像素為單位，例：p-2*2\r\ns-寬*高-亮度：以子像素 (RGB) 為單位，亮度 0~255，例：s-2*2-127",
+                "選項：每一格的顏色\r\np 顏色寫法：每格寫一個顏色，格之間空格、列之間 /\r\n　" + ConfigColorHelp + "\r\n　也可寫 0 黑、1 白、2 灰，例：red lime/blue 127.127.127\r\n　（只有 1 格且用 R.G.B 時，結尾加 /，例：255.0.0/）\r\np 精簡寫法：每格 1 個字元 0 黑、1 白、2 灰，列之間 .，例：10.01\r\ns：每像素 3 個字元 (R G B)，1 亮、0 暗，列之間 .，例：101010.010101"),
+            ["Text"] = (
+                "參數：背景色-文字色\r\n" + ConfigColorHelp + "\r\n例：Black-White、Navy-Yellow",
+                "選項：文字/大小/字距/行距/串距（大小之後可省略）\r\n文字：最多 10 個字，不能有逗號 , 與斜線 /，保留大小寫\r\n大小：像素 1~500（預設 12）\r\n間距：筆畫之間的空白像素 0~500，0 = 貼齊\r\n　預設 字距 大小/5、行距 大小/3、串距 大小/2\r\n例：測試ABC、ABC/24、ABC/24/0/0/10"),
+            ["Dynamic"] = (
+                "參數：背景色-物件色（只寫一色時物件為白色）\r\n" + ConfigColorHelp + "\r\n例：Black-White、Gray-Red",
+                "選項：可省略，多項用 - 連接（選取時只預覽，按空白鍵或 Esc 全螢幕播放）\r\n形狀：ball 球、cube 方塊、strip 長條（預設 ball）\r\n方向：h 水平、v 垂直、b 斜角（預設 b，長條不能斜角）\r\n大小：size 加數字 1~200（預設 50）\r\n速度：speed 加數字 1~256（預設 50）\r\n例：ball-b-size50-speed50、strip-h-size20-speed10"),
+        };
+        private ToolTip configHelp_tip;
+        private TextBox cfgName_txt, cfgParam_txt, cfgOption_txt;
+        private ComboBox cfgType_cmb;
+        private void InitConfigEditor()
+        {
+            configHelp_tip = new ToolTip { AutoPopDelay = 30000, InitialDelay = 200, ReshowDelay = 100, ShowAlways = true };
+            var panel = new FlowLayoutPanel { Dock = DockStyle.Bottom, AutoSize = true, WrapContents = true, Padding = new Padding(2) };
+            Label Caption(string text) => new Label { Text = text, AutoSize = true, Margin = new Padding(6, 7, 0, 0) };
+            cfgName_txt = new TextBox { Width = 120, ImeMode = ImeMode.NoControl };  // 名稱可打中文
+            cfgType_cmb = new ComboBox { Width = 85, DropDownStyle = ComboBoxStyle.DropDownList, ImeMode = ImeMode.Disable };
+            cfgType_cmb.Items.AddRange(ConfigHelp.Keys.ToArray());
+            cfgParam_txt = new TextBox { Width = 190, ImeMode = ImeMode.Disable };
+            cfgOption_txt = new TextBox { Width = 190, ImeMode = ImeMode.Disable };
+            var add = new Button { Text = "新增", Width = 50 };
+            var update = new Button { Text = "修改", Width = 50 };
+            var delete = new Button { Text = "刪除", Width = 50 };
+            var moveUp = new Button { Text = "上移", Width = 50 };
+            var moveDown = new Button { Text = "下移", Width = 50 };
+            add.Click += (s, e) => SaveConfigLine(false);
+            update.Click += (s, e) => SaveConfigLine(true);
+            delete.Click += (s, e) => DeleteConfigLine();
+            moveUp.Click += (s, e) => MoveConfigLine(-1);
+            moveDown.Click += (s, e) => MoveConfigLine(+1);
+            cfgType_cmb.SelectedIndexChanged += (s, e) => UpdateConfigHelp();
+            // 第一行：名稱、類型、按鈕；第二行：參數、選項、config 檔案
+            cfgFile_cmb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 150, ImeMode = ImeMode.Disable };
+            cfgFile_cmb.DropDown += (s, e) => RefreshConfigFiles();  // 展開時重新掃描資料夾
+            cfgFile_cmb.SelectionChangeCommitted += (s, e) => LoadSelectedConfigFile();
+            configHelp_tip.SetToolTip(cfgFile_cmb, "程式資料夾中 config 開頭的 .txt；選擇後載入該檔案");
+            // 「檔案」標籤與選單包成一組，換行時一起移動
+            var fileGroup = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = Padding.Empty };
+            fileGroup.Controls.AddRange(new Control[] { Caption("檔案"), cfgFile_cmb });
+            panel.Controls.AddRange(new Control[] {
+                Caption("名稱"), cfgName_txt, Caption("類型"), cfgType_cmb, add, update, delete, moveUp, moveDown,
+                Caption("參數"), cfgParam_txt, Caption("選項"), cfgOption_txt, fileGroup });
+            panel.SetFlowBreak(moveDown, true);
+            configHelp_tip.SetToolTip(moveUp, "選取項目往上移一列");
+            configHelp_tip.SetToolTip(moveDown, "選取項目往下移一列");
+            configHelp_tip.SetToolTip(cfgName_txt, "顯示在清單上的名稱，不能包含逗號");
+            configHelp_tip.SetToolTip(add, "加到目前選取項目的下一列並預覽");
+            configHelp_tip.SetToolTip(update, "以編輯區內容取代目前選取的項目");
+            configHelp_tip.SetToolTip(delete, "刪除目前選取的項目（右鍵 SaveConfig 存檔後才會寫入檔案）");
+            tabImgList.Controls.Add(panel);
+            cfgType_cmb.SelectedIndex = 0;
+        }  // 建立 config 編輯區
+        private ComboBox cfgFile_cmb;
+        private const string BuiltinConfigName = "內建設定";
+        private void RefreshConfigFiles()
+        {
+            // 列出程式資料夾中 config 開頭的 .txt，加上內建設定與目前載入的來源
+            string current = tabilPatternList_lst.Tag?.ToString();
+            var items = new List<string> { BuiltinConfigName };
+            items.AddRange(Directory.GetFiles(Application.StartupPath, "config*.txt")
+                .Where(path => Path.GetFileName(path).StartsWith("config", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(current) && !items.Contains(current, StringComparer.OrdinalIgnoreCase))
+            {
+                items.Add(current);  // 從其他位置開啟或拖入的檔案
+            }
+            cfgFile_cmb.Items.Clear();
+            foreach (string item in items)
+            {
+                cfgFile_cmb.Items.Add(new ConfigFileItem(item));
+            }
+            SyncConfigFileCombo();
+        }  // 掃描 config 檔案
+        private void SyncConfigFileCombo()
+        {
+            // 下拉選單顯示目前載入的來源（不重新載入）
+            string current = tabilPatternList_lst.Tag?.ToString();
+            cfgFile_cmb.SelectedItem = cfgFile_cmb.Items.Cast<ConfigFileItem>().FirstOrDefault(i => string.Equals(i.Path, current, StringComparison.OrdinalIgnoreCase));
+        }  // 同步目前來源
+        private void LoadSelectedConfigFile()
+        {
+            if (!(cfgFile_cmb.SelectedItem is ConfigFileItem item)) return;
+            try
+            {
+                if (item.Path == BuiltinConfigName)
+                {
+                    LoadConfig(Resources.config, BuiltinConfigName);
+                }
+                else
+                {
+                    LoadConfig(ReadConfigText(item.Path), item.Path);
+                }
+                ssrStatus_lbl.Text = $"Config：{item.Path}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SyncConfigFileCombo();
+            }
+        }  // 載入選擇的 config
+        private class ConfigFileItem
+        {
+            public string Path { get; }
+            public ConfigFileItem(string path) { Path = path; }
+            public override string ToString() => Path == BuiltinConfigName ? Path : System.IO.Path.GetFileName(Path);
+        }  // 下拉選單項目：顯示檔名，保留完整路徑
+        private void UpdateConfigHelp()
+        {
+            // 參數與選項的 tooltip 依類型顯示對應寫法
+            string type = cfgType_cmb.SelectedItem?.ToString();
+            if (type == null || !ConfigHelp.TryGetValue(type, out var help)) return;
+            configHelp_tip.SetToolTip(cfgType_cmb, $"{type}：滑鼠移到參數、選項欄位可看寫法");
+            configHelp_tip.SetToolTip(cfgParam_txt, help.param);
+            configHelp_tip.SetToolTip(cfgOption_txt, help.option);
+        }  // 更新寫法提示
+        private void FillConfigEditor(ListViewItem item)
+        {
+            // SubItems：0 編號、1 名稱、2 類型、3 參數、4 選項
+            cfgName_txt.Text = item.SubItems[1].Text;
+            string type = ConfigHelp.Keys.FirstOrDefault(k => k.Equals(item.SubItems[2].Text, StringComparison.OrdinalIgnoreCase));
+            if (type != null) cfgType_cmb.SelectedItem = type;
+            cfgParam_txt.Text = item.SubItems[3].Text;
+            cfgOption_txt.Text = item.SubItems[4].Text;
+        }  // 選取項目帶入編輯區
+        private void SaveConfigLine(bool replaceSelected)
+        {
+            string[] values = { cfgName_txt.Text.Trim(), cfgType_cmb.SelectedItem?.ToString() ?? "", cfgParam_txt.Text.Trim(), cfgOption_txt.Text.Trim() };
+            if (values[0] == "" || values[2] == "")
+            {
+                MessageBox.Show("請填寫名稱與參數！", "Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (values.Any(v => v.Contains(",")))
+            {
+                MessageBox.Show("欄位內容不能包含逗號（逗號是欄位分隔符號）！", "Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            ListViewItem item = CreateConfigItem(string.Join(",", values));
+            int selected = tabilPatternList_lst.SelectedIndices.Count > 0 ? tabilPatternList_lst.SelectedIndices[0] : -1;
+            if (replaceSelected)
+            {
+                if (selected < 0)
+                {
+                    MessageBox.Show("請先在清單選取要修改的項目！", "Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                tabilPatternList_lst.Items[selected] = item;
+            }
+            else
+            {
+                // 加在選取項目的下一列；沒有選取時加在最後
+                tabilPatternList_lst.Items.Insert(selected >= 0 ? selected + 1 : tabilPatternList_lst.Items.Count, item);
+            }
+            RenumberPatternList();
+            item.Selected = true;  // 觸發預覽，格式錯誤會提示
+            item.Focused = true;
+            item.EnsureVisible();
+        }  // 新增 / 修改 config 項目
+        private void DeleteConfigLine()
+        {
+            if (tabilPatternList_lst.SelectedItems.Count == 0) return;
+            int index = tabilPatternList_lst.SelectedIndices[0];
+            tabilPatternList_lst.Items.RemoveAt(index);
+            RenumberPatternList();
+            if (tabilPatternList_lst.Items.Count > 0)
+            {
+                tabilPatternList_lst.Items[Math.Min(index, tabilPatternList_lst.Items.Count - 1)].Selected = true;
+            }
+        }  // 刪除 config 項目
+        // 預覽區：config 文字、最近使用、螢幕更新率-----------------------------------------------------------------
+        private Label showimgConfig_lbl;
+        private GroupBox recent_grp;
+        private ListBox recent_lst;
+        private ToolStripLabel mnsRefresh_lbl;
+        private bool _configDraftFocused;  // 焦點在 ImgList 編輯區後，Enter / Generate 預覽草稿
+        private RecentItem _shownItem;     // 目前預覽來自最近使用 / 草稿（null 表示來自目前分頁）
+        private bool _dirListLoaded;       // DirList 只在第一次切換時自動讀取
+        private const int RecentMax = 10;
+        private class RecentItem
+        {
+            public string Name { get; private set; }
+            public string Line { get; private set; }  // config 一行；圖檔為 null
+            public string Path { get; private set; }  // 圖檔路徑；config 為 null
+            // 相同內容只留一筆：config 比對名稱以外的欄位，圖檔比對路徑
+            public string Key => Line != null
+                ? "cfg:" + string.Join(",", Line.Split(',').Skip(1).Select(v => v.Trim().ToLower()))
+                : "file:" + Path.ToLower();
+            public static RecentItem FromConfig(string line) => new RecentItem { Name = line.Split(',')[0].Trim(), Line = line };
+            public static RecentItem FromFile(string path) => new RecentItem { Name = System.IO.Path.GetFileName(path), Path = path };
+            public override string ToString() => Name;
+        }  // 最近使用項目
+        private void InitPreviewPanel()
+        {
+            // Showimage_flp 由下往上排列（index 越大越上面）：縮圖上方插入 config 文字，最上方為最近使用
+            int width = showimgPicture_pic.Width;
+            showimgConfig_lbl = new Label
+            {
+                AutoSize = true, MaximumSize = new Size(width, 0), UseMnemonic = false, Visible = false,
+                ForeColor = Color.DimGray, Margin = new Padding(3, 0, 3, 2)
+            };
+            Showimage_flp.Controls.Add(showimgConfig_lbl);
+            Showimage_flp.Controls.SetChildIndex(showimgConfig_lbl, Showimage_flp.Controls.GetChildIndex(showimgSize_lbl));
+            recent_lst = new ListBox { Dock = DockStyle.Fill, IntegralHeight = false, HorizontalScrollbar = true };
+            recent_lst.DoubleClick += (s, e) => OpenRecent();
+            recent_lst.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; OpenRecent(); }
+            };
+            toolTip.SetToolTip(recent_lst, "最近開啟 / 編輯的 10 張圖片：單擊選取、雙擊或 Enter 開啟");
+            recent_grp = new GroupBox { Text = "最近使用", Width = width, Height = 100, Margin = new Padding(3, 2, 3, 2) };
+            recent_grp.Controls.Add(recent_lst);
+            Showimage_flp.Controls.Add(recent_grp);  // 最後加入 = 最上方
+            Showimage_flp.Resize += (s, e) => LayoutRecent();
+            // 工具列最右邊顯示目前螢幕的更新率（右對齊項目中第一個在最右邊）
+            mnsRefresh_lbl = new ToolStripLabel { Alignment = ToolStripItemAlignment.Right, ToolTipText = "目前螢幕的更新率" };
+            menuStrip.Items.Insert(0, mnsRefresh_lbl);
+            // ImgList 編輯區：取得焦點後 Enter 或 Generate 預覽草稿
+            foreach (Control field in new Control[] { cfgName_txt, cfgType_cmb, cfgParam_txt, cfgOption_txt })
+            {
+                field.Enter += (s, e) => _configDraftFocused = true;
+                field.KeyDown += (s, e) =>
+                {
+                    if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; PreviewConfigDraft(); }
+                };
+            }
+            tabilPatternList_lst.Enter += (s, e) => _configDraftFocused = false;  // 回到清單後 Generate 依清單選取
+        }  // 建立預覽區的 config 文字、最近使用與更新率
+        private void LayoutRecent()
+        {
+            // 最近使用填滿上方剩餘的高度
+            if (recent_grp == null) return;
+            int used = Showimage_flp.Controls.Cast<Control>()
+                .Where(c => c != recent_grp && (c != showimgConfig_lbl || showimgConfig_lbl.Text != ""))
+                .Sum(c => c.Height + c.Margin.Vertical);
+            recent_grp.Height = Math.Max(60, Showimage_flp.ClientSize.Height - Showimage_flp.Padding.Vertical - used - recent_grp.Margin.Vertical);
+        }  // 調整最近使用高度
+        private void ShowPreviewInfo(int width, int height, string line)
+        {
+            // 圖片大小與 config（line 為 null 時隱藏 config 文字）
+            showimgSize_lbl.Text = $"當前圖片大小：{width} x {height}";
+            if (line != null)
+            {
+                line = string.Join(",", line.Split(',').Select(v => v.Trim())).TrimEnd(',');  // 去掉對齊用的 Tab 與空白
+            }
+            showimgConfig_lbl.Text = line ?? "";
+            showimgConfig_lbl.Visible = !string.IsNullOrEmpty(line);
+            toolTip.SetToolTip(showimgConfig_lbl, line);
+            LayoutRecent();
+        }  // 更新預覽資訊
+        private void AddRecent(RecentItem item)
+        {
+            var existing = recent_lst.Items.Cast<RecentItem>().FirstOrDefault(i => i.Key == item.Key);
+            if (existing != null) recent_lst.Items.Remove(existing);
+            recent_lst.Items.Insert(0, item);
+            while (recent_lst.Items.Count > RecentMax)
+            {
+                recent_lst.Items.RemoveAt(recent_lst.Items.Count - 1);
+            }
+        }  // 加入最近使用（最新的在最上面）
+        private void OpenRecent()
+        {
+            if (!(recent_lst.SelectedItem is RecentItem item)) return;
+            bool ok = item.Line != null ? ApplyConfigLine(item.Line) : LoadImageFile(item.Path);
+            if (!ok) return;
+            _shownItem = item;
+            AddRecent(item);
+            recent_lst.SelectedItem = item;
+            ssrStatus_lbl.Text = $"最近使用：{item.Path ?? item.Line}";
+            if (_pictureWindow != null && !_pictureWindow.IsDisposed)
+            {
+                FullScreen(recent_lst, EventArgs.Empty);  // 全螢幕開著時一起更新
+            }
+        }  // 開啟最近使用
+        private void PreviewConfigDraft()
+        {
+            // 依 ImgList 編輯區目前內容產生預覽（不寫入清單）
+            string name = cfgName_txt.Text.Trim();
+            string[] values = { name == "" ? "預覽" : name, cfgType_cmb.SelectedItem?.ToString() ?? "", cfgParam_txt.Text.Trim(), cfgOption_txt.Text.Trim() };
+            if (values[2] == "")
+            {
+                ssrStatus_lbl.Text = "預覽：請先填寫參數";
+                return;
+            }
+            if (values.Any(v => v.Contains(",")))
+            {
+                MessageBox.Show("欄位內容不能包含逗號（逗號是欄位分隔符號）！", "Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string line = string.Join(",", values);
+            if (!ApplyConfigLine(line)) return;
+            var item = RecentItem.FromConfig(line);
+            _shownItem = item;
+            AddRecent(item);
+            ssrStatus_lbl.Text = $"預覽草稿：{line}";
+        }  // 預覽編輯區草稿
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct DEVMODE
+        {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmDeviceName;
+            public short dmSpecVersion, dmDriverVersion, dmSize, dmDriverExtra;
+            public int dmFields, dmPositionX, dmPositionY, dmDisplayOrientation, dmDisplayFixedOutput;
+            public short dmColor, dmDuplex, dmYResolution, dmTTOption, dmCollate;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmFormName;
+            public short dmLogPixels;
+            public int dmBitsPerPel, dmPelsWidth, dmPelsHeight, dmDisplayFlags, dmDisplayFrequency;
+            public int dmICMMethod, dmICMIntent, dmMediaType, dmDitherType, dmReserved1, dmReserved2, dmPanningWidth, dmPanningHeight;
+        }
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+        private void UpdateRefreshRate()
+        {
+            // 顯示下拉選單目前螢幕的更新率（沒有選擇時保留原本顯示）
+            string device = mnsScreenlist_cmb.SelectedItem?.ToString();
+            if (device == null || mnsRefresh_lbl == null) return;
+            var mode = new DEVMODE { dmSize = (short)Marshal.SizeOf(typeof(DEVMODE)) };
+            mnsRefresh_lbl.Text = EnumDisplaySettings(device, -1, ref mode) && mode.dmDisplayFrequency > 1  // -1：ENUM_CURRENT_SETTINGS
+                ? $"{mode.dmDisplayFrequency} Hz"
+                : "? Hz";
+        }  // 更新螢幕更新率
+        private void InitDirListReload()
+        {
+            var reload = new Button { Text = "重新讀取", AutoSize = true, Dock = DockStyle.Top };
+            reload.Click += (s, e) => { PopulateListView(); ssrStatus_lbl.Text = $"已重新讀取：{Application.StartupPath}"; };
+            toolTip.SetToolTip(reload, "重新掃描程式資料夾的圖檔（新增 / 刪除檔案後使用）");
+            tabDirList.Controls.Add(reload);
+            tabdlPatternList_lvw.BringToFront();  // 清單最後 Dock，填滿按鈕以外的空間
+        }  // DirList 重新讀取按鈕
+        private bool _movingConfigLine;  // 移動時重新選取不重新產生圖片
+        private void MoveConfigLine(int step)
+        {
+            if (tabilPatternList_lst.SelectedItems.Count == 0) return;
+            int index = tabilPatternList_lst.SelectedIndices[0];
+            int target = index + step;
+            if (target < 0 || target >= tabilPatternList_lst.Items.Count) return;
+            ListViewItem item = tabilPatternList_lst.Items[index];
+            _movingConfigLine = true;
+            try
+            {
+                tabilPatternList_lst.Items.RemoveAt(index);
+                tabilPatternList_lst.Items.Insert(target, item);
+                RenumberPatternList();
+                item.Selected = true;
+                item.Focused = true;
+                item.EnsureVisible();
+            }
+            finally
+            {
+                _movingConfigLine = false;
+            }
+        }  // 上移 / 下移 config 項目
         private void ConfigToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (sender is ToolStripMenuItem targetbutton)
@@ -1534,9 +2791,14 @@ namespace Thunder
                         openFileDialog.Filter = "Text Files|*.txt";
                         if (openFileDialog.ShowDialog() == DialogResult.OK)
                         {
-                            string configfile = File.ReadAllText(openFileDialog.FileName);
-                            PopulateListBox(configfile);
-                            tabilPatternList_lst.Tag = openFileDialog.FileName; // 儲存檔案路徑
+                            try
+                            {
+                                LoadConfig(ReadConfigText(openFileDialog.FileName), openFileDialog.FileName);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
                         }
                     }
                 }
@@ -1546,10 +2808,20 @@ namespace Thunder
                     using (SaveFileDialog saveFileDialog = new SaveFileDialog())
                     {
                         saveFileDialog.Filter = "Text Files|*.txt";
+                        saveFileDialog.FileName = "config.txt";
                         if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
-                            string configfile = string.Join(Environment.NewLine, tabilPatternList_lst.Items.Cast<string>());
-                            File.WriteAllText(saveFileDialog.FileName, configfile);
+                            // 第一行寫欄名，其餘照原始內容寫回；UTF-8（含 BOM）方便記事本與 Excel 開啟
+                            var lines = new[] { string.Join(",", ConfigColumns) }
+                                .Concat(tabilPatternList_lst.Items.Cast<ListViewItem>().Select(item => item.Tag.ToString()));
+                            try
+                            {
+                                File.WriteAllText(saveFileDialog.FileName, string.Join(Environment.NewLine, lines), Encoding.UTF8);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"儲存失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
                         }
                     }
                 }
@@ -1658,7 +2930,7 @@ namespace Thunder
         }  // Frame 其他線的卷軸值變更
         private void hScrollBar1_ValueChanged(object sender, EventArgs e)
         {
-            tabiecGray_lbl.Text = $"Gary: {tabiecGray_hsc.Value.ToString()}"; // 更新 Label 顯示當前值
+            tabiecGray_lbl.Text = $"Gray: {tabiecGray_hsc.Value}"; // 更新 Label 顯示當前值
         }  // Chess卷軸值變更
 
         private void Framechkother_CheckStateChanged(object sender, EventArgs e)
@@ -2188,88 +3460,135 @@ namespace Thunder
                     }
                     else
                     {
+                        int outW = bitmap.Width, outH = bitmap.Height;
+                        var done = new List<object>();
+                        var failed = new List<string>();
                         foreach (object iteamChecked in tabieaPatternList_chl.CheckedItems)
                         {
-                            string[] words = iteamChecked.ToString().Split('.');
-                            string filePath = $"{words[0]}_new.{words[1]}"; // 儲存路徑
-
-                            if (tabieaResize_rdo.Checked)
+                            string sourcePath = iteamChecked.ToString();
+                            // 用 Path 取副檔名（資料夾名稱含 . 也不會切錯，大小寫皆可）
+                            string extension = Path.GetExtension(sourcePath).ToLower();
+                            ImageFormat format = extension == ".bmp" ? ImageFormat.Bmp
+                                : extension == ".png" ? ImageFormat.Png
+                                : extension == ".jpg" || extension == ".jpeg" ? ImageFormat.Jpeg : null;
+                            if (format == null)
                             {
-                                g.DrawImage(Image.FromFile(iteamChecked.ToString()), 0, 0, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text));
-                                filePath = $"{words[0]}_{mnsW_txt}x{mnsH_txt}.{words[1]}";
+                                failed.Add($"{Path.GetFileName(sourcePath)}：不支援的格式 {extension}");
+                                ssrProgressbar_prg.Value++;
+                                continue;
                             }
-                            else if (tabieaRotate90_rdo.Checked)
+                            try
                             {
-                                using (Bitmap originalBitmap = new Bitmap(iteamChecked.ToString()))
+                                Bitmap source;
+                                using (FileStream stream = File.OpenRead(sourcePath))  // 讀進記憶體後即釋放檔案，不鎖檔
+                                using (Image image = Image.FromStream(stream))
                                 {
-                                    originalBitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                                    g.DrawImage(originalBitmap, 0, 0, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text));
+                                    source = new Bitmap(image);
                                 }
-                                filePath = $"{words[0]}_Rotate90_{mnsW_txt}x{mnsH_txt}.{words[1]}";
-                            }
-                            else if (tabieaRotate180_rdo.Checked)
-                            {
-                                using (Bitmap originalBitmap = new Bitmap(iteamChecked.ToString()))
+                                string suffix;
+                                using (source)
                                 {
-                                    originalBitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                                    g.DrawImage(originalBitmap, 0, 0, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text));
+                                    g.Clear(Color.Black);  // 每張先清空，避免殘留上一張；留邊處為黑色
+                                    if (tabieaResize_rdo.Checked)
+                                    {
+                                        g.DrawImage(source, ResizeRectangle(source.Size, outW, outH, tabieaResizeMode_cmb.SelectedIndex));
+                                        string[] modeSuffix = { "", "Fit_", "Fill_", "1to1_" };
+                                        suffix = $"{modeSuffix[Math.Max(0, tabieaResizeMode_cmb.SelectedIndex)]}{outW}x{outH}";
+                                    }
+                                    else
+                                    {
+                                        var (rotate, rotateName) =
+                                              tabieaRotate90_rdo.Checked ? (RotateFlipType.Rotate90FlipNone, "Rotate90")
+                                            : tabieaRotate180_rdo.Checked ? (RotateFlipType.Rotate180FlipNone, "Rotate180")
+                                            : tabieaRotate270_rdo.Checked ? (RotateFlipType.Rotate270FlipNone, "Rotate270")
+                                            : tabieaHFlip_rdo.Checked ? (RotateFlipType.RotateNoneFlipX, "FlipX")
+                                            : (RotateFlipType.RotateNoneFlipY, "FlipY");
+                                        source.RotateFlip(rotate);
+                                        g.DrawImage(source, 0, 0, outW, outH);
+                                        suffix = $"{rotateName}_{outW}x{outH}";
+                                    }
                                 }
-                                filePath = $"{words[0]}_Rotate180_{mnsW_txt}x{mnsH_txt}.{words[1]}";
+                                string outputPath = Path.Combine(Path.GetDirectoryName(sourcePath), $"{Path.GetFileNameWithoutExtension(sourcePath)}_{suffix}{extension}");
+                                bitmap.Save(outputPath, format);
+                                done.Add(iteamChecked);
                             }
-                            else if (tabieaRotate270_rdo.Checked)
+                            catch (Exception ex)
                             {
-                                using (Bitmap originalBitmap = new Bitmap(iteamChecked.ToString()))
-                                {
-                                    originalBitmap.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                                    g.DrawImage(originalBitmap, 0, 0, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text));
-                                }
-                                filePath = $"{words[0]}_Rotate270_{mnsW_txt}x{mnsH_txt}.{words[1]}";
+                                failed.Add($"{Path.GetFileName(sourcePath)}：{ex.Message}");
                             }
-                            else if (tabieaHFlip_rdo.Checked)
-                            {
-                                using (Bitmap originalBitmap = new Bitmap(iteamChecked.ToString()))
-                                {
-                                    originalBitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
-                                    g.DrawImage(originalBitmap, 0, 0, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text));
-                                }
-                                filePath = $"{words[0]}_FlipX_{mnsW_txt}x{mnsH_txt}.{words[1]}";
-                            }
-                            else if (tabieaVFlip_rdo.Checked)
-                            {
-                                using (Bitmap originalBitmap = new Bitmap(iteamChecked.ToString()))
-                                {
-                                    originalBitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-                                    g.DrawImage(originalBitmap, 0, 0, int.Parse(mnsW_txt.Text), int.Parse(mnsH_txt.Text));
-                                }
-                                filePath = $"{words[0]}_FlipY_{mnsW_txt}x{mnsH_txt}.{words[1]}";
-                            }
-                            switch (words[1])
-                            {
-                                case "bmp":
-                                    bitmap.Save(filePath, ImageFormat.Bmp);
-                                    break;
-                                case "png":
-                                    bitmap.Save(filePath, ImageFormat.Png); // 儲存圖片
-                                    break;
-                                case "jpeg":
-                                case "jpg":
-                                    bitmap.Save(filePath, ImageFormat.Jpeg);
-                                    break;
-                                default:
-                                    break;
-                            }
-
                             ssrProgressbar_prg.Value++;
                         }
-                        for (int i = tabieaPatternList_chl.CheckedItems.Count - 1; i >= 0; i--)
+                        // 只移除轉換成功的項目，失敗的留在清單上
+                        foreach (object item in done)
                         {
-                            tabieaPatternList_chl.Items.Remove(tabieaPatternList_chl.CheckedItems[i]);
+                            tabieaPatternList_chl.Items.Remove(item);
+                        }
+                        if (failed.Count > 0)
+                        {
+                            MessageBox.Show($"以下 {failed.Count} 個檔案轉換失敗：\r\n\r\n" + string.Join("\r\n", failed), "ImageAdjust", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
                     }
                 }
             }
             ssrProgressbar_prg.Visible = false; // 在迴圈完成後隱藏進度條
         }  // Adjust 調整圖片
+        private static Rectangle ResizeRectangle(Size source, int width, int height, int mode)
+        {
+            // 0 拉伸填滿、1 等比例（留黑邊）、2 填滿裁切（等比例，超出裁掉）、3 1:1 置中
+            if (mode == 3) return new Rectangle((width - source.Width) / 2, (height - source.Height) / 2, source.Width, source.Height);
+            if (mode == 1 || mode == 2)
+            {
+                double sx = (double)width / source.Width, sy = (double)height / source.Height;
+                double scale = mode == 1 ? Math.Min(sx, sy) : Math.Max(sx, sy);
+                int w = (int)Math.Round(source.Width * scale), h = (int)Math.Round(source.Height * scale);
+                return new Rectangle((width - w) / 2, (height - h) / 2, w, h);
+            }
+            return new Rectangle(0, 0, width, height);
+        }  // Resize 縮放模式的繪製範圍
+        private void InitQuickButtons()
+        {
+            // Gradient：FirstLevel / LastLevel 右側，數值對調（例 0/255 → 255/0）
+            var swap = new Button { Text = "對調", Location = new Point(368, 45), Size = new Size(44, 24) };
+            swap.Click += (s, e) =>
+            {
+                string first = tabigFirstLevel_cmb.Text;
+                tabigFirstLevel_cmb.Text = tabigLastLevel_cmb.Text;
+                tabigLastLevel_cmb.Text = first;
+            };
+            toolTip.SetToolTip(swap, "FirstLevel 與 LastLevel 數值對調（例：0 / 255 → 255 / 0）");
+            tabimgeGradient.Controls.Add(swap);
+            swap.BringToFront();
+
+            // Chess：灰階捲軸下方，快速設定 水平×垂直 格數
+            var sizes = new (int h, int v)[] { (2, 2), (5, 5), (8, 8), (32, 32), (8, 5) };
+            for (int i = 0; i < sizes.Length; i++)
+            {
+                var (h, v) = sizes[i];
+                var button = new Button { Text = $"{h}×{v}", Location = new Point(85 + i * 52, 148), Size = new Size(50, 24) };
+                button.Click += (s, e) =>
+                {
+                    tabiecHNum_nud.Value = Math.Min(h, tabiecHNum_nud.Maximum);
+                    tabiecVNum_nud.Value = Math.Min(v, tabiecVNum_nud.Maximum);
+                };
+                toolTip.SetToolTip(button, $"水平 {h} 格、垂直 {v} 格");
+                tabimgeChess.Controls.Add(button);
+                button.BringToFront();
+            }
+        }  // Gradient 對調、Chess 快速格數
+        private ComboBox tabieaResizeMode_cmb;
+        private void InitResizeMode()
+        {
+            // ReSize 右側：縮放模式（選 ReSize 時才可用）
+            tabieaResizeMode_cmb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(75, 42), Width = 85, ImeMode = ImeMode.Disable };
+            tabieaResizeMode_cmb.Items.AddRange(new object[] { "拉伸填滿", "等比例", "填滿裁切", "1:1 置中" });
+            tabieaResizeMode_cmb.SelectedIndex = 0;
+            toolTip.SetToolTip(tabieaResizeMode_cmb, "拉伸填滿：拉成目前寬高\r\n等比例：完整顯示，留黑邊\r\n填滿裁切：等比例填滿，超出裁掉\r\n1:1 置中：原尺寸置中，不縮放");
+            tabimgeAdjust.Controls.Add(tabieaResizeMode_cmb);
+            tabieaResizeMode_cmb.BringToFront();
+            void Update() => tabieaResizeMode_cmb.Enabled = tabieaResize_rdo.Checked;
+            tabieaResize_rdo.CheckedChanged += (s, e) => Update();
+            Update();
+        }  // 建立縮放模式選單
         private void windowPictureBox_Click(object sender, EventArgs e)
         {
             if (sender is PictureBox targetPictureBox)
@@ -3002,6 +4321,32 @@ namespace Thunder
                 }
             }
         }  //Dymenic物件移動方式選擇
+        private void DrawDynamicObject(Graphics g, int width, int height)
+        {
+            // 依 Dynamic 設定在目前位置畫出物件（動畫與預覽共用）
+            using (Brush brush = new SolidBrush(tabiedObjectColor_btn.BackColor))
+            {
+                if (tabiedObjectBall_rdo.Checked)
+                {
+                    g.FillEllipse(brush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2);
+                }
+                else if (tabiedObjectCube_rdo.Checked)
+                {
+                    g.FillRectangle(brush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2);
+                }
+                else if (tabiedObjectStrip_rdo.Checked)
+                {
+                    if (tabiedMoveH_rdo.Checked)
+                    {
+                        g.FillRectangle(brush, mypicture.startX, 0, mypicture.objectSize, height);
+                    }
+                    else if (tabiedMoveV_rdo.Checked)
+                    {
+                        g.FillRectangle(brush, 0, mypicture.startY, width, mypicture.objectSize);
+                    }
+                }
+            }
+        }  // 畫動態物件
         private void AnimationTimer_Tick(object sender, EventArgs e)
         {
             // 更新球體位置
@@ -3047,36 +4392,7 @@ namespace Thunder
 
             using (Graphics g = Graphics.FromImage(bitmap))
             {
-
-                // 繪製其他物件
-                if (tabiedObjectBall_rdo.Checked)
-                {
-                    using (Brush ballBrush = new SolidBrush(tabiedObjectColor_btn.BackColor))
-                    {
-                        g.FillEllipse(ballBrush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2);
-                    }
-                }
-                else if (tabiedObjectCube_rdo.Checked)
-                {
-                    using (Brush cubeBrush = new SolidBrush(tabiedObjectColor_btn.BackColor))
-                    {
-                        g.FillRectangle(cubeBrush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2);
-                    }
-                }
-                else if (tabiedObjectStrip_rdo.Checked)
-                {
-                    using (Brush stripBrush = new SolidBrush(tabiedObjectColor_btn.BackColor))
-                    {
-                        if (tabiedMoveH_rdo.Checked)
-                        {
-                            g.FillRectangle(stripBrush, mypicture.startX, 0, mypicture.objectSize, mypicture.Getpicture().Height);
-                        }
-                        else if (tabiedMoveV_rdo.Checked)
-                        {
-                            g.FillRectangle(stripBrush, 0, mypicture.startY, mypicture.Getpicture().Width, mypicture.objectSize);
-                        }
-                    }
-                }
+                DrawDynamicObject(g, bitmap.Width, bitmap.Height);
             }
 
             // 更新到 PictureBox
@@ -3104,6 +4420,16 @@ namespace Thunder
             {
                 case Keys.Escape:
                     FullScreen(sender, e);
+                    break;
+                case Keys.Space:
+                    // 空白鍵：ImgEditor / ImgList 用目前寬高重新產生後全螢幕；DirList 直接全螢幕（正在文字框輸入時不攔截）
+                    if (e.Modifiers == Keys.None && !IsTextInputFocused())
+                    {
+                        e.Handled = true;
+                        e.SuppressKeyPress = true;
+                        RegenerateCurrent();
+                        FullScreen(sender, e);
+                    }
                     break;
                 case Keys.F1:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
@@ -3141,26 +4467,10 @@ namespace Thunder
                     break;
                 case Keys.Add: // 數字鍵盤的加號
                 case Keys.Oemplus: // 主鍵盤的加號
-                    if (mnsScreenlist_cmb.SelectedIndex < mnsScreenlist_cmb.Items.Count - 1)
-                    {
-                        mnsScreenlist_cmb.SelectedIndex += 1;
-                    }
-                    else
-                    {
-                        mnsScreenlist_cmb.SelectedIndex = 0;
-                    }
+                    SwitchScreen(+1);
                     break;
                 case Keys.Subtract: // 數字鍵盤的減號
                 case Keys.OemMinus: // 主鍵盤的減號
-                    if (mnsScreenlist_cmb.SelectedIndex == 0)
-                    {
-                        mnsScreenlist_cmb.SelectedIndex = mnsScreenlist_cmb.Items.Count - 1;
-                    }
-                    else
-                    {
-                        mnsScreenlist_cmb.SelectedIndex -= 1;
-                    }
-                    break;
                 default:
                     //switch (e.KeyValue)
                     //{
@@ -3238,43 +4548,23 @@ namespace Thunder
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files.Length > 0)
             {
-                // 過濾只允許檔名為 config.txt 的檔案  
-                var configFiles = files.Where(file => Path.GetFileName(file).ToLower() == "config.txt").ToArray();
-
-                if (configFiles.Length > 0)
+                // 只接受 .txt（匯出的 config 可能改過檔名），多個檔案時載入第一個
+                string filePath = files.FirstOrDefault(file => Path.GetExtension(file).ToLower() == ".txt");
+                if (filePath != null)
                 {
-                    foreach (var filePath in configFiles)
+                    try
                     {
-                        try
-                        {
-                            //MessageBox.Show(filePath);
-                            // 在這裡處理 config.txt 檔案的邏輯 
-                            // 如果找到 config.txt，將其內容讀取為字串並傳入 PopulateListBox 函式
-                            if (!string.IsNullOrEmpty(filePath))
-                            {
-                                try
-                                {
-                                    PopulateListBox(File.ReadAllText(filePath)); // 將字串傳入 PopulateListBox
-                                }
-                                catch (Exception ex)
-                                {
-                                    MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                }
-                            }
-                            else
-                            {
-                                PopulateListBox(Resources.config);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"無法載入文件：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                        LoadConfig(ReadConfigText(filePath), filePath);
+                        ssrStatus_lbl.Text = $"Config：{filePath}";
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"讀取檔案失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("只允許拖入檔名為 config.txt 的檔案！", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("只允許拖入 .txt 的 config 檔案！", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }  // tabilPatternList_lst拖放後執行
@@ -3283,8 +4573,7 @@ namespace Thunder
             // 檢查檔案是否為支援的 config.txt  
             bool IsSupportedFile(string filePath)
             {
-                string filename = Path.GetFileName(filePath).ToLower();
-                return filename == "config.txt";// || filename.EndsWith(".json") || filename.EndsWith(".xml");
+                return Path.GetExtension(filePath).ToLower() == ".txt";
             }
 
             // 檢查拖入的資料是否包含檔案，並且是支援的 config.txt  
@@ -3371,6 +4660,15 @@ namespace Thunder
                 return true; // 圖片已被處置或無效
             }
         }  // 測試用
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetFocus();
+        private bool IsTextInputFocused()
+        {
+            // 文字框、NumericUpDown、可輸入的 ComboBox 需要保留空白鍵
+            Control focused = Control.FromChildHandle(GetFocus());
+            return focused is TextBoxBase
+                || (focused is ComboBox combo && combo.DropDownStyle != ComboBoxStyle.DropDownList);
+        }  // 目前焦點是否在可輸入文字的控制項
         protected override bool ProcessKeyPreview(ref Message m)
         {
             if (m.Msg == 0x100 || m.Msg == 0x104) // WM_KEYDOWN 或 WM_SYSKEYDOWN
@@ -3401,23 +4699,29 @@ namespace Thunder
                 string[] colorParts = sc.Split('.');
                 return Color.FromArgb(int.Parse(colorParts[0]), int.Parse(colorParts[1]), int.Parse(colorParts[2])); // 修改 Form1 的背景顏色
             }
+            else if (sc.EndsWith("%gray") || sc.EndsWith("%gary"))  // 例如 50%Gray（相容舊的拼法 Gary）
+            {
+                int level = Math.Max(0, Math.Min(255, (int)(float.Parse(sc.Split('%')[0]) / 100 * 256) - 1));
+                return Color.FromArgb(level, level, level);
+            }
             else
             {
-                // 根據傳入的顏色名稱來設置顏色
-                try
+                // 根據傳入的顏色名稱來設置顏色；Color.FromName 遇到不認識的名稱不會丟例外，會回傳透明黑
+                Color color = Color.FromName(sc);
+                if (!color.IsKnownColor)
                 {
-                    return Color.FromName(sc);
+                    throw new FormatException($"無法識別顏色「{sc}」");
                 }
-                catch
-                {
-                    // 如果顏色名稱無效，則使用 Color.FromName 方法將其轉換為顏色
-                    MessageBox.Show($"無法識別顏色：{sc}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return Color.Gray;
-                }
+                return color;
             }
         }
         private void funcFrame(string color, string line)
         {
+            // 先重設 config 沒有指定的 ImgEditor 狀態，避免沿用使用者手動的設定
+            tabiefOther_chk.Checked = false;  // 額外的 H/V 線
+            tabiefText_chk.Checked = false;   // 文字模式
+            tabiefLineSize_nud.Value = 1;
+            mypicture.tag = "";  // 匯入背景圖後 tag 會是 "image"，會畫出匯入的圖而不是純色
             if (color.EndsWith("%gary"))
             {
                 int cc = (int)((float.Parse(color.Split('%')[0]) / 100) * 256) - 1;
@@ -3429,47 +4733,164 @@ namespace Thunder
                 tabiefBack_btn.BackColor = switchcolor(color);
             }
             // 根據傳入的 line 參數來設置其他控件的狀態
+            // 格式：線種-線色；線種可組合 c 中心、o 外框、n 九點、r 左紅右藍（r 不用線色，只有 r 時可省略線色）
             string[] li = line.Split('-');
-            if (li.Length >= 2)
-            {
-                tabiefCenter_chk.Checked = li[0].Contains("c") ? true : false;
-                tabiefOutside_chk.Checked = li[0].Contains("o") ? true : false;
-                tabiefNine_chk.Checked = li[0].Contains("n") ? true : false;
-                tabiefLineColor_btn.BackColor = switchcolor(li[1]);
-            }
-            else
-            {
-                tabiefCenter_chk.Checked = false;
-                tabiefOutside_chk.Checked = false;
-                tabiefNine_chk.Checked = false;
-            }
+            string kinds = li[0].Trim();
+            tabiefCenter_chk.Checked = kinds.Contains("c");
+            tabiefOutside_chk.Checked = kinds.Contains("o");
+            tabiefNine_chk.Checked = kinds.Contains("n");
+            tabiefRedBlue_chk.Checked = kinds.Contains("r");
+            tabiefLineColor_btn.BackColor = li.Length >= 2 ? switchcolor(li[1]) : Color.White;
         } // listbox控制Frame
-        private void funcChess(string num, string hv)
+        private void funcChess(string num, string option)
         {
+            // 選項以 - 分隔：h / v / hv 為翻轉，其他視為格子顏色（預設白色，另一色固定黑色）
+            // 例如 "v"、"red"、"255.0.0-v"、"50%gray"
+            Color color = Color.White;
+            bool hFlip = false, vFlip = false;
+            foreach (string token in option.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string t = token.Trim();
+                if (t == "h" || t == "v" || t == "hv" || t == "vh")
+                {
+                    hFlip |= t.Contains("h");
+                    vFlip |= t.Contains("v");
+                }
+                else
+                {
+                    color = switchcolor(t);
+                }
+            }
             string[] numParts = num.Split('*');
-            if (numParts.Length >= 2)
+            if (numParts.Length < 2)
             {
-                tabiecBaseColor_lbl.BackColor = Color.White;
-                tabiecHNum_nud.Value = int.Parse(numParts[0]);
-                tabiecVNum_nud.Value = int.Parse(numParts[1]); 
-                tabiecHFlip_chk.Checked = hv.Contains("h") ? true : false;
-                tabiecVFlip_chk.Checked = hv.Contains("v") ? true : false;
+                throw new FormatException($"格數「{num}」格式應為 寬*高，例如 8*8");
             }
-            else 
-            {
-                tabiecHFlip_chk.Checked = false;
-                tabiecVFlip_chk.Checked = false;
-            }
+            tabiecHNum_nud.Value = int.Parse(numParts[0]);
+            tabiecVNum_nud.Value = int.Parse(numParts[1]);
+            tabiecHFlip_chk.Checked = hFlip;
+            tabiecVFlip_chk.Checked = vFlip;
+            // 產生棋盤格時讀的是 tabiecGray_lbl 與灰階捲軸，兩者都要設定，否則會沿用 ImgEditor 的狀態
+            tabiecBaseColor_lbl.BackColor = color;
+            tabiecGray_lbl.BackColor = color;
+            tabiecGray_lbl.ForeColor = (color.R + color.G + color.B) / 3 < 127 ? Color.White : Color.Black;
+            tabiecGray_hsc.Maximum = Math.Max(color.R, Math.Max(color.G, color.B));
+            tabiecGray_hsc.Value = tabiecGray_hsc.Maximum;
         }  // listbox控制棋盤格
+        private void funcText(string colors, string option)
+        {
+            // 參數：背景色-文字色；選項：文字/大小/字距/行距/串距（大小以後可省略，用預設值）
+            string[] colorParts = colors.Split('-');
+            funcFrame(colorParts[0], "");  // 背景與框線（重設為無線條、關閉文字模式）
+            string[] parts = option.Split('/');
+            string text = parts[0].Trim();
+            if (text == "") throw new FormatException("沒有文字（選項第一段為文字）");
+            if (text.Length > 10) throw new FormatException($"文字最多 10 個字，目前 {text.Length} 個");
+            decimal Number(int index, string name, NumericUpDown range)
+            {
+                if (!decimal.TryParse(parts[index].Trim(), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out decimal value))
+                {
+                    throw new FormatException($"{name}「{parts[index]}」不是數字");
+                }
+                if (value < range.Minimum || value > range.Maximum) throw new FormatException($"{name}需在 {range.Minimum}~{range.Maximum}");
+                return value;
+            }
+            tabiefTextSize_nud.Value = parts.Length > 1 ? Number(1, "大小", tabiefTextSize_nud) : 12;  // 會依比例重設間距
+            if (parts.Length > 2) tabiefTextCharGap_nud.Value = Number(2, "字距", tabiefTextCharGap_nud);
+            if (parts.Length > 3) tabiefTextLineGap_nud.Value = Number(3, "行距", tabiefTextLineGap_nud);
+            if (parts.Length > 4) tabiefTextStringGap_nud.Value = Number(4, "串距", tabiefTextStringGap_nud);
+            tabiefTextColor_btn.BackColor = colorParts.Length > 1 ? switchcolor(colorParts[1]) : Color.White;
+            tabiefText_txt.Text = text;
+            tabiefText_chk.Checked = true;
+        }  // listbox控制文字模式
+        private void funcDynamic(string colors, string option)
+        {
+            // 參數：背景色-物件色；選項：形狀(ball/cube/strip)、方向(h/v/b)、size數字、speed數字，以 - 連接
+            mypicture.tag = "";  // 不使用匯入的背景圖
+            string[] colorParts = colors.Split('-');
+            tabiedBackColor_btn.BackColor = switchcolor(colorParts[0]);
+            tabiedObjectColor_btn.BackColor = colorParts.Length > 1 ? switchcolor(colorParts[1]) : Color.White;
+            RadioButton shape = tabiedObjectBall_rdo;
+            RadioButton direction = tabiedMoveBevel_rdo;
+            decimal size = 50, speed = 50;
+            foreach (string token in option.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string t = token.Trim();
+                if (t == "ball") shape = tabiedObjectBall_rdo;
+                else if (t == "cube") shape = tabiedObjectCube_rdo;
+                else if (t == "strip") shape = tabiedObjectStrip_rdo;
+                else if (t == "h") direction = tabiedMoveH_rdo;
+                else if (t == "v") direction = tabiedMoveV_rdo;
+                else if (t == "b") direction = tabiedMoveBevel_rdo;
+                else if (t.StartsWith("size") && decimal.TryParse(t.Substring(4), out decimal s)) size = s;
+                else if (t.StartsWith("speed") && decimal.TryParse(t.Substring(5), out decimal v)) speed = v;
+                else throw new FormatException($"無法識別選項「{t}」");
+            }
+            if (size < tabiedObjectSize_nud.Minimum || size > tabiedObjectSize_nud.Maximum)
+            {
+                throw new FormatException($"size 需在 {tabiedObjectSize_nud.Minimum}~{tabiedObjectSize_nud.Maximum}");
+            }
+            if (speed < tabiedMoveSpeed_nud.Minimum || speed > tabiedMoveSpeed_nud.Maximum)
+            {
+                throw new FormatException($"speed 需在 {tabiedMoveSpeed_nud.Minimum}~{tabiedMoveSpeed_nud.Maximum}");
+            }
+            shape.Checked = true;  // 先設形狀：選長條時會強制水平並停用斜角
+            if (shape == tabiedObjectStrip_rdo && direction == tabiedMoveBevel_rdo)
+            {
+                direction = tabiedMoveH_rdo;  // 長條不能斜角移動
+            }
+            direction.Checked = true;
+            tabiedObjectSize_nud.Value = size;
+            tabiedMoveSpeed_nud.Value = speed;
+        }  // listbox控制動態
         private void funcGrad(string color, string hv)
         {
+            // 先重設 config 沒有指定的 ImgEditor 狀態（起訖灰階、反向）
+            tabigFirstLevel_cmb.Text = "0";
+            tabigLastLevel_cmb.Text = "255";
+            tabigReverse_chk.Checked = false;
+            // 格式：[r-]方向-階數-分割[-起始.結束]；r- 為反向（分割需 ≥ 2），起始.結束 為灰階（例：255.0 由亮到暗）
+            bool reverse = hv.StartsWith("r-");
+            if (reverse) hv = hv.Substring(2);
             string[] hvs = hv.Split('-');
-            if (hvs.Length >= 2)
+            if (hv.Trim() != "" && hvs.Length < 3)
+            {
+                throw new FormatException($"漸層選項「{hv}」格式應為 方向-階數-分割，例如 v-256-1");
+            }
+            if (hvs.Length >= 3)
             {
                 tabigHWay_rdo.Checked = hvs[0].Contains("h") ? true : false;
                 tabigVWay_rdo.Checked = hvs[0].Contains("v") ? true : false;
                 tabigStep_cmb.Text = hvs[1];
                 tabigDivid_cmb.Text = hvs[2];
+                if (hvs.Length >= 5)
+                {
+                    throw new FormatException($"起始、結束灰階請用 . 連接，例如 {hvs[0]}-{hvs[1]}-{hvs[2]}-{hvs[3]}.{hvs[4]}");
+                }
+                if (hvs.Length == 4)
+                {
+                    // 第 4 段為「起始.結束」灰階（例：255.0 由亮到暗）
+                    string[] levels = hvs[3].Split('.');
+                    if (levels.Length != 2 || !int.TryParse(levels[0], out int first) || !int.TryParse(levels[1], out int last)
+                        || first < 0 || first > 255 || last < 0 || last > 255)
+                    {
+                        throw new FormatException($"起始.結束灰階「{hvs[3]}」需為兩個 0~255 的整數，用 . 連接，例如 255.0");
+                    }
+                    tabigFirstLevel_cmb.Text = first.ToString();
+                    tabigLastLevel_cmb.Text = last.ToString();
+                }
+                if (reverse)
+                {
+                    if (!int.TryParse(hvs[2], out int divisions) || divisions < 2)
+                    {
+                        throw new FormatException("反向 (r-) 需要畫面等分 ≥ 2");
+                    }
+                    tabigReverse_chk.Checked = true;
+                }
+            }
+            else if (reverse)
+            {
+                throw new FormatException("反向 (r-) 後面需要漸層設定，例如 r-h-256-2");
             }
             else
             {
@@ -3522,6 +4943,11 @@ namespace Thunder
                 tabigBaseColor_lbl.BackColor = switchcolor(color); // 修改 Form1 的背景顏色  
             }
         }  // listbox控制漸層
+        private static bool IsColorMaskOption(string option)
+        {
+            // 舊寫法只有 0~2 與 . （例：10.01）；出現 / 、空格、英文字母或 % 就是顏色寫法
+            return option.IndexOfAny(new[] { '/', ' ', '%' }) >= 0 || option.Any(char.IsLetter);
+        }  // 判斷 Mask 選項是否為顏色寫法
         private void funcMask(string num, string onoff)
         {
             string[] numParts = num.Split('-');
@@ -3540,6 +4966,36 @@ namespace Thunder
                 }
 
                 MaskPanelCreat(tabiemPixelClear_btn, EventArgs.Empty);
+                if (numParts[0].Contains("p") && IsColorMaskOption(onoff))
+                {
+                    // 顏色寫法：每格一個顏色（名稱、R.G.B、N%Gray，或 0/1/2），格之間空格、列之間 /
+                    tabiemPixel_rdo.Checked = true;
+                    int w = (int)tabiemWNum_nud.Value, h = (int)tabiemHNum_nud.Value;
+                    string[] rows = onoff.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (rows.Length != h)
+                    {
+                        throw new FormatException($"高度為 {h}，選項需要 {h} 列（以 / 分隔），實際 {rows.Length} 列");
+                    }
+                    var colors = new Color[w * h];
+                    for (int y = 0; y < h; y++)
+                    {
+                        string[] cells = rows[y].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (cells.Length != w)
+                        {
+                            throw new FormatException($"寬度為 {w}，第 {y + 1} 列需要 {w} 格（以空格分隔），實際 {cells.Length} 格");
+                        }
+                        for (int x = 0; x < w; x++)
+                        {
+                            colors[y * w + x] = cells[x] == "0" ? Color.Black : cells[x] == "1" ? Color.White : cells[x] == "2" ? Color.Gray : switchcolor(cells[x]);
+                        }
+                    }
+                    foreach (Panel targetPanel in tabiemPixelPanel_pnl.Controls.OfType<Panel>())
+                    {
+                        string[] coordinates = targetPanel.Tag.ToString().Split(',');
+                        targetPanel.BackColor = colors[int.Parse(coordinates[1]) * w + int.Parse(coordinates[0])];
+                    }
+                    return;
+                }
                 onoff = onoff.Replace(".", "");
                 if (numParts[0].Contains("p"))
                 {
@@ -3597,6 +5053,15 @@ namespace Thunder
         }  // listbox控制遮罩
         private void funcWind(string color, string sizeloc)
         {
+            // 先重設 config 沒有指定的 ImgEditor 狀態，避免沿用使用者手動的設定
+            tabiwDiagonal_cmb.SelectedIndex = 0;  // 斜角：無
+            tabiwDiagonal_btn.Checked = false;    // 選單原本就是「無」時不會觸發同步，直接重設
+            tabiwLineOutside_btn.Checked = false;
+            tabiwLineCross_btn.Checked = false;
+            tabiwCMaskPixel_rdo.Checked = true;  // 自製圖固定用 Pixel 格，下面的 onoff 以像素排列
+            // 視窗大小要在 Custom_btn_Click 產生窗口圖之前設定，否則窗口圖會用舊尺寸產生再被縮放
+            tabiwWinSizePercent_rdo.Checked = true;
+            tabiwWinSizePercent_nud.Value = sizeloc.Contains("%") ? int.Parse(sizeloc.Split('%')[0]) : 50;
             if (color.Contains("excel"))
             {
                 tabiwBackColor_rdo.Checked = true;
@@ -3753,7 +5218,7 @@ namespace Thunder
                     {
                         tabiwWinColor_rdo.Checked = true;
                         tabiwWin_pic.Image = null;
-                        tabiwWin_pic.BackColor = switchcolor(colorParts[0]); // 修改 Form1 的背景顏色
+                        tabiwWin_pic.BackColor = switchcolor(colorParts[2]); // Custom-背景-窗口：第 3 段為窗口顏色
                     }
 
 
@@ -3811,7 +5276,7 @@ namespace Thunder
                     {
                         tabiwBackColor_rdo.Checked = true;
                         tabiwBack_pic.Image = null;
-                        tabiwBack_pic.BackColor = switchcolor(colorParts[0]); // 修改 Form1 的背景顏色
+                        tabiwBack_pic.BackColor = switchcolor(colorParts[1]); // Custom-背景-窗口：第 2 段為背景顏色
                     }
                     if (tabiwBackCustom_rdo.Checked == true && onoff != "")
                     {
@@ -3930,18 +5395,6 @@ namespace Thunder
             else  //loc center
             {
                 tabiwWinLocCenter_rdo.Checked = true;
-            }
-
-
-            if (sizeloc.Contains("%"))  //size
-            {
-                tabiwWinSizePercent_rdo.Checked = true;
-                tabiwWinSizePercent_nud.Value = int.Parse(sizeloc.Split('%')[0]);
-            }
-            else
-            {
-                tabiwWinSizePercent_rdo.Checked = true;
-                tabiwWinSizePercent_nud.Value = 50;
             }
         } // listbox控制窗口
 

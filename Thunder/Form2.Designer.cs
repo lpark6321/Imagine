@@ -52,7 +52,7 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.cmsClose = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.picwinPicture_pic = new System.Windows.Forms.PictureBox();
+            this.picwinPicture_pic = new Thunder.ScalablePictureBox();
             this.timerSlideshow = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picwinPicture_pic)).BeginInit();
@@ -288,7 +288,7 @@
         private System.Windows.Forms.ToolStripMenuItem cmsClose;
         private System.Windows.Forms.ToolStripComboBox cmsScreenlist;
         private System.Windows.Forms.ToolTip toolTip;
-        private System.Windows.Forms.PictureBox picwinPicture_pic;
+        private Thunder.ScalablePictureBox picwinPicture_pic;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem cmsSlideshow;

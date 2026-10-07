@@ -1,50 +1,51 @@
-§Q¶r∂¬πœ,				Solid,		Black,				con-white	
-•’πœ,					Solid,		White,			
-¨ıπœ,					Solid,		Red,			
-∫Ò,						Solid,		Lime,
-¬≈,						Solid,		Blue,
-127¶«,					Solid,		50%Gary,
-64¶«,					Solid,		25%Gary,
-∂¿,						Solid,		Yellow,
-§Ù¬≈,					Solid,		Aqua,
-µµ√πƒı,					Solid,		Magenta,
+ÔªøÂêçÁ®±,È°ûÂûã,ÂèÉÊï∏,ÈÅ∏È†Ö
+ÂçÅÂ≠óÈªëÂúñ,				Solid,		Black,				con-white
+ÁôΩÂúñ,					Solid,		White,
+Á¥ÖÂúñ,					Solid,		Red,
+Á∂†,						Solid,		Lime,
+Ëóç,						Solid,		Blue,
+127ÁÅ∞,					Solid,		50%Gary,
+64ÁÅ∞,					Solid,		25%Gary,
+ÈªÉ,						Solid,		Yellow,
+Ê∞¥Ëóç,					Solid,		Aqua,
+Á¥´ÁæÖËò≠,					Solid,		Magenta,
 6bitXP,					Solid,		14.27.41,
 8bitXP,					Solid,		58.110.165,
-55∞®¡…ßJ,				Chess,		5*5,
-33∞®¡…ßJ,				Chess,		3*3,
-77∞®¡…ßJ,				Chess,		7*7,
-88∞®¡…ßJ,				Chess,		8*8,
-3232∞®¡…ßJ,				Chess,		32*32,
-84∞®¡…ßJ,				Chess,		8*4,
-§W•’§U∂¬,				Chess,		1*2,
-§W∂¬§U•’,				Chess,		1*2,				v
-V•’∫•ºh,				Gradient,	White,				v-256-1
-H•’∫•ºh,				Gradient,	White,				h-256-1
-V•’∫•ºh8,				Gradient,	White,				v-8-1
-H•’∫•ºh8,				Gradient,	White,				h-8-1
+55È¶¨Ë≥ΩÂÖã,				Chess,		5*5,
+33È¶¨Ë≥ΩÂÖã,				Chess,		3*3,
+77È¶¨Ë≥ΩÂÖã,				Chess,		7*7,
+88È¶¨Ë≥ΩÂÖã,				Chess,		8*8,
+3232È¶¨Ë≥ΩÂÖã,				Chess,		32*32,
+84È¶¨Ë≥ΩÂÖã,				Chess,		8*4,
+‰∏äÁôΩ‰∏ãÈªë,				Chess,		1*2,
+‰∏äÈªë‰∏ãÁôΩ,				Chess,		1*2,				v
+VÁôΩÊº∏Â±§,				Gradient,	White,				v-256-1
+HÁôΩÊº∏Â±§,				Gradient,	White,				h-256-1
+VÁôΩÊº∏Â±§8,				Gradient,	White,				v-8-1
+HÁôΩÊº∏Â±§8,				Gradient,	White,				h-8-1
 ColorBar4H,				Gradient,	colorbar-h-4.White.Red.Lime.Blue,
 ColorBar4V,				Gradient,	colorbar-four-v,
 ColorBar8H,				Gradient,	colorbar-eight-h,
 ColorBar8V,				Gradient,	colorbar-eight-v,
-ColorBarV∫•ºh,			Gradient,	colorbar-four-h,	v-256-1
-ColorBarH∫•ºh,			Gradient,	colorbar-four-v,	h-256-1
+ColorBarVÊº∏Â±§,			Gradient,	colorbar-four-h,	v-256-1
+ColorBarHÊº∏Â±§,			Gradient,	colorbar-four-v,	h-256-1
 pixelonoff,				Mask,		p-2*2,				20.02
 subpixelonoff,			Mask,		s-2*2-127,			101010.010101
 2h1v e,					Mask,		p-4*2,				1100.0011
 2h1v o,					Mask,		p-4*2,				1001.0110
 1h2v e,					Mask,		p-2*4,				10.10.01.01
-1h2v o,					Mask,		p-2*4,				10.01.01.10	
+1h2v o,					Mask,		p-2*4,				10.01.01.10
 aabbba,					Mask,		s-4*2-127,			101001010110.010110101001
 v strip sub 127G,		Mask		,s-2*1-127,			101010
 v strip dot,			Mask		,p-2*2,				10.10
-v strip sub KGBKGK,		Mask		,s-2*2-255,			011010.011010				
+v strip sub KGBKGK,		Mask		,s-2*2-255,			011010.011010
 h strip 1line,			Mask		,p-1*2,				1.0
 h strip 2line,			Mask		,p-1*3,				1.0.0
 Gray/Black,					Window,		Gray-Black,			50%c
-≤ƒ§@∂H≠≠•’,				Window,		Black-White,		50%xyq_++
-≤ƒ§G∂H≠≠•’,				Window,		Black-White,		50%xy_0.0
-≤ƒ§T∂H≠≠•’,				Window,		Black-White,		50%xyq_--
-≤ƒ•|∂H≠≠•’,				Window,		Black-White,		50%xyq_+-
+Á¨¨‰∏ÄË±°ÈôêÁôΩ,				Window,		Black-White,		50%xyq_++
+Á¨¨‰∫åË±°ÈôêÁôΩ,				Window,		Black-White,		50%xy_0.0
+Á¨¨‰∏âË±°ÈôêÁôΩ,				Window,		Black-White,		50%xyq_--
+Á¨¨ÂõõË±°ÈôêÁôΩ,				Window,		Black-White,		50%xyq_+-
 dot/Black,				Window,		Custom-dotG-Black,			50%c
 Vstripe50%/Black,			Window,		Custom-vstripeG-Black,			50%c
 Vstripe100%/Gray,			Window,		Custom-vstripeW-Gray,			50%c
@@ -57,3 +58,66 @@ CrossTalkB_4,			Window,		excel4,
 CrossTalkB_5,			Window,		excel5,
 CrossTalkB_6,			Window,		excel6,
 CrossTalkB_7,			Window,		excel7,
+1_white,Solid,white,
+2_black,Solid,black,
+3_red,Solid,red,
+4_green,Solid,green,
+5_blue,Solid,blue,
+6_Gray191,Solid,Silver,
+7_Gray127,Solid,127.127.127,
+8_Gray64,Solid,64.64.64,
+9_Gray32,Solid,32.32.32,
+10_Gray24,Solid,24.24.24,
+11_Gray16,Solid,16.16.16,
+12_pixel_onoff_255,Mask,p-2*2,10.01
+13_pixel_onoff_128,Mask,p-2*2,White 127.127.127/127.127.127 White
+14_sub_pixel_onoff_255,Mask,s-2*2-255,101010.010101
+15_sub_pixel_onoff_128,Mask,s-2*2-127,101010.010101
+16_one_pixelH_strip_255,Mask,p-2*2,11.00
+17_one_pixelH_strip_128,Mask,p-2*2,127.127.127 127.127.127/Black Black
+18_two_pixelH_strip_255,Mask,p-2*4,11.11.00.00
+19_two_pixelH_strip_128,Mask,p-2*4,127.127.127 127.127.127/127.127.127 127.127.127/Black Black/Black Black
+20_subV_strip_255,Mask,s-2*2-255,101010.101010
+21_subV_strip_128,Mask,s-2*2-127,101010.101010
+22_one_pixelV_strip_255,Mask,p-2*2,10.10
+23_one_pixelV_strip_128,Mask,p-2*2,127.127.127 Black/127.127.127 Black
+24_two_pixelV_strip_255,Mask,p-4*2,1100.1100
+25_two_pixelV_strip_128,Mask,p-4*2,127.127.127 127.127.127 Black Black/127.127.127 127.127.127 Black Black
+26_2H1V(HSD),Mask,s-2*2-255,000000.101010
+27_8X5_Chess,Chess,8*5,
+28_PatternH,Text,Black-White,H/12/2.4/4/3
+29_WaKu,Solid,Black,r-White
+30_GrayScaleH_whie,Gradient,White,h-256-1
+30_GrayScaleH_whie-2,Gradient,White,h-256-1-255.0
+31_GrayScaleH_Red,Gradient,Red,h-256-1
+31_GrayScaleH_Red-2,Gradient,Red,h-256-1-255.0
+32_GrayScaleH_Green,Gradient,Green,h-256-1
+32_GrayScaleH_Green-2,Gradient,Green,h-256-1-255.0
+32_GrayScaleH_Blue,Gradient,Blue,h-256-1
+32_GrayScaleH_Blue-2,Gradient,Blue,h-256-1-255.0
+34_GrayScaleH_RGBW,Gradient,colorbar-v-4.White.Red.Lime.Blue,h-256-1
+34_GrayScaleH_RGBW-2,Gradient,colorbar-v-4.White.Red.Lime.Blue,h-256-1-255.0
+35_GrayScaleV_white,Gradient,White,v-256-1
+35_GrayScaleV_white-2,Gradient,White,v-256-1-255.0
+36_GrayScaleV_Red,Gradient,Red,v-256-1
+36_GrayScaleV_Red-2,Gradient,Red,v-256-1-255.0
+37_GrayScaleV_Green,Gradient,Green,v-256-1
+37_GrayScaleV_Green-2,Gradient,Green,v-256-1-255.0
+38_GrayScaleV_Blue,Gradient,Blue,v-256-1
+38_GrayScaleV_Blue-2,Gradient,Blue,v-256-1-255.0
+39_GrayScaleV_RGBW,Gradient,colorbar-h-4.White.Red.Lime.Blue,v-256-1
+39_GrayScaleV_RGBW-2,Gradient,colorbar-h-4.White.Red.Lime.Blue,v-256-1-255.0
+40_Crosstalk_L64_L0,Window,64.64.64-Black,50%c
+41_Crosstalk_L64_L255,Window,64.64.64-White,50%c
+45_Green_128,Solid,Green,
+46_Green_160,Solid,0.160.0,
+47_Green_95,Solid,0.95.0,
+48_Crosstalk_L128_G255,Window,Gray-Lime,50%c
+49_Crosstalk_L128_L255,Window,Gray-White,50%c
+50_Crosstalk_L128_L0,Window,Gray-Black,50%c
+51_Red_128,Solid,Maroon,
+52_Green_128,Solid,Green,
+53_Blue_128,Solid,Navy,
+54_Sub V stripe-L128( Ch7~12 reverse),Mask,s-2*2-127,101010.101010
+55_2line Vstripe-L128,Mask,s-4*2-127,110011001100.110011001100
+55_Hstripe-L128,Mask,p-2*2,127.127.127 127.127.127/Black Black
