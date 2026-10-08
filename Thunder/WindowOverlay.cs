@@ -8,19 +8,20 @@ namespace Thunder
     {
         Window,  // 窗口：X、Y、寬、高
         HLine,   // 水平線：Y、粗細
-        VLine    // 垂直線：X、粗細
+        VLine,   // 垂直線：X、粗細
+        Circle   // 圓形：圓心 X、Y、直徑
     }
 
     // ImgEditor Window 額外疊加的窗口或線條（與外框、十字分開）
     public class WindowOverlay
     {
         public OverlayKind Kind;
-        public int X, Y;             // 窗口左上角；水平線用 Y、垂直線用 X
-        public int Width, Height;    // 窗口大小；線條的粗細存在 Width
+        public int X, Y;             // 窗口左上角；圓形為圓心；水平線用 Y、垂直線用 X
+        public int Width, Height;    // 窗口大小；線條的粗細、圓形的直徑存在 Width
         public Color Color;
 
         public static string KindText(OverlayKind kind) =>
-            kind == OverlayKind.Window ? "窗口" : kind == OverlayKind.HLine ? "水平線" : "垂直線";
+            kind == OverlayKind.Window ? "窗口" : kind == OverlayKind.HLine ? "水平線" : kind == OverlayKind.VLine ? "垂直線" : "圓形";
 
         public static string ColorText(Color c) => c.IsNamedColor ? c.Name : $"{c.R}.{c.G}.{c.B}";
 
@@ -30,6 +31,7 @@ namespace Thunder
             {
                 case OverlayKind.Window: return $"({X},{Y}) {Width}x{Height} {ColorText(Color)}";
                 case OverlayKind.HLine: return $"Y={Y} 粗{Width} {ColorText(Color)}";
+                case OverlayKind.Circle: return $"圓心({X},{Y}) 直徑{Width} {ColorText(Color)}";
                 default: return $"X={X} 粗{Width} {ColorText(Color)}";
             }
         }
@@ -44,6 +46,7 @@ namespace Thunder
                     case OverlayKind.Window: g.FillRectangle(brush, X, Y, Width, Height); break;
                     case OverlayKind.HLine: g.FillRectangle(brush, 0, Y, imageWidth, Width); break;
                     case OverlayKind.VLine: g.FillRectangle(brush, X, 0, Width, imageHeight); break;
+                    case OverlayKind.Circle: g.FillEllipse(brush, X - Width / 2f, Y - Width / 2f, Width, Width); break;  // 不反鋸齒，邊緣保持純色
                 }
             }
         }
@@ -72,7 +75,7 @@ namespace Thunder
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
-            kind_cmb.Items.AddRange(new object[] { WindowOverlay.KindText(OverlayKind.Window), WindowOverlay.KindText(OverlayKind.HLine), WindowOverlay.KindText(OverlayKind.VLine) });
+            kind_cmb.Items.AddRange(new object[] { WindowOverlay.KindText(OverlayKind.Window), WindowOverlay.KindText(OverlayKind.HLine), WindowOverlay.KindText(OverlayKind.VLine), WindowOverlay.KindText(OverlayKind.Circle) });
             kind_cmb.SelectedIndexChanged += (s, e) => UpdateFields();
             color_btn.Click += (s, e) =>
             {
@@ -111,14 +114,16 @@ namespace Thunder
 
         private void UpdateFields()
         {
-            // 依類型切換欄位：窗口用 X/Y/寬/高；水平線用 Y/粗細；垂直線用 X/粗細
+            // 依類型切換欄位：窗口用 X/Y/寬/高；水平線用 Y/粗細；垂直線用 X/粗細；圓形用圓心 X/Y/直徑
             OverlayKind kind = (OverlayKind)Math.Max(0, kind_cmb.SelectedIndex);
-            bool window = kind == OverlayKind.Window;
+            bool window = kind == OverlayKind.Window, circle = kind == OverlayKind.Circle;
             x_nud.Enabled = kind != OverlayKind.HLine;
             y_nud.Enabled = kind != OverlayKind.VLine;
             h_nud.Enabled = h_lbl.Enabled = window;
-            w_lbl.Text = window ? "寬" : "粗細";
-            if (!window && w_nud.Value > 100) w_nud.Value = 1;
+            x_lbl.Text = circle ? "圓心X" : "X";
+            y_lbl.Text = circle ? "圓心Y" : "Y";
+            w_lbl.Text = window ? "寬" : circle ? "直徑" : "粗細";
+            if (!window && !circle && w_nud.Value > 100) w_nud.Value = 1;
         }
 
         private WindowOverlay BuildResult() => new WindowOverlay

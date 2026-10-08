@@ -54,6 +54,10 @@ namespace Thunder
             InitResizeMode();
             InitPreviewPanel();
             InitDirListReload();
+            InitMassTooltip();
+            InitMaskZoom();
+            InitImgListExport();
+            InitMultiScreen();
             //Mainwindow_Load(this, EventArgs.Empty);
             mypicture = new MyPicture(this);
             Instance = this; // 初始化 Singleton 實例
@@ -89,6 +93,11 @@ namespace Thunder
         }  // 還原被輸入法攔截的按鍵
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            if (keyData == (Keys.Alt | Keys.Space))
+            {
+                Generate_Click(showimgGenerate_btn, EventArgs.Empty);  // 原本由工具列 Generate 提供的快捷鍵
+                return true;
+            }
             // 輸入法攔截的快捷鍵在這裡還原處理，並回傳 true 讓輸入法收不到（文字欄位除外）
             if ((keyData & Keys.KeyCode) == Keys.ProcessKey && !IsTextInputFocused())
             {
@@ -506,13 +515,22 @@ namespace Thunder
                     showimgPicture_pic.Image = mypicture.Getpicture();
                     showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
                 //}
-                ShowPreviewInfo(width, height, null);  // ImgEditor 產生的圖不顯示 config
-                _shownItem = null;
-                if (tabControl.SelectedTab == tabImgEditor)
+                // 顯示加入 ImgList 時的 config；無法轉換時顯示不支援
+                var ignored = new List<string>();
+                string line = EditorToConfigLine(ignored, out string error);
+                ShowPreviewInfo(width, height, line);
+                if (line == null)
                 {
-                    // 最近使用記錄成加入 config 時的名稱（無法轉成 config 的設定不記錄）
-                    string line = EditorToConfigLine(new List<string>(), out string error);
-                    if (line != null) AddRecent(RecentItem.FromConfig(line));
+                    ShowConfigNote(error == null ? "不支援輸出到 ImgList" : $"不支援輸出到 ImgList：{error}");
+                }
+                else if (ignored.Count > 0)
+                {
+                    ShowConfigNote($"{showimgConfig_lbl.Text}\n（不會寫入：{string.Join("、", ignored)}）");
+                }
+                _shownItem = null;
+                if (tabControl.SelectedTab == tabImgEditor && line != null)
+                {
+                    AddRecent(RecentItem.FromEditor(line));  // 最近使用以「類型_參數_選項」記錄
                 }
             }
             catch (Exception ex)
@@ -749,7 +767,7 @@ namespace Thunder
                         }
                         else if (tabiwBackImg_rdo.Checked) // 圖片背景
                         {
-                            g.DrawImage(tabiwBack_pic.Image, 0, 0, width, height);
+                            DrawScreenshot(g, tabiwBack_pic.Image, 0, 0, width, height);
                         }
                         else if (tabiwBackCustom_rdo.Checked) // 圖片背景
                         {
@@ -802,7 +820,7 @@ namespace Thunder
                                 }
                                 else if (tabiwWinImg_rdo.Checked)// 繪製圖片方塊
                                 {
-                                    g.DrawImage(tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
+                                    DrawScreenshot(g, tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
                                 }
                                 else if (tabiwWinCustom_rdo.Checked)
                                 {
@@ -818,7 +836,7 @@ namespace Thunder
                             }
                             else if (tabiwWinImg_rdo.Checked)// 繪製圖片方塊
                             {
-                                g.DrawImage(tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
+                                DrawScreenshot(g, tabiwWin_pic.Image, xstart, ystart, newWidth, newHeight);
                             }
                             else if (tabiwWinCustom_rdo.Checked)
                             {
@@ -1382,7 +1400,14 @@ namespace Thunder
         // 圖片顯示----------------------------------------------------------------------------------------------------
         public void FullScreen(object sender, EventArgs e)
         {
-            // 獲取選擇的螢幕  
+            // 多螢幕模式（主螢幕以外至少一個螢幕）改由 FullScreenMulti 處理
+            List<Screen> others = OtherScreens();
+            if (_multiMode != MultiScreenMode.Single && others.Count > 0)
+            {
+                FullScreenMulti(others);
+                return;
+            }
+            // 獲取選擇的螢幕
             string selectedScreen = mnsScreenlist_cmb.SelectedItem?.ToString() ?? Screen.AllScreens[0].DeviceName;
             Screen secondScreen = Screen.AllScreens.FirstOrDefault(screen => screen.DeviceName == selectedScreen) ?? Screen.AllScreens[0];
 
@@ -1390,6 +1415,7 @@ namespace Thunder
             {
                 // 如果 _pictureWindow 尚未初始化或已被釋放，則創建新的實例  
                 _pictureWindow = new pictureWindow();
+                _pictureWindow.FormClosed += (s, ev) => OnScreenWindowClosed((pictureWindow)s);
             }
 
             //_pictureWindow.setBitmap((Bitmap)showimgPicture_pic.Image);
@@ -1430,6 +1456,245 @@ namespace Thunder
                 MessageBox.Show("Form 尚未初始化或已被釋放！");
             }
         }  // 全螢幕顯示
+        // 多螢幕-------------------------------------------------------------------------------------------------------
+        private enum MultiScreenMode { Single, SyncOthers, SeparateOthers, SequenceOthers }
+        private MultiScreenMode _multiMode = MultiScreenMode.Single;
+        private ToolStripComboBox mnsMultiScreen_cmb;
+        private readonly Dictionary<string, pictureWindow> _screenWindows = new Dictionary<string, pictureWindow>();
+        private bool _updatingScreens;      // 產生 / 顯示多螢幕時，忽略視窗啟用事件
+        private bool _closingAllScreens;
+        private bool _restoringSelection;   // 還原分離螢幕的選取時，DirList 不要再觸發全螢幕
+        private bool _skipScreenRegenerate; // 切換作用中螢幕時先不重新產生（之後還原選取會產生）
+        private class ScreenSelection
+        {
+            public TabPage Tab;
+            public int Index = -1;
+            public RecentItem Shown;
+        }  // 分離模式每個螢幕記住的分頁與項目
+        private void InitMultiScreen()
+        {
+            // 螢幕清單左邊的多螢幕模式；預設單一螢幕，與原本相同
+            mnsMultiScreen_cmb = new ToolStripComboBox
+            {
+                Alignment = ToolStripItemAlignment.Right, DropDownStyle = ComboBoxStyle.DropDownList, AutoSize = false, Size = new Size(130, 23),
+                ToolTipText = "單一螢幕：全螢幕顯示在右邊選的螢幕\r\n" +
+                              "主螢幕之外同步：主螢幕以外的螢幕全部顯示同一張圖、一起換圖\r\n" +
+                              "分離第二視窗：主螢幕以外每個螢幕各自顯示，點哪個螢幕就控制哪個（主視窗會跳到那個螢幕的圖）\r\n" +
+                              "主螢幕之外依序：第二螢幕顯示目前的圖、第三螢幕顯示下一張…，← → 一起往下換\r\n" +
+                              "多螢幕時各螢幕依自己的解析度產生圖片；任一個全螢幕關閉時全部關閉",
+            };
+            mnsMultiScreen_cmb.ComboBox.ImeMode = ImeMode.Disable;
+            mnsMultiScreen_cmb.Items.AddRange(new object[] { "單一螢幕", "主螢幕之外同步", "分離第二視窗", "主螢幕之外依序" });
+            mnsMultiScreen_cmb.SelectedIndex = 0;
+            mnsMultiScreen_cmb.SelectedIndexChanged += (s, e) =>
+            {
+                CloseAllFullScreen();  // 換模式時關掉目前的全螢幕，下次全螢幕依新模式開啟
+                _multiMode = (MultiScreenMode)mnsMultiScreen_cmb.SelectedIndex;
+                int count = OtherScreens().Count;
+                ssrStatus_lbl.Text = _multiMode == MultiScreenMode.Single || count > 0
+                    ? $"全螢幕模式：{mnsMultiScreen_cmb.Text}{(_multiMode == MultiScreenMode.Single ? "" : $"（主螢幕以外 {count} 個螢幕）")}"
+                    : "只有主螢幕，多螢幕模式會改用單一螢幕";
+            };
+            // 右對齊項目依集合順序由右往左排，插在螢幕清單後面 = 顯示在它左邊
+            menuStrip.Items.Insert(menuStrip.Items.IndexOf(mnsScreenlist_cmb) + 1, mnsMultiScreen_cmb);
+        }  // 建立多螢幕選單
+        private static List<Screen> OtherScreens() =>
+            Screen.AllScreens.Where(s => !s.Primary).OrderBy(s => s.Bounds.X).ThenBy(s => s.Bounds.Y).ToList();  // 主螢幕以外，由左到右
+        private static string ScreenLabel(string device) => device?.TrimStart('\\', '.') ?? "";
+        private void FullScreenMulti(List<Screen> others)
+        {
+            string selected = mnsScreenlist_cmb.SelectedItem?.ToString();
+            Screen active = others.FirstOrDefault(s => s.DeviceName == selected) ?? others[0];
+            // 要產生的螢幕與偏移（依序模式第 n 個螢幕顯示後面第 n 張）
+            var renders = new List<(Screen screen, int offset)>();
+            switch (_multiMode)
+            {
+                case MultiScreenMode.SyncOthers:
+                    renders.AddRange(others.Select(s => (s, 0)));
+                    break;
+                case MultiScreenMode.SequenceOthers:
+                    renders.AddRange(others.Select((s, i) => (s, i)));
+                    break;
+                default:  // 分離：只更新作用中螢幕；還沒開的螢幕先顯示同一張
+                    renders.AddRange(others.Where(s => s == active || !HasScreenWindow(s.DeviceName)).Select(s => (s, 0)));
+                    break;
+            }
+            // 主視窗預覽要停在「偏移 0、作用中螢幕」的結果，所以它排最後產生
+            renders = renders.OrderBy(r => r.offset == 0 ? 1 : 0).ThenBy(r => r.screen == active ? 1 : 0).ToList();
+            string width = mnsW_txt.Text, height = mnsH_txt.Text;
+            _updatingScreens = true;
+            try
+            {
+                Screen lastScreen = null;
+                foreach (var (screen, offset) in renders)
+                {
+                    using (Bitmap bitmap = RenderForScreen(screen, offset, out string caption))
+                    {
+                        pictureWindow window = ShowOnScreen(screen, bitmap, caption);
+                        if (_multiMode == MultiScreenMode.SeparateOthers) window.Selection = CaptureSelection();
+                    }
+                    lastScreen = screen;
+                }
+                mnsW_txt.Text = width;
+                mnsH_txt.Text = height;
+                if (lastScreen != null && (lastScreen.Bounds.Width.ToString() != width || lastScreen.Bounds.Height.ToString() != height))
+                {
+                    RegenerateCurrent();  // 選的螢幕解析度不同（例如選主螢幕）：主視窗預覽恢復成原本寬高
+                }
+                _pictureWindow = _screenWindows.TryGetValue(active.DeviceName, out var activeWindow) ? activeWindow : _pictureWindow;
+                _pictureWindow?.Activate();
+            }
+            finally
+            {
+                _updatingScreens = false;
+            }
+            if (_dynamicBackground != null && ReferenceEquals(mypicture.Getpicture(), _dynamicBackground) && !timerDynamic.Enabled)
+            {
+                timerDynamic.Start();  // 動畫只在作用中螢幕播放
+            }
+        }  // 多螢幕全螢幕
+        private bool HasScreenWindow(string device) => _screenWindows.TryGetValue(device, out var w) && !w.IsDisposed;
+        private Bitmap RenderForScreen(Screen screen, int offset, out string caption)
+        {
+            // 依螢幕解析度產生目前的圖；offset > 0 時改用清單後面第 offset 項（ImgList / DirList）
+            mnsW_txt.Text = screen.Bounds.Width.ToString();
+            mnsH_txt.Text = screen.Bounds.Height.ToString();
+            if (offset > 0 && _shownItem == null)
+            {
+                if (tabControl.SelectedTab == tabImgList && tabilPatternList_lst.SelectedIndices.Count > 0)
+                {
+                    var item = tabilPatternList_lst.Items[(tabilPatternList_lst.SelectedIndices[0] + offset) % tabilPatternList_lst.Items.Count];
+                    caption = item.SubItems[1].Text;
+                    if (ApplyConfigLine(item.Tag.ToString(), new List<string>()) && mypicture.Getpicture() != null)
+                    {
+                        return new Bitmap(showimgPicture_pic.Image);  // Dynamic 時是含物件的預覽
+                    }
+                    return ErrorBitmap(screen, $"{caption}：設定有誤");
+                }
+                if (tabControl.SelectedTab == tabDirList && tabdlPatternList_lvw.SelectedIndices.Count > 0)
+                {
+                    var item = tabdlPatternList_lvw.Items[(tabdlPatternList_lvw.SelectedIndices[0] + offset) % tabdlPatternList_lvw.Items.Count];
+                    caption = item.Text;
+                    try
+                    {
+                        using (var stream = new FileStream(item.Tag.ToString(), FileMode.Open, FileAccess.Read))
+                        using (var image = Image.FromStream(stream))
+                        {
+                            return new Bitmap(image);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        return ErrorBitmap(screen, $"{caption}：{ex.Message}");
+                    }
+                }
+            }
+            RegenerateCurrent();
+            caption = CurrentImageName();
+            Bitmap current = mypicture.Getpicture();
+            return current != null ? new Bitmap(current) : ErrorBitmap(screen, "沒有圖片");
+        }  // 產生某個螢幕要顯示的圖
+        private static Bitmap ErrorBitmap(Screen screen, string message)
+        {
+            var bitmap = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            using (Font font = new Font("新細明體", 24f))
+            {
+                g.Clear(Color.Black);
+                g.DrawString(message, font, Brushes.White, 20, 20);
+            }
+            return bitmap;
+        }  // 無法產生時顯示的圖
+        private pictureWindow ShowOnScreen(Screen screen, Bitmap bitmap, string caption)
+        {
+            if (!_screenWindows.TryGetValue(screen.DeviceName, out pictureWindow window) || window.IsDisposed)
+            {
+                window = new pictureWindow { ScreenDevice = screen.DeviceName, StartPosition = FormStartPosition.Manual };
+                window.FormClosed += (s, e) => OnScreenWindowClosed((pictureWindow)s);
+                window.Activated += (s, e) => OnScreenWindowActivated((pictureWindow)s);
+                _screenWindows[screen.DeviceName] = window;
+            }
+            window.setBitmap(bitmap);
+            window.Caption = caption;
+            if (!window.Visible)
+            {
+                window.FormBorderStyle = FormBorderStyle.None;
+                window.Location = screen.Bounds.Location;
+                window.Size = screen.Bounds.Size;
+                window.Show();
+                window.WindowState = FormWindowState.Maximized;
+            }
+            return window;
+        }  // 顯示到指定螢幕
+        private ScreenSelection CaptureSelection()
+        {
+            var selection = new ScreenSelection { Tab = tabControl.SelectedTab, Shown = _shownItem };
+            if (selection.Tab == tabImgList && tabilPatternList_lst.SelectedIndices.Count > 0) selection.Index = tabilPatternList_lst.SelectedIndices[0];
+            if (selection.Tab == tabDirList && tabdlPatternList_lvw.SelectedIndices.Count > 0) selection.Index = tabdlPatternList_lvw.SelectedIndices[0];
+            return selection;
+        }  // 記錄目前分頁與項目
+        private void OnScreenWindowActivated(pictureWindow window)
+        {
+            // 分離模式：點哪個螢幕就控制哪個，主視窗跳回那個螢幕顯示的圖
+            if (_updatingScreens || _closingAllScreens || _multiMode != MultiScreenMode.SeparateOthers) return;
+            if (ReferenceEquals(window, _pictureWindow)) return;
+            _pictureWindow = window;
+            _skipScreenRegenerate = true;
+            try
+            {
+                mnsScreenlist_cmb.SelectedItem = window.ScreenDevice;  // 寬高改成這個螢幕的解析度
+            }
+            finally
+            {
+                _skipScreenRegenerate = false;
+            }
+            if (window.Selection is ScreenSelection selection)
+            {
+                _restoringSelection = true;
+                try
+                {
+                    tabControl.SelectedTab = selection.Tab;
+                    ListView list = selection.Tab == tabImgList ? tabilPatternList_lst : selection.Tab == tabDirList ? tabdlPatternList_lvw : null;
+                    if (list != null && selection.Index >= 0 && selection.Index < list.Items.Count)
+                    {
+                        list.Items[selection.Index].Selected = true;
+                        list.Items[selection.Index].Focused = true;
+                        list.Items[selection.Index].EnsureVisible();
+                    }
+                    _shownItem = selection.Shown;
+                    RegenerateCurrent();
+                }
+                finally
+                {
+                    _restoringSelection = false;
+                }
+            }
+            window.FlashMessage($"{ScreenLabel(window.ScreenDevice)} 作用中");
+        }  // 分離模式切換作用中螢幕
+        private void OnScreenWindowClosed(pictureWindow window)
+        {
+            if (window.ScreenDevice != null && _screenWindows.TryGetValue(window.ScreenDevice, out var stored) && ReferenceEquals(stored, window))
+            {
+                _screenWindows.Remove(window.ScreenDevice);
+            }
+            if (!_closingAllScreens) CloseAllFullScreen();  // 關掉其中一個（Esc）時全部關閉
+        }  // 全螢幕視窗關閉
+        private void CloseAllFullScreen()
+        {
+            _closingAllScreens = true;
+            try
+            {
+                foreach (pictureWindow window in _screenWindows.Values.ToList())
+                {
+                    if (!window.IsDisposed) window.Close();
+                }
+                if (_pictureWindow != null && !_pictureWindow.IsDisposed) _pictureWindow.Close();
+            }
+            finally
+            {
+                _closingAllScreens = false;
+            }
+        }  // 關閉所有全螢幕
         private string CurrentImageName()
         {
             // DirList 顯示檔名、ImgList 顯示 config 名稱；ImgEditor 不顯示；最近使用 / 草稿顯示其名稱
@@ -1476,7 +1741,7 @@ namespace Thunder
                 }
             }
             UpdateRefreshRate();
-            RegenerateCurrent();
+            if (!_skipScreenRegenerate) RegenerateCurrent();
         }  // 螢幕選擇
         public void SwitchScreen(int step)
         {
@@ -1518,7 +1783,7 @@ namespace Thunder
                     _shownItem = null;
                     AddRecent(RecentItem.FromFile(imagePath));
                     // 如果需要全屏顯示，更新 _pictureWindow
-                    if (_pictureWindow != null && !_pictureWindow.IsDisposed)
+                    if (_pictureWindow != null && !_pictureWindow.IsDisposed && !_restoringSelection)
                     {
                         FullScreen(sender, e);
                     }
@@ -1679,12 +1944,19 @@ namespace Thunder
                 }
             }
         }  // ImgList選擇圖片
-        private bool ApplyConfigLine(string line)
+        private bool ApplyConfigLine(string line, List<string> errors = null)
         {
             // 套用一行 config 並產生預覽圖（ImgList 選取、編輯區預覽、最近使用共用）；成功回傳 true
+            // errors 不為 null 時錯誤記錄在清單（批次匯出用），否則跳出訊息
             string trimlower(string st)
             {
                 return st.Trim().ToLower();
+            }
+            void Report(string message, string caption = "")
+            {
+                if (errors != null) errors.Add(message);
+                else if (caption == "") MessageBox.Show(message);
+                else MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             string[] patternVar = line.Split(',');
             if (patternVar.Length < 4)
@@ -1696,7 +1968,7 @@ namespace Thunder
             }
             if (!int.TryParse(mnsW_txt.Text, out int width) || !int.TryParse(mnsH_txt.Text, out int height))
             {
-                MessageBox.Show("請輸入有效的寬度與高度！");
+                Report("請輸入有效的寬度與高度！");
                 return false;
             }
             try
@@ -1734,7 +2006,7 @@ namespace Thunder
                         funcText(trimlower(patternVar[2]), patternVar[3].Trim());  // 文字保留大小寫
                         break;
                     default:
-                        MessageBox.Show($"「{patternVar[0].Trim()}」的類型「{patternVar[1].Trim()}」不支援！");
+                        Report($"「{patternVar[0].Trim()}」的類型「{patternVar[1].Trim()}」不支援！");
                         return false;
                 }
                 string tag = patternVar[0];
@@ -1764,7 +2036,7 @@ namespace Thunder
             catch (Exception ex)
             {
                 // config 格式錯誤時提示，不讓程式當掉
-                MessageBox.Show($"「{patternVar[0].Trim()}」的設定有誤：{ex.Message}", "Config 錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Report($"「{patternVar[0].Trim()}」的設定有誤：{ex.Message}", "Config 錯誤");
                 return false;
             }
             showimgPicture_pic.Image = mypicture.Getpicture();
@@ -1901,7 +2173,17 @@ namespace Thunder
         }  // 建立「新增至 ImgList」與 Window 顏色按鈕
         private void InitMaskQuickButtons()
         {
-            // Pixel：格子下方快速選色（設定「選擇顏色」，之後點格子即填入）
+            // ImgEditor Mask：Pixel 選色在格子下方一排，Sub Pixel 亮度在捲軸右側
+            AddMaskQuickButtons(tabimgeMask, tabiemPixelColor_btn, tabiemPixelGray_vsc, tabiemPixel_rdo, tabiemSubPixel_rdo,
+                i => new Rectangle(10 + i * 35, 322, 34, 24), i => new Rectangle(266, 70 + i * 49, 40, 24));
+            // Window 自製圖 Mask：空間較小，兩種按鈕都放在捲軸右側一欄（同時只顯示一種）
+            AddMaskQuickButtons(tabiwCustomMask_grp, tabiwCMaskPixelColor_btn, tabiwCMaskPixelGray_vsc, tabiwCMaskPixel_rdo, tabiwCMaskSubPixel_rdo,
+                i => new Rectangle(246, 58 + i * 28, 48, 24), i => new Rectangle(246, 58 + i * 44, 48, 24));
+        }  // Mask 快速選色與亮度按鈕
+        private void AddMaskQuickButtons(Control box, Button colorButton, VScrollBar grayScroll, RadioButton pixelRadio, RadioButton subPixelRadio,
+            Func<int, Rectangle> pixelBounds, Func<int, Rectangle> subPixelBounds)
+        {
+            // Pixel：快速選色（設定「選擇顏色」，之後點格子即填入）
             var colors = new (string text, Color color)[]
             {
                 ("黑", Color.Black), ("白", Color.White), ("紅", Color.Red), ("綠", Color.Lime), ("藍", Color.Blue),
@@ -1915,34 +2197,34 @@ namespace Thunder
                 var button = new Button
                 {
                     Text = text, BackColor = color, ForeColor = dark ? Color.White : Color.Black, FlatStyle = FlatStyle.Flat,
-                    Location = new Point(10 + i * 35, 322), Size = new Size(34, 24), Margin = Padding.Empty,
+                    Bounds = pixelBounds(i), Margin = Padding.Empty,
                 };
-                button.Click += (s, e) => tabiemPixelColor_btn.BackColor = color;
+                button.Click += (s, e) => colorButton.BackColor = color;
                 toolTip.SetToolTip(button, $"選擇顏色設為{(text.All(char.IsDigit) ? text + " 灰" : text)}（{color.R},{color.G},{color.B}）");
                 pixelButtons.Add(button);
             }
-            // Sub Pixel：灰階捲軸右側快速設定亮度（捲軸值 = 255 - 亮度）
+            // Sub Pixel：快速設定亮度（捲軸值 = 255 - 亮度）
             int[] levels = { 255, 192, 127, 64, 0 };
             var subPixelButtons = new List<Button>();
             for (int i = 0; i < levels.Length; i++)
             {
                 int level = levels[i];
-                var button = new Button { Text = level.ToString(), Location = new Point(266, 70 + i * 49), Size = new Size(40, 24) };
-                button.Click += (s, e) => tabiemPixelGray_vsc.Value = 255 - level;
+                var button = new Button { Text = level.ToString(), Bounds = subPixelBounds(i) };
+                button.Click += (s, e) => grayScroll.Value = 255 - level;
                 toolTip.SetToolTip(button, $"子像素亮度設為 {level}");
                 subPixelButtons.Add(button);
             }
-            tabimgeMask.Controls.AddRange(pixelButtons.Concat(subPixelButtons).ToArray<Control>());
+            box.Controls.AddRange(pixelButtons.Concat(subPixelButtons).ToArray<Control>());
             void UpdateVisible()
             {
-                bool subPixel = tabiemSubPixel_rdo.Checked;
+                bool subPixel = subPixelRadio.Checked;
                 pixelButtons.ForEach(b => b.Visible = !subPixel);
                 subPixelButtons.ForEach(b => b.Visible = subPixel);
             }
-            tabiemPixel_rdo.CheckedChanged += (s, e) => UpdateVisible();
-            tabiemSubPixel_rdo.CheckedChanged += (s, e) => UpdateVisible();
+            pixelRadio.CheckedChanged += (s, e) => UpdateVisible();
+            subPixelRadio.CheckedChanged += (s, e) => UpdateVisible();
             UpdateVisible();
-        }  // Mask 快速選色與亮度按鈕
+        }  // 加入 Mask 快速按鈕
         private void InitGradientReverse()
         {
             // 反向是讓奇數等分反轉漸層方向，畫面等分 < 2 時沒有作用，停用並取消勾選
@@ -2616,9 +2898,17 @@ namespace Thunder
             public string Key => Line != null
                 ? "cfg:" + string.Join(",", Line.Split(',').Skip(1).Select(v => v.Trim().ToLower()))
                 : "file:" + Path.ToLower();
-            public static RecentItem FromConfig(string line) => new RecentItem { Name = line.Split(',')[0].Trim(), Line = line };
-            public static RecentItem FromFile(string path) => new RecentItem { Name = System.IO.Path.GetFileName(path), Path = path };
-            public override string ToString() => Name;
+            public string Source { get; private set; }  // 來源分頁：ImgList / ImgEditor / DirList
+            public static RecentItem FromConfig(string line) => new RecentItem { Source = "ImgList", Name = line.Split(',')[0].Trim(), Line = line };
+            public static RecentItem FromEditor(string line)
+            {
+                // ImgEditor 沒有名稱：以「類型_參數_選項」顯示（選項空白時省略）
+                string[] v = line.Split(',').Select(s => s.Trim()).ToArray();
+                string name = string.Join("_", v.Skip(1).Where(s => s != ""));
+                return new RecentItem { Source = "ImgEditor", Name = name, Line = line };
+            }
+            public static RecentItem FromFile(string path) => new RecentItem { Source = "DirList", Name = System.IO.Path.GetFileName(path), Path = path };
+            public override string ToString() => $"{Source} / {Name}";  // 清單顯示「分頁 / 名稱」；全螢幕左上角只用 Name
         }  // 最近使用項目
         private void InitPreviewPanel()
         {
@@ -2629,9 +2919,26 @@ namespace Thunder
                 AutoSize = true, MaximumSize = new Size(width, 0), UseMnemonic = false, Visible = false,
                 ForeColor = Color.DimGray, Margin = new Padding(3, 0, 3, 2)
             };
+            float fontSize = showimgConfig_lbl.Font.Size == 12f ? 14f : showimgConfig_lbl.Font.Size + 2f;  // 12 調到 14，其他大 2 號
+            showimgConfig_lbl.Font = new Font(showimgConfig_lbl.Font.FontFamily, fontSize, showimgConfig_lbl.Font.Style);
             Showimage_flp.Controls.Add(showimgConfig_lbl);
             Showimage_flp.Controls.SetChildIndex(showimgConfig_lbl, Showimage_flp.Controls.GetChildIndex(showimgSize_lbl));
-            recent_lst = new ListBox { Dock = DockStyle.Fill, IntegralHeight = false, HorizontalScrollbar = true };
+            recent_lst = new ListBox { Dock = DockStyle.Fill, IntegralHeight = false, HorizontalScrollbar = true, DrawMode = DrawMode.OwnerDrawFixed };
+            recent_lst.Font = new Font(recent_lst.Font.FontFamily, 11f);
+            recent_lst.ItemHeight = recent_lst.Font.Height + 2;
+            recent_lst.DrawItem += (s, e) =>
+            {
+                // 第 2、4、6… 項用 225 灰底區分；選取時用系統選取色
+                if (e.Index < 0) return;
+                bool selected = (e.State & DrawItemState.Selected) != 0;
+                Color back = selected ? SystemColors.Highlight : e.Index % 2 == 1 ? Color.FromArgb(225, 225, 225) : recent_lst.BackColor;
+                using (Brush brush = new SolidBrush(back))
+                {
+                    e.Graphics.FillRectangle(brush, e.Bounds);
+                }
+                TextRenderer.DrawText(e.Graphics, recent_lst.Items[e.Index].ToString(), recent_lst.Font, e.Bounds,
+                    selected ? SystemColors.HighlightText : recent_lst.ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
+            };
             recent_lst.DoubleClick += (s, e) => OpenRecent();
             recent_lst.KeyDown += (s, e) =>
             {
@@ -2673,11 +2980,16 @@ namespace Thunder
             {
                 line = string.Join(",", line.Split(',').Select(v => v.Trim())).TrimEnd(',');  // 去掉對齊用的 Tab 與空白
             }
-            showimgConfig_lbl.Text = line ?? "";
-            showimgConfig_lbl.Visible = !string.IsNullOrEmpty(line);
-            toolTip.SetToolTip(showimgConfig_lbl, line);
-            LayoutRecent();
+            ShowConfigNote(line);
         }  // 更新預覽資訊
+        private void ShowConfigNote(string text)
+        {
+            // 縮圖上方的文字（null 或空字串時隱藏）
+            showimgConfig_lbl.Text = text ?? "";
+            showimgConfig_lbl.Visible = !string.IsNullOrEmpty(text);
+            toolTip.SetToolTip(showimgConfig_lbl, text);
+            LayoutRecent();
+        }  // 顯示 config 文字
         private void AddRecent(RecentItem item)
         {
             var existing = recent_lst.Items.Cast<RecentItem>().FirstOrDefault(i => i.Key == item.Key);
@@ -2687,6 +2999,8 @@ namespace Thunder
             {
                 recent_lst.Items.RemoveAt(recent_lst.Items.Count - 1);
             }
+            // 自繪清單不會自動計算水平捲軸寬度
+            recent_lst.HorizontalExtent = recent_lst.Items.Cast<object>().Max(i => TextRenderer.MeasureText(i.ToString(), recent_lst.Font).Width) + 4;
         }  // 加入最近使用（最新的在最上面）
         private void OpenRecent()
         {
@@ -2756,6 +3070,195 @@ namespace Thunder
             tabDirList.Controls.Add(reload);
             tabdlPatternList_lvw.BringToFront();  // 清單最後 Dock，填滿按鈕以外的空間
         }  // DirList 重新讀取按鈕
+        private void InitImgListExport()
+        {
+            var export = new ToolStripMenuItem("全部匯出成 PNG...", null, (s, e) => ExportImgList());
+            export.ToolTipText = "依目前寬高把 ImgList 每一項存成「編號_名稱.png」";
+            tabilPatternList_cms.Items.Add(new ToolStripSeparator());
+            tabilPatternList_cms.Items.Add(export);
+        }  // ImgList 右鍵匯出
+        private void ExportImgList()
+        {
+            if (tabilPatternList_lst.Items.Count == 0) return;
+            string folder;
+            using (var dialog = new FolderBrowserDialog { Description = $"選擇匯出資料夾（{mnsW_txt.Text} x {mnsH_txt.Text}，共 {tabilPatternList_lst.Items.Count} 張）", SelectedPath = Application.StartupPath })
+            {
+                if (dialog.ShowDialog(this) != DialogResult.OK) return;
+                folder = dialog.SelectedPath;
+            }
+            ExportImgListTo(folder);
+        }  // 選擇資料夾後匯出
+        private int ExportImgListTo(string folder)
+        {
+            // 逐項產生並存檔；有問題的項目略過，最後一次列出
+            var errors = new List<string>();
+            int saved = 0, total = tabilPatternList_lst.Items.Count;
+            char[] invalid = Path.GetInvalidFileNameChars();
+            ssrProgressbar_prg.Maximum = total;
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                foreach (ListViewItem item in tabilPatternList_lst.Items)
+                {
+                    string name = new string(item.SubItems[1].Text.Trim().Select(ch => invalid.Contains(ch) ? '_' : ch).ToArray());
+                    string fileName = $"{item.Index + 1:000}_{name}.png";
+                    int before = errors.Count;
+                    if (ApplyConfigLine(item.Tag.ToString(), errors) && showimgPicture_pic.Image != null)
+                    {
+                        showimgPicture_pic.Image.Save(Path.Combine(folder, fileName), ImageFormat.Png);
+                        saved++;
+                    }
+                    else if (errors.Count == before)
+                    {
+                        errors.Add($"「{name}」無法產生圖片");
+                    }
+                    ssrProgressbar_prg.Value = item.Index + 1;
+                    ssrStatus_lbl.Text = $"匯出中 {item.Index + 1}/{total}：{fileName}";
+                    Application.DoEvents();  // 更新進度列
+                }
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+                ssrProgressbar_prg.Value = 0;
+            }
+            ssrStatus_lbl.Text = $"已匯出 {saved}/{total} 張到 {folder}";
+            if (errors.Count > 0)
+            {
+                MessageBox.Show($"以下 {errors.Count} 項沒有匯出：\r\n\r\n・" + string.Join("\r\n・", errors), "全部匯出", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            // 預覽恢復成目前選取的項目
+            if (tabilPatternList_lst.SelectedItems.Count > 0)
+            {
+                ApplyConfigLine(tabilPatternList_lst.SelectedItems[0].Tag.ToString());
+            }
+            return saved;
+        }  // 匯出 ImgList 全部圖片
+        private static void DrawScreenshot(Graphics g, Image image, int x, int y, int width, int height)
+        {
+            // Window 匯入的截圖：比目標大時 1:1 從左上裁切，比目標小時拉伸（寬、高分開判斷）
+            if (image == null || width <= 0 || height <= 0) return;
+            var source = new Rectangle(0, 0, Math.Min(image.Width, width), Math.Min(image.Height, height));
+            GraphicsState state = g.Save();
+            g.InterpolationMode = InterpolationMode.NearestNeighbor;  // 拉伸時保持像素銳利
+            g.PixelOffsetMode = PixelOffsetMode.Half;
+            g.DrawImage(image, new Rectangle(x, y, width, height), source, GraphicsUnit.Pixel);
+            g.Restore(state);
+        }  // 畫截圖（大裁切、小拉伸）
+        private void InitMassTooltip()
+        {
+            string tip = "勾選後按 AutoSave（Ctrl+S）批量輸出純色圖：\r\n" +
+                         "・從 0 開始，每隔設定的階數輸出一張，最後一張為背景色\r\n" +
+                         "　例：背景白 (255)、每 32 階 → 0、32、64 … 224、255\r\n" +
+                         "・各色版不超過背景色（背景 255.0.0 → 只輸出紅色階）\r\n" +
+                         "・檔名為「檔名_灰階.png」，存在程式資料夾，同名時加 (2)、(3)…\r\n" +
+                         "・只輸出背景純色，框線、文字等設定不會畫上";
+            toolTip.SetToolTip(tabiefMass_chk, tip);
+            toolTip.SetToolTip(tabiefMassNum_nud, "每幾階輸出一張（1 = 每一階都輸出）");
+        }  // 大量建圖說明
+        private void InitMaskZoom()
+        {
+            // Mask 格子與 Gradient 色條面板旁加「放大」：移到可拖拉大小的視窗編輯，關閉後放回原位
+            foreach (var (panel, box, clear) in new[] {
+                (tabiemPixelPanel_pnl, (Control)tabimgeMask, tabiemPixelClear_btn),
+                (tabiwCMaskPixelPanel_pnl, (Control)tabiwCustomMask_grp, tabiwCMaskPixelClear_btn) })
+            {
+                AddZoomButton(panel, box, new Rectangle(clear.Right + 6, clear.Top, 44, 24), "Mask");
+            }
+            AddZoomButton(tabigOtherSplit_pnl, tabigOther_grp, new Rectangle(285, 160, 62, 24), "ColorBar");
+            // Window 自製圖的 ColorBar 空間較小：四色 / 八色按鈕稍微上移、群組加高放入放大按鈕
+            tabiwCGradOther_grp.Height += 5;
+            foreach (Button button in new[] { tabiwCGradFourColor_btn, tabiwCGradEightColor_btn })
+            {
+                button.SetBounds(button.Left, 128, button.Width, 22);
+            }
+            AddZoomButton(tabiwCGradOtherSplit_pnl, tabiwCGradOther_grp, new Rectangle(280, 152, 62, 20), "ColorBar");
+        }  // Mask / ColorBar 放大按鈕
+        private void AddZoomButton(Panel panel, Control box, Rectangle bounds, string title)
+        {
+            var zoom = new Button { Text = "放大", Bounds = bounds };
+            zoom.Click += (s, e) => ZoomBlockPanel(panel, title);
+            toolTip.SetToolTip(zoom, $"開啟可拖拉大小的視窗編輯 {title}（格子多時比較好點選）");
+            box.Controls.Add(zoom);
+            panel.Resize += (s, e) => LayoutBlocks(panel);
+        }  // 加入放大按鈕
+        private static (int x, int y) BlockCell(Control block)
+        {
+            // Mask 格子 Tag 為「x,y」；ColorBar 色條為「V,序號」（直排）或「H,序號」（橫排）
+            string[] xy = block.Tag.ToString().Split(',');
+            if (xy[0] == "V") return (int.Parse(xy[1]), 0);
+            if (xy[0] == "H") return (0, int.Parse(xy[1]));
+            return (int.Parse(xy[0]), int.Parse(xy[1]));
+        }  // 格子座標
+        private static void LayoutBlocks(Panel panel)
+        {
+            // 依面板大小重新排列格子（保留顏色）
+            var blocks = panel.Controls.OfType<Panel>().ToList();
+            if (blocks.Count == 0) return;
+            int columns = blocks.Max(b => BlockCell(b).x) + 1, rows = blocks.Max(b => BlockCell(b).y) + 1;
+            int blockWidth = Math.Max(1, panel.Width / columns), blockHeight = Math.Max(1, panel.Height / rows);
+            panel.SuspendLayout();
+            foreach (Panel block in blocks)
+            {
+                var (x, y) = BlockCell(block);
+                block.SetBounds(x * blockWidth, y * blockHeight, blockWidth, blockHeight);
+            }
+            panel.ResumeLayout();
+        }  // 重新排列格子
+        private void ZoomBlockPanel(Panel panel, string title)
+        {
+            // 每次開啟建立新視窗、關閉即釋放；格子本身直接搬過去用，不另外複製
+            var blocks = panel.Controls.OfType<Panel>().ToList();
+            if (blocks.Count == 0) return;
+            int columns = blocks.Max(b => BlockCell(b).x) + 1, rows = blocks.Max(b => BlockCell(b).y) + 1;
+            Control parent = panel.Parent;
+            Rectangle bounds = panel.Bounds;
+            int index = parent.Controls.GetChildIndex(panel);
+            var coord = new Label { Dock = DockStyle.Bottom, Height = 22, TextAlign = ContentAlignment.MiddleLeft, Text = "左鍵填色、右鍵清除；拖拉視窗邊緣可調整大小，Esc 關閉" };
+            EventHandler showCoord = (s, e) => coord.Text = $"座標 {((Control)s).Tag}";
+            Rectangle area = Screen.FromControl(this).WorkingArea;
+            Size client;
+            if (columns > 1 && rows > 1)
+            {
+                // Mask：格子盡量為正方形
+                int cell = Math.Max(6, Math.Min((area.Width - 80) / columns, (area.Height - 120) / rows));
+                cell = Math.Min(cell, Math.Max(24, 640 / Math.Max(columns, rows)));
+                client = new Size(columns * cell, rows * cell);
+            }
+            else
+            {
+                // ColorBar：直排色條用橫長視窗、橫排用直長視窗
+                client = columns > 1 ? new Size(720, 400) : new Size(400, Math.Min(640, area.Height - 120));
+            }
+            using (var form = new Form
+            {
+                Text = $"{title} 放大編輯（{columns} x {rows}）", ShowIcon = false, ShowInTaskbar = false, MinimizeBox = false,
+                StartPosition = FormStartPosition.CenterParent, KeyPreview = true,
+                ClientSize = new Size(client.Width, client.Height + coord.Height), MinimumSize = new Size(200, 200),
+            })
+            {
+                form.KeyDown += (s, e) => { if (e.KeyCode == Keys.Escape) form.Close(); };
+                blocks.ForEach(b => b.MouseEnter += showCoord);
+                parent.Controls.Remove(panel);
+                panel.Dock = DockStyle.Fill;
+                form.Controls.Add(panel);
+                form.Controls.Add(coord);  // 後加入的先 Dock，座標列在下方
+                try
+                {
+                    form.ShowDialog(this);
+                }
+                finally
+                {
+                    form.Controls.Remove(panel);
+                    blocks.ForEach(b => b.MouseEnter -= showCoord);
+                    panel.Dock = DockStyle.None;
+                    panel.Bounds = bounds;
+                    parent.Controls.Add(panel);
+                    parent.Controls.SetChildIndex(panel, index);
+                    LayoutBlocks(panel);
+                }
+            }
+        }  // 放大編輯視窗
         private bool _movingConfigLine;  // 移動時重新選取不重新產生圖片
         private void MoveConfigLine(int step)
         {
@@ -3195,7 +3698,8 @@ namespace Thunder
                     }
                 }
 
-                RadioButton targetRdo = targetPanel.Parent.Controls.OfType<RadioButton>()
+                Control box = targetPanel.Parent;  // 先記下群組：放大編輯時面板會暫時移到其他視窗
+                RadioButton targetRdo = box.Controls.OfType<RadioButton>()
                                     .FirstOrDefault(rdo => rdo.Name.Contains("HSplit_rdo")); // 替換為目標 Label 的名稱
 
                 // 生成分割區塊
@@ -3220,15 +3724,9 @@ namespace Thunder
                         }
                         else if (args.Button == MouseButtons.Left)
                         {
-                            if (block.Parent is Panel parentpanel)
-                            {
-                                if (parentpanel.Parent is GroupBox grandbox)
-                                {
-                                    Label targetLabel = grandbox.Controls.OfType<Label>()
-                                    .FirstOrDefault(label => label.Name.Contains("Color_lbl")); // 替換為目標 Label 的名稱
-                                    block.BackColor = targetLabel.BackColor;
-                                }
-                            }
+                            Label targetLabel = box.Controls.OfType<Label>()
+                            .FirstOrDefault(label => label.Name.Contains("Color_lbl"));
+                            block.BackColor = targetLabel.BackColor;
                         }
                     };
                     block.MouseUp += (s, args) =>
@@ -3242,15 +3740,9 @@ namespace Thunder
                     // 設定滑鼠移入事件以顯示座標
                     block.MouseEnter += (s, args) =>
                     {
-                        if (block.Parent is Panel parentpanel)
-                        {
-                            if (parentpanel.Parent is GroupBox grandbox)
-                            {
-                                Label targetLabel = grandbox.Controls.OfType<Label>()
-                                .FirstOrDefault(label => label.Name.Contains("Loc_lbl")); // 替換為目標 Label 的名稱
-                                targetLabel.Text = $"{block.Tag}"; // 更新 Label 顯示區塊座標
-                            }
-                        }
+                        Label targetLabel = box.Controls.OfType<Label>()
+                        .FirstOrDefault(label => label.Name.Contains("Loc_lbl"));
+                        targetLabel.Text = $"{block.Tag}"; // 更新 Label 顯示區塊座標
                     };
 
                     targetPanel.Controls.Add(block);
@@ -3786,8 +4278,10 @@ namespace Thunder
                 int blockHeight;
                 string pixelType;
                 VScrollBar brightnessvsc;
+                GroupBox box;  // 顏色按鈕與座標標籤所在的群組（面板放大編輯時 Parent 會暫時改變，不能用 Parent 找）
                 if (control.Parent != null && control.Parent.Name == "tabimgeMask")
                 {
+                    box = tabimgeMask;
                     // 取得並清空面板
                     targetPanel = tabiemPixelPanel_pnl;
                     targetPanel.Controls.Clear();
@@ -3800,6 +4294,7 @@ namespace Thunder
                 }
                 else
                 {
+                    box = tabiwCustomMask_grp;
                     // 取得並清空面板
                     targetPanel = tabiwCMaskPixelPanel_pnl;
                     targetPanel.Controls.Clear();
@@ -3839,28 +4334,16 @@ namespace Thunder
                                 }
                                 else if (args.Button == MouseButtons.Left)
                                 {
-                                    if (block.Parent is Panel parentpanel)
-                                    {
-                                        if (parentpanel.Parent is GroupBox grandbox)
-                                        {
-                                            Button targetButton = grandbox.Controls.OfType<Button>()
-                                            .FirstOrDefault(button => button.Name.Contains("PixelColor")); // 替換為目標 Label 的名稱
-                                            block.BackColor = targetButton.BackColor;
-                                        }
-                                    }
+                                    Button targetButton = box.Controls.OfType<Button>()
+                                    .FirstOrDefault(button => button.Name.Contains("PixelColor"));
+                                    block.BackColor = targetButton.BackColor;
                                 }
                             };
                             block.MouseEnter += (s, args) =>
                             {
-                                if (block.Parent is Panel parentpanel)
-                                {
-                                    if (parentpanel.Parent is GroupBox grandbox)
-                                    {
-                                        Label targetLabel = grandbox.Controls.OfType<Label>()
-                                        .FirstOrDefault(label => label.Name.Contains("Loc_lbl")); // 替換為目標 Label 的名稱
-                                        targetLabel.Text = $"{block.Tag}"; // 更新 Label 顯示區塊座標
-                                    }
-                                }
+                                Label targetLabel = box.Controls.OfType<Label>()
+                                .FirstOrDefault(label => label.Name.Contains("Loc_lbl"));
+                                targetLabel.Text = $"{block.Tag}"; // 更新 Label 顯示區塊座標
                             };
 
                             targetPanel.Controls.Add(block);
@@ -3902,15 +4385,9 @@ namespace Thunder
                             };
                             block.MouseEnter += (s, args) =>
                             {
-                                if (block.Parent is Panel parentpanel)
-                                {
-                                    if (parentpanel.Parent is GroupBox grandbox)
-                                    {
-                                        Label targetLabel = grandbox.Controls.OfType<Label>()
-                                        .FirstOrDefault(label => label.Name.Contains("PixelLoc_lbl")); // 替換為目標 Label 的名稱
-                                        targetLabel.Text = $"{block.Tag}"; // 更新 Label 顯示區塊座標
-                                    }
-                                }
+                                Label targetLabel = box.Controls.OfType<Label>()
+                                .FirstOrDefault(label => label.Name.Contains("PixelLoc_lbl"));
+                                targetLabel.Text = $"{block.Tag}"; // 更新 Label 顯示區塊座標
                             };
                             targetPanel.Controls.Add(block);
                         }

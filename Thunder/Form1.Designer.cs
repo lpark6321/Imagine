@@ -40,7 +40,6 @@ namespace Thunder
             this.mnsX_lbl = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsW_txt = new System.Windows.Forms.ToolStripTextBox();
             this.mnsScreenlist_cmb = new System.Windows.Forms.ToolStripComboBox();
-            this.mnsGenerate_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsEdid_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsAbout_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnsPattername_txt = new System.Windows.Forms.ToolStripTextBox();
@@ -357,7 +356,6 @@ namespace Thunder
             this.mnsX_lbl,
             this.mnsW_txt,
             this.mnsScreenlist_cmb,
-            this.mnsGenerate_btn,
             this.mnsEdid_btn,
             this.mnsAbout_btn,
             this.mnsPattername_txt,
@@ -418,15 +416,6 @@ namespace Thunder
             this.mnsScreenlist_cmb.Size = new System.Drawing.Size(104, 23);
             this.mnsScreenlist_cmb.SelectedIndexChanged += new System.EventHandler(this.menuToolStripCmb_SelectedIndexChanged);
             this.mnsScreenlist_cmb.Click += new System.EventHandler(this.Screenlist);
-            // 
-            // mnsGenerate_btn
-            // 
-            this.mnsGenerate_btn.Name = "mnsGenerate_btn";
-            this.mnsGenerate_btn.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.Space)));
-            this.mnsGenerate_btn.Size = new System.Drawing.Size(71, 23);
-            this.mnsGenerate_btn.Text = "Generate";
-            this.mnsGenerate_btn.ToolTipText = "Alt+Space";
-            this.mnsGenerate_btn.Click += new System.EventHandler(this.Generate_Click);
             //
             // mnsEdid_btn
             //
@@ -3860,7 +3849,6 @@ namespace Thunder
         private ComboBox tabiwCGradLastLevel_cmb;
         private Label tabiwCGradFirstLevel_lbl;
         private Label tabigOtherSplitLoc_lbl;
-        private ToolStripMenuItem mnsGenerate_btn;
         private CheckBox tabigOther_chk;
         private Button tabigEightColor_btn;
         private Button tabiwCGradEightColor_btn;

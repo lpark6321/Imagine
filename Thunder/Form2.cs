@@ -19,6 +19,8 @@ namespace Thunder
             InitDrawMenu();
             InitSlideshowMenu();
             InitCaption();
+            InitLens();
+            InitAutoHideCursor();
             MouseWheel += pictureWindow_MouseWheel;  // PictureBox 不會取得焦點，滾輪事件由視窗接收
             //_bitmap = bitMap; // 將接收到的 Bitmap 儲存到類別屬性中
             //this.Paint += Form2_show; // 綁定 Paint 事件  
@@ -48,9 +50,9 @@ namespace Thunder
         //pictureWindow操控--------------------------------------------------------------------------------------------
         private void pictureWindow_DoubleClick(object sender, EventArgs e)
         {
-            if (sender is PictureBox && _drawTool != DrawTool.None)
+            if (sender is PictureBox && (_drawTool != DrawTool.None || _pickerOn))
             {
-                return;  // 畫圖時雙擊不切換全螢幕
+                return;  // 畫圖或吸管時雙擊不切換全螢幕
             }
             if (WindowState == FormWindowState.Maximized)
             {
@@ -252,6 +254,40 @@ namespace Thunder
                         // 使用 Point 結構來修改游標位置  
                         Cursor.Position = new Point(currentPosition.X + 1, currentPosition.Y);
                         break;
+                    case Keys.M:
+                        SetMagnifier(!_magnifierOn);
+                        break;
+                    case Keys.R:
+                        // 每 1 秒幻燈片：播放中按 R 停止
+                        if (timerSlideshow.Enabled) timerSlideshow.Stop();
+                        else Slideshow(cmsSlideshow1, EventArgs.Empty);
+                        FlashCaption(timerSlideshow.Enabled ? "幻燈片 每 1 秒" : "幻燈片 停止");
+                        break;
+                    case Keys.T:
+                    case Keys.E:
+                        // 幻燈片播放中：T 間隔加 1 秒、E 減 1 秒（最少 1 秒）
+                        if (timerSlideshow.Enabled)
+                        {
+                            int interval = timerSlideshow.Interval + (e.KeyCode == Keys.T ? 1000 : -1000);
+                            timerSlideshow.Interval = Math.Max(Math.Min(1000, timerSlideshow.Interval), interval);
+                            FlashCaption($"幻燈片 每 {timerSlideshow.Interval / 1000.0:0.#} 秒");
+                        }
+                        break;
+                    case Keys.Up:
+                        AdjustSolidLevel(+1);
+                        break;
+                    case Keys.Down:
+                        AdjustSolidLevel(-1);
+                        break;
+                    case Keys.PageUp:
+                        AdjustSolidLevel(+16);
+                        break;
+                    case Keys.PageDown:
+                        AdjustSolidLevel(-16);
+                        break;
+                    case Keys.C:
+                        if (!e.Control) SetPicker(!_pickerOn);
+                        break;
                     case Keys.Space:
                         if (mainWindow.Instance == null || !mainWindow.Instance.IsDynamicMode)
                         {
@@ -417,9 +453,31 @@ namespace Thunder
             {
                 if (_caption == value) return;
                 _caption = value;
+                if (!timerSlideshow.Enabled) FlashCaption(null);  // 開啟全螢幕或換圖時顯示 1 秒（幻燈片播放中不顯示，避免一直蓋著）
                 InvalidateCaption();
             }
         }  // 目前圖片名稱（DirList 檔名 / ImgList 名稱；null 不顯示）
+        public string ScreenDevice { get; set; }  // 多螢幕模式：這個視窗負責的螢幕
+        public object Selection { get; set; }     // 分離模式：這個螢幕目前顯示的分頁與項目（由主視窗記錄 / 還原）
+        public void FlashMessage(string message) => FlashCaption(message);
+        private Timer _flashTimer;
+        private string _flashText;  // 暫時顯示的訊息（灰階、幻燈片間隔）；null 時顯示名稱
+        private bool _flashing;
+        private void FlashCaption(string message)
+        {
+            // 左上角顯示 1 秒後自動隱藏；message 為 null 時顯示圖片名稱
+            if (message == null && string.IsNullOrEmpty(_caption)) return;
+            if (_flashTimer == null)
+            {
+                _flashTimer = new Timer { Interval = 1000 };
+                _flashTimer.Tick += (s, e) => { _flashTimer.Stop(); _flashing = false; _flashText = null; InvalidateCaption(); };
+            }
+            _flashText = message;
+            _flashing = true;
+            _flashTimer.Stop();
+            _flashTimer.Start();
+            InvalidateCaption();
+        }  //左上角短暫顯示
         private void InvalidateCaption()
         {
             // 名稱長度會變，重繪整條頂端
@@ -439,13 +497,14 @@ namespace Thunder
         }  //顯示 / 隱藏名稱
         private void picwinPicture_PaintCaption(object sender, PaintEventArgs e)
         {
-            if (!_captionVisible || string.IsNullOrEmpty(_caption)) return;
+            string text = _flashing && _flashText != null ? _flashText : _caption;
+            if (!(_captionVisible || _flashing) || string.IsNullOrEmpty(text)) return;
             // 127 灰底 50% 透明；黑色粗體字加白框（用路徑描邊再填色）
             Graphics g = e.Graphics;
             float emSize = CaptionFont.SizeInPoints * g.DpiY / 72f;  // 路徑以像素為單位
             using (GraphicsPath path = new GraphicsPath())
             {
-                path.AddString(_caption, CaptionFont.FontFamily, (int)CaptionFont.Style, emSize, new PointF(8, 4), StringFormat.GenericTypographic);
+                path.AddString(text, CaptionFont.FontFamily, (int)CaptionFont.Style, emSize, new PointF(8, 4), StringFormat.GenericTypographic);
                 RectangleF textBounds = path.GetBounds();
                 _captionBounds = new Rectangle(0, 0, (int)Math.Ceiling(textBounds.Right) + 10, (int)Math.Ceiling(textBounds.Bottom) + 10);
                 using (Brush background = new SolidBrush(Color.FromArgb(128, 127, 127, 127)))
@@ -466,6 +525,7 @@ namespace Thunder
         {
             // 間隔（毫秒）存在 Tag，不再從名稱解析秒數
             cmsSlideshow1.Tag = 1000;
+            cmsSlideshow1.ShortcutKeyDisplayString = "R";  // R 開始 / 停止每 1 秒幻燈片
             cmsSlideshow3.Tag = 3000;
             cmsSlideshow5.Tag = 5000;
             cmsSlideshow10.Tag = 10000;
@@ -640,6 +700,7 @@ namespace Thunder
         {
             if (sender is ToolStripMenuItem menuItem && menuItem.Tag is DrawTool tool)
             {
+                if (tool != DrawTool.None) SetPicker(false);  // 畫圖與吸管都用左鍵，只能擇一
                 _drawTool = tool;
                 Cursor = tool != DrawTool.None || cmsShowLoc.ForeColor == Color.Red ? Cursors.Cross : Cursors.Hand;
                 UpdateDrawMenu();
@@ -791,6 +852,288 @@ namespace Thunder
                 e.Cancel = true;  // 取消或存檔沒有完成就不關閉
             }
         }  //關閉前詢問是否存檔
+        //放大鏡與顏色吸管---------------------------------------------------------------------------------------------
+        private static bool _magnifierOn;  // 關閉視窗後仍保留設定
+        private static bool _pickerOn;
+        private static int _magnifierZoom = 8;
+        private const int LensTarget = 240;  // 放大鏡大約邊長（畫面像素）
+        private const int InfoHeight = 46;
+        private static readonly Font LensFont = new Font("Microsoft JhengHei UI", 10F, FontStyle.Bold);
+        private Point _lensMouse = new Point(-1, -1);  // 滑鼠位置（畫面座標），-1 表示不在圖片上
+        private Rectangle _lensDrawn;                  // 上次畫的範圍，用來局部重繪
+        private string _pickerCopied;                  // 剛複製的顏色（滑鼠移到別的像素後清除）
+        private Point? _pickerCopiedAt;
+        private ToolStripMenuItem cmsMagnifier;
+        private ToolStripMenuItem cmsMagnifierOn;
+        private ToolStripMenuItem cmsPicker;
+        private void InitLens()
+        {
+            cmsMagnifier = new ToolStripMenuItem("放大鏡") { Name = "cmsMagnifier" };
+            cmsMagnifierOn = new ToolStripMenuItem("開啟", null, (s, e) => SetMagnifier(!_magnifierOn)) { ShortcutKeyDisplayString = "M" };
+            cmsMagnifier.DropDownItems.Add(cmsMagnifierOn);
+            cmsMagnifier.DropDownItems.Add(new ToolStripSeparator());
+            foreach (int zoom in new[] { 4, 8, 16, 32 })
+            {
+                cmsMagnifier.DropDownItems.Add(new ToolStripMenuItem($"{zoom} 倍", null, (s, e) => { _magnifierZoom = zoom; SetMagnifier(true); }) { Tag = zoom });
+            }
+            cmsPicker = new ToolStripMenuItem("顏色吸管（左鍵複製 R.G.B）", null, (s, e) => SetPicker(!_pickerOn)) { Name = "cmsPicker", ShortcutKeyDisplayString = "C" };
+            contextMenuStrip.Items.Insert(contextMenuStrip.Items.IndexOf(cmsDraw) + 1, cmsMagnifier);
+            contextMenuStrip.Items.Insert(contextMenuStrip.Items.IndexOf(cmsMagnifier) + 1, cmsPicker);
+            picwinPicture_pic.PaintScreenOverlay += picwinPicture_PaintLens;  // 在名稱之後加入，畫在最上層
+            picwinPicture_pic.MouseMove += (s, e) => MoveLens(e.Location);
+            picwinPicture_pic.MouseLeave += (s, e) => MoveLens(new Point(-1, -1));
+            picwinPicture_pic.MouseDown += picwinPicture_PickerMouseDown;
+            UpdateLensMenu();
+        }  //建立放大鏡與吸管選單
+        private void SetMagnifier(bool on)
+        {
+            _magnifierOn = on;
+            UpdateLensMenu();
+            RefreshLens();
+        }  //開關放大鏡
+        private void SetPicker(bool on)
+        {
+            if (on && _drawTool != DrawTool.None)
+            {
+                _drawTool = DrawTool.None;  // 吸管與畫圖都用左鍵，開吸管時停止畫圖
+                UpdateDrawMenu();
+            }
+            _pickerOn = on;
+            Cursor = on || _drawTool != DrawTool.None || cmsShowLoc.ForeColor == Color.Red ? Cursors.Cross : Cursors.Hand;
+            UpdateLensMenu();
+            RefreshLens();
+        }  //開關顏色吸管
+        private void UpdateLensMenu()
+        {
+            cmsMagnifierOn.Checked = _magnifierOn;
+            foreach (ToolStripItem item in cmsMagnifier.DropDownItems)
+            {
+                if (item is ToolStripMenuItem mi && mi.Tag is int zoom) mi.Checked = zoom == _magnifierZoom;
+            }
+            cmsMagnifier.Checked = _magnifierOn;
+            cmsPicker.Checked = _pickerOn;
+        }  //更新選單勾選
+        private void MoveLens(Point location)
+        {
+            _lensMouse = location;
+            if (_magnifierOn || _pickerOn) RefreshLens();
+        }  //滑鼠移動時更新
+        private void RefreshLens()
+        {
+            // 只重繪上次與這次的範圍，避免整張圖重畫
+            Rectangle now = LensLayout(out _, out _);
+            picwinPicture_pic.Invalidate(_lensDrawn);
+            picwinPicture_pic.Invalidate(now);
+            _lensDrawn = now;
+        }  //重繪放大鏡
+        private int LensPixels() => Math.Max(5, (LensTarget / _magnifierZoom) | 1);  // 放大鏡內顯示幾個像素（奇數，中心為游標像素）
+        private Rectangle LensLayout(out Rectangle lens, out Rectangle info)
+        {
+            // 放大鏡在游標右下方，超出畫面時改放左方 / 上方；資訊列接在放大鏡下方
+            lens = info = Rectangle.Empty;
+            if ((!_magnifierOn && !_pickerOn) || _lensMouse.X < 0 || picwinPicture_pic.Image == null) return Rectangle.Empty;
+            int side = _magnifierOn ? LensPixels() * _magnifierZoom : 0;
+            int width = Math.Max(side, 230), height = side + InfoHeight;
+            int x = _lensMouse.X + 24, y = _lensMouse.Y + 24;
+            if (x + width > picwinPicture_pic.ClientSize.Width) x = _lensMouse.X - 24 - width;
+            if (y + height > picwinPicture_pic.ClientSize.Height) y = _lensMouse.Y - 24 - height;
+            if (_magnifierOn) lens = new Rectangle(x, y, side, side);
+            info = new Rectangle(x, y + side, width, InfoHeight);
+            return Rectangle.Inflate(Rectangle.Union(_magnifierOn ? lens : info, info), 3, 3);
+        }  //計算放大鏡位置
+        private void picwinPicture_PaintLens(object sender, PaintEventArgs e)
+        {
+            LensLayout(out Rectangle lens, out Rectangle info);
+            if (info.IsEmpty || !(picwinPicture_pic.Image is Bitmap bitmap)) return;
+            Point? pixel = picwinPicture_pic.ToImagePoint(_lensMouse);
+            Graphics g = e.Graphics;
+            GraphicsState state = g.Save();
+            if (!lens.IsEmpty)
+            {
+                // 以游標像素為中心，最近鄰放大；超出圖片的部分為深灰
+                int n = LensPixels(), zoom = _magnifierZoom;
+                g.FillRectangle(Brushes.DimGray, lens);
+                if (pixel.HasValue)
+                {
+                    Rectangle source = new Rectangle(pixel.Value.X - n / 2, pixel.Value.Y - n / 2, n, n);
+                    Rectangle visible = Rectangle.Intersect(source, new Rectangle(0, 0, bitmap.Width, bitmap.Height));
+                    if (!visible.IsEmpty)
+                    {
+                        Rectangle dest = new Rectangle(lens.X + (visible.X - source.X) * zoom, lens.Y + (visible.Y - source.Y) * zoom, visible.Width * zoom, visible.Height * zoom);
+                        g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                        g.PixelOffsetMode = PixelOffsetMode.Half;
+                        g.DrawImage(bitmap, dest, visible, GraphicsUnit.Pixel);
+                        g.PixelOffsetMode = PixelOffsetMode.Default;
+                    }
+                    if (zoom >= 8)
+                    {
+                        using (Pen grid = new Pen(Color.FromArgb(70, 128, 128, 128)))
+                        {
+                            for (int i = 1; i < n; i++)
+                            {
+                                g.DrawLine(grid, lens.X + i * zoom, lens.Y, lens.X + i * zoom, lens.Bottom);
+                                g.DrawLine(grid, lens.X, lens.Y + i * zoom, lens.Right, lens.Y + i * zoom);
+                            }
+                        }
+                    }
+                    // 中心像素框：黑白雙框，任何底色都看得到
+                    Rectangle center = new Rectangle(lens.X + n / 2 * zoom, lens.Y + n / 2 * zoom, zoom, zoom);
+                    g.DrawRectangle(Pens.Black, Rectangle.Inflate(center, 1, 1));
+                    g.DrawRectangle(Pens.White, center.X, center.Y, center.Width - 1, center.Height - 1);
+                }
+                g.DrawRectangle(Pens.White, lens.X - 1, lens.Y - 1, lens.Width + 1, lens.Height + 1);
+                g.DrawRectangle(Pens.Black, lens.X - 2, lens.Y - 2, lens.Width + 3, lens.Height + 3);
+            }
+            // 資訊列：座標、顏色值與色塊
+            using (Brush background = new SolidBrush(Color.FromArgb(220, 20, 20, 20)))
+            {
+                g.FillRectangle(background, info);
+            }
+            if (pixel.HasValue)
+            {
+                Color c = bitmap.GetPixel(pixel.Value.X, pixel.Value.Y);
+                Rectangle swatch = new Rectangle(info.X + 6, info.Y + 6, InfoHeight - 12, InfoHeight - 12);
+                using (Brush brush = new SolidBrush(Color.FromArgb(255, c)))
+                {
+                    g.FillRectangle(brush, swatch);
+                }
+                g.DrawRectangle(Pens.White, swatch);
+                string copied = _pickerCopiedAt == pixel ? $"  已複製 {_pickerCopied}" : "";
+                string text = $"X {pixel.Value.X}, Y {pixel.Value.Y}{copied}\nRGB {c.R}.{c.G}.{c.B}   #{c.R:X2}{c.G:X2}{c.B:X2}";
+                TextRenderer.DrawText(g, text, LensFont, new Rectangle(swatch.Right + 6, info.Y + 3, info.Right - swatch.Right - 8, InfoHeight - 6),
+                    Color.White, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
+            }
+            else
+            {
+                TextRenderer.DrawText(g, "圖片範圍外", LensFont, info, Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            }
+            g.Restore(state);
+        }  //畫放大鏡與顏色資訊
+        private void picwinPicture_PickerMouseDown(object sender, MouseEventArgs e)
+        {
+            // 吸管：左鍵複製 R.G.B（與 config 的顏色寫法相同）
+            if (!_pickerOn || e.Button != MouseButtons.Left || !(picwinPicture_pic.Image is Bitmap bitmap)) return;
+            Point? pixel = picwinPicture_pic.ToImagePoint(e.Location);
+            if (!pixel.HasValue) return;
+            Color c = bitmap.GetPixel(pixel.Value.X, pixel.Value.Y);
+            _pickerCopied = $"{c.R}.{c.G}.{c.B}";
+            _pickerCopiedAt = pixel;
+            try
+            {
+                Clipboard.SetText(_pickerCopied);
+            }
+            catch (System.Runtime.InteropServices.ExternalException)
+            {
+                _pickerCopied = "失敗（剪貼簿忙碌）";
+            }
+            RefreshLens();
+        }  //吸管複製顏色
+        //純色灰階調整-------------------------------------------------------------------------------------------------
+        private Bitmap _solidChecked;   // 已檢查過的圖片（換圖後重新檢查）
+        private bool _solidIsUniform;
+        private bool[] _solidChannels;  // 要調整的色版（R、G、B）：灰階三個一起，紅色只調 R
+        private int _solidLevel;
+        private void AdjustSolidLevel(int delta)
+        {
+            if (!(picwinPicture_pic.Image is Bitmap bitmap)) return;
+            if (!ReferenceEquals(bitmap, _solidChecked))
+            {
+                _solidChecked = bitmap;
+                _solidIsUniform = IsUniform(bitmap, out Color c);
+                if (_solidIsUniform)
+                {
+                    _solidLevel = Math.Max(c.R, Math.Max(c.G, c.B));
+                    _solidChannels = _solidLevel == 0
+                        ? new[] { true, true, true }  // 黑色視為灰階
+                        : new[] { c.R == _solidLevel, c.G == _solidLevel, c.B == _solidLevel };
+                }
+            }
+            if (!_solidIsUniform)
+            {
+                FlashCaption("不是純色圖，無法調整灰階");
+                return;
+            }
+            _solidLevel = Math.Max(0, Math.Min(255, _solidLevel + delta));
+            Color color = Color.FromArgb(_solidChannels[0] ? _solidLevel : 0, _solidChannels[1] ? _solidLevel : 0, _solidChannels[2] ? _solidLevel : 0);
+            // 換成同尺寸的新純色圖（只影響全螢幕，不改主視窗）
+            var solid = new Bitmap(bitmap.Width, bitmap.Height);
+            using (Graphics g = Graphics.FromImage(solid))
+            {
+                g.Clear(color);
+            }
+            picwinPicture_pic.Image = solid;
+            if (_bitmap != null) _bitmap.Dispose();
+            _bitmap = solid;
+            _solidChecked = solid;  // 新圖仍是純色，保留色版設定
+            bool gray = _solidChannels.All(on => on);
+            FlashCaption(gray ? $"灰階 {_solidLevel}" : $"R{color.R} G{color.G} B{color.B}");
+        }  //純色圖調整階數
+        private static bool IsUniform(Bitmap bitmap, out Color color)
+        {
+            // 逐列比對整張圖是否同一個顏色
+            color = bitmap.GetPixel(0, 0);
+            var data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            try
+            {
+                int[] row = new int[bitmap.Width];
+                int first = color.ToArgb();
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    System.Runtime.InteropServices.Marshal.Copy(data.Scan0 + y * data.Stride, row, 0, row.Length);
+                    foreach (int pixel in row)
+                    {
+                        if (pixel != first) return false;
+                    }
+                }
+                return true;
+            }
+            finally
+            {
+                bitmap.UnlockBits(data);
+            }
+        }  //是否為純色圖
+        //自動隱藏游標---------------------------------------------------------------------------------------------------
+        private Timer _cursorTimer;
+        private bool _cursorHidden;
+        private Point _lastCursor;
+        private void InitAutoHideCursor()
+        {
+            // 滑鼠 2 秒沒動就隱藏；畫圖、吸管時不隱藏
+            _cursorTimer = new Timer { Interval = 2000 };
+            _cursorTimer.Tick += (s, e) =>
+            {
+                _cursorTimer.Stop();
+                if (!_cursorHidden && _drawTool == DrawTool.None && !_pickerOn && !contextMenuStrip.Visible && Bounds.Contains(Cursor.Position))
+                {
+                    Cursor.Hide();
+                    _cursorHidden = true;
+                }
+            };
+            picwinPicture_pic.MouseMove += (s, e) => CursorMoved();
+            MouseMove += (s, e) => CursorMoved();
+            contextMenuStrip.Opening += (s, e) => ShowCursorAgain();
+            // 隱藏是整個程式共用的，離開全螢幕視窗（移到主視窗）時一定要恢復
+            picwinPicture_pic.MouseLeave += (s, e) => ShowCursorAgain();
+            MouseLeave += (s, e) => ShowCursorAgain();
+            Deactivate += (s, e) => ShowCursorAgain();
+            FormClosed += (s, e) => { _cursorTimer.Stop(); ShowCursorAgain(); };
+            _cursorTimer.Start();
+        }  //建立自動隱藏游標
+        private void CursorMoved()
+        {
+            // 顯示 / 隱藏游標本身也會觸發 MouseMove，位置沒變就不算移動
+            if (Cursor.Position == _lastCursor) return;
+            _lastCursor = Cursor.Position;
+            ShowCursorAgain();
+            _cursorTimer.Stop();
+            _cursorTimer.Start();
+        }  //滑鼠移動時顯示游標
+        private void ShowCursorAgain()
+        {
+            if (!_cursorHidden) return;
+            Cursor.Show();
+            _cursorHidden = false;
+        }  //恢復游標
     }
 
     public enum DrawTool
