@@ -21,6 +21,8 @@ namespace Thunder
             InitCaption();
             InitLens();
             InitAutoHideCursor();
+            InitGrayScanMenu();
+            picwinPicture_pic.PaintScreenOverlay += picwinPicture_PaintInfo;  // I 鍵資訊列
             MouseWheel += pictureWindow_MouseWheel;  // PictureBox 不會取得焦點，滾輪事件由視窗接收
             //_bitmap = bitMap; // 將接收到的 Bitmap 儲存到類別屬性中
             //this.Paint += Form2_show; // 綁定 Paint 事件  
@@ -147,6 +149,16 @@ namespace Thunder
                 UndoDrawing();
                 return;
             }
+            if (e.Alt && e.KeyCode == Keys.R)
+            {
+                ToggleGrayScan();  // Alt+R 自動掃灰階
+                e.SuppressKeyPress = true;
+                return;
+            }
+            if (HandleLevelInput(e))
+            {
+                return;  // 數字鍵輸入階數（輸入中 Esc 只取消輸入，不關閉視窗）
+            }
             if (sender is Form targetform)
             {
                 Point currentPosition = Cursor.Position;
@@ -257,8 +269,12 @@ namespace Thunder
                     case Keys.M:
                         SetMagnifier(!_magnifierOn);
                         break;
+                    case Keys.I:
+                        ToggleInfo();
+                        break;
                     case Keys.R:
                         // 每 1 秒幻燈片：播放中按 R 停止
+                        _scanTimer?.Stop();  // 不和自動掃灰階同時跑
                         if (timerSlideshow.Enabled) timerSlideshow.Stop();
                         else Slideshow(cmsSlideshow1, EventArgs.Empty);
                         FlashCaption(timerSlideshow.Enabled ? "幻燈片 每 1 秒" : "幻燈片 停止");
@@ -463,18 +479,19 @@ namespace Thunder
         private Timer _flashTimer;
         private string _flashText;  // 暫時顯示的訊息（灰階、幻燈片間隔）；null 時顯示名稱
         private bool _flashing;
-        private void FlashCaption(string message)
+        private void FlashCaption(string message, int milliseconds = 1000)
         {
-            // 左上角顯示 1 秒後自動隱藏；message 為 null 時顯示圖片名稱
+            // 左上角顯示一段時間（預設 1 秒）後自動隱藏；message 為 null 時顯示圖片名稱
             if (message == null && string.IsNullOrEmpty(_caption)) return;
             if (_flashTimer == null)
             {
-                _flashTimer = new Timer { Interval = 1000 };
+                _flashTimer = new Timer();
                 _flashTimer.Tick += (s, e) => { _flashTimer.Stop(); _flashing = false; _flashText = null; InvalidateCaption(); };
             }
             _flashText = message;
             _flashing = true;
             _flashTimer.Stop();
+            _flashTimer.Interval = milliseconds;
             _flashTimer.Start();
             InvalidateCaption();
         }  //左上角短暫顯示
@@ -1033,9 +1050,10 @@ namespace Thunder
         private bool _solidIsUniform;
         private bool[] _solidChannels;  // 要調整的色版（R、G、B）：灰階三個一起，紅色只調 R
         private int _solidLevel;
-        private void AdjustSolidLevel(int delta)
+        private bool PrepareSolid(bool grayIfNotSolid)
         {
-            if (!(picwinPicture_pic.Image is Bitmap bitmap)) return;
+            // 檢查目前是否為純色圖並記下色版；grayIfNotSolid 時非純色圖改用灰階（自動掃描用）
+            if (!(picwinPicture_pic.Image is Bitmap bitmap)) return false;
             if (!ReferenceEquals(bitmap, _solidChecked))
             {
                 _solidChecked = bitmap;
@@ -1048,12 +1066,27 @@ namespace Thunder
                         : new[] { c.R == _solidLevel, c.G == _solidLevel, c.B == _solidLevel };
                 }
             }
-            if (!_solidIsUniform)
+            if (!_solidIsUniform && grayIfNotSolid)
+            {
+                _solidIsUniform = true;
+                _solidChannels = new[] { true, true, true };
+                _solidLevel = 0;
+            }
+            return _solidIsUniform;
+        }  //準備調整純色圖
+        private void AdjustSolidLevel(int delta)
+        {
+            if (!PrepareSolid(false))
             {
                 FlashCaption("不是純色圖，無法調整灰階");
                 return;
             }
-            _solidLevel = Math.Max(0, Math.Min(255, _solidLevel + delta));
+            SetSolidLevel(_solidLevel + delta);
+        }  //純色圖調整階數
+        private void SetSolidLevel(int level, string note = "")
+        {
+            if (!(picwinPicture_pic.Image is Bitmap bitmap)) return;
+            _solidLevel = Math.Max(0, Math.Min(255, level));
             Color color = Color.FromArgb(_solidChannels[0] ? _solidLevel : 0, _solidChannels[1] ? _solidLevel : 0, _solidChannels[2] ? _solidLevel : 0);
             // 換成同尺寸的新純色圖（只影響全螢幕，不改主視窗）
             var solid = new Bitmap(bitmap.Width, bitmap.Height);
@@ -1066,8 +1099,173 @@ namespace Thunder
             _bitmap = solid;
             _solidChecked = solid;  // 新圖仍是純色，保留色版設定
             bool gray = _solidChannels.All(on => on);
-            FlashCaption(gray ? $"灰階 {_solidLevel}" : $"R{color.R} G{color.G} B{color.B}");
-        }  //純色圖調整階數
+            FlashCaption((gray ? $"灰階 {_solidLevel}" : $"R{color.R} G{color.G} B{color.B}") + note);
+        }  //設定純色圖階數
+        //輸入階數------------------------------------------------------------------------------------------------------
+        private string _levelInput = "";
+        private DateTime _levelInputTime;
+        private static int DigitOf(Keys key) =>
+            key >= Keys.D0 && key <= Keys.D9 ? key - Keys.D0 : key >= Keys.NumPad0 && key <= Keys.NumPad9 ? key - Keys.NumPad0 : -1;
+        private bool HandleLevelInput(KeyEventArgs e)
+        {
+            // 數字鍵輸入階數、Enter 套用、Backspace 刪一碼、Esc 取消；3 秒沒輸入自動清除
+            if ((DateTime.Now - _levelInputTime).TotalSeconds > 3) _levelInput = "";
+            int digit = DigitOf(e.KeyCode);
+            if (digit >= 0 && !e.Alt && !e.Control)
+            {
+                _levelInput = _levelInput.Length >= 3 ? digit.ToString() : _levelInput + digit;
+            }
+            else if (_levelInput == "")
+            {
+                return false;
+            }
+            else if (e.KeyCode == Keys.Back)
+            {
+                _levelInput = _levelInput.Substring(0, _levelInput.Length - 1);
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                _levelInput = "";
+                FlashCaption("取消輸入");
+                return true;
+            }
+            else if (e.KeyCode == Keys.Enter)
+            {
+                int level = int.Parse(_levelInput);
+                _levelInput = "";
+                if (!PrepareSolid(false))
+                {
+                    FlashCaption("不是純色圖，無法調整灰階");
+                    return true;
+                }
+                SetSolidLevel(level, level > 255 ? "（上限 255）" : "");
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            _levelInputTime = DateTime.Now;
+            FlashCaption($"輸入階數 {_levelInput}_（Enter 確定）", 3000);
+            return true;
+        }  //數字鍵輸入階數
+        //自動掃灰階----------------------------------------------------------------------------------------------------
+        private static int _scanStep = 1;         // 預設每次 +1 階；關閉視窗後仍保留設定
+        private static int _scanInterval = 500;   // 預設每 0.5 秒（毫秒）
+        private Timer _scanTimer;
+        private ToolStripMenuItem cmsScan;
+        private ToolStripMenuItem cmsScanToggle;
+        private void InitGrayScanMenu()
+        {
+            // 右鍵選單「幻燈片」下方：開始 / 停止、步進、間隔
+            cmsScan = new ToolStripMenuItem("自動掃灰階") { Name = "cmsScan" };
+            cmsScanToggle = new ToolStripMenuItem("開始", null, (s, e) => ToggleGrayScan()) { ShortcutKeyDisplayString = "Alt+R" };
+            cmsScan.DropDownItems.Add(cmsScanToggle);
+            cmsScan.DropDownItems.Add(new ToolStripSeparator());
+            foreach (int step in new[] { 1, 4, 8, 16, 32 })
+            {
+                cmsScan.DropDownItems.Add(new ToolStripMenuItem($"每次 +{step} 階", null, (s, e) => { _scanStep = step; UpdateScanMenu(); }) { Tag = "step" + step });
+            }
+            cmsScan.DropDownItems.Add(new ToolStripSeparator());
+            foreach (int interval in new[] { 500, 1000, 2000, 3000 })
+            {
+                cmsScan.DropDownItems.Add(new ToolStripMenuItem($"每 {interval / 1000.0:0.#} 秒", null, (s, e) =>
+                {
+                    _scanInterval = interval;
+                    if (_scanTimer != null) _scanTimer.Interval = interval;
+                    UpdateScanMenu();
+                }) { Tag = "interval" + interval });
+            }
+            contextMenuStrip.Items.Insert(contextMenuStrip.Items.IndexOf(cmsSlideshowStop) + 1, cmsScan);  // 幻燈片、停止幻燈片之後
+            contextMenuStrip.Opening += (s, e) => UpdateScanMenu();
+            FormClosed += (s, e) => _scanTimer?.Stop();
+            UpdateScanMenu();
+        }  //建立自動掃灰階選單
+        private void UpdateScanMenu()
+        {
+            cmsScanToggle.Text = _scanTimer != null && _scanTimer.Enabled ? "停止" : "開始（目前亮度掃到 255）";
+            foreach (ToolStripItem item in cmsScan.DropDownItems)
+            {
+                if (item is ToolStripMenuItem mi && mi.Tag is string tag)
+                {
+                    mi.Checked = tag == "step" + _scanStep || tag == "interval" + _scanInterval;
+                }
+            }
+        }  //更新選單勾選
+        private void ToggleGrayScan()
+        {
+            if (_scanTimer != null && _scanTimer.Enabled)
+            {
+                _scanTimer.Stop();
+                FlashCaption($"停止掃描，停在 {_solidLevel} 階");
+                UpdateScanMenu();
+                return;
+            }
+            if (!PrepareSolid(true)) return;  // 非純色圖改用灰階
+            if (_scanTimer == null)
+            {
+                _scanTimer = new Timer();
+                _scanTimer.Tick += (s, e) =>
+                {
+                    if (_solidLevel >= 255)
+                    {
+                        _scanTimer.Stop();
+                        FlashCaption("掃描完成（255）");
+                        return;
+                    }
+                    SetSolidLevel(Math.Min(255, _solidLevel + _scanStep), "（自動）");
+                };
+            }
+            timerSlideshow.Stop();  // 不和幻燈片同時跑
+            _scanTimer.Interval = _scanInterval;
+            if (_solidLevel >= 255)
+            {
+                FlashCaption("已經是 255，先輸入較低的階數再開始");  // 從目前亮度往上掃，已到頂就不開始
+                return;
+            }
+            SetSolidLevel(_solidLevel, "（自動）");  // 從目前亮度開始，不必每次從 0 跑
+            _scanTimer.Start();
+            UpdateScanMenu();
+        }  //開始 / 停止自動掃灰階
+        //資訊列--------------------------------------------------------------------------------------------------------
+        private static bool _infoOn;  // 關閉視窗後仍保留
+        private void ToggleInfo()
+        {
+            _infoOn = !_infoOn;
+            picwinPicture_pic.Invalidate();
+        }  //開關資訊列
+        private void picwinPicture_PaintInfo(object sender, PaintEventArgs e)
+        {
+            // 左下角：位置 / 名稱、圖片與螢幕尺寸、更新率、是否 1:1 顯示
+            if (!_infoOn || picwinPicture_pic.Image == null) return;
+            Image image = picwinPicture_pic.Image;
+            Screen screen = Screen.FromControl(this);
+            Rectangle shown = picwinPicture_pic.GetImageRectangle();
+            bool oneToOne = shown.Width == image.Width && shown.Height == image.Height;
+            string position = mainWindow.Instance?.FullScreenPositionText(this) ?? Caption ?? "";
+            int hz = mainWindow.GetRefreshRate(screen.DeviceName);
+            string[] lines =
+            {
+                position,
+                $"圖片 {image.Width} x {image.Height}　螢幕 {screen.Bounds.Width} x {screen.Bounds.Height}{(hz > 1 ? $" @ {hz} Hz" : "")}",
+                oneToOne ? "顯示 1:1" : $"⚠ 縮放 {shown.Width / (double)image.Width:0.###} x {shown.Height / (double)image.Height:0.###}（不是 1:1，1px 圖樣可能失真）",
+            };
+            Graphics g = e.Graphics;
+            var sizes = lines.Select(l => TextRenderer.MeasureText(l, LensFont)).ToList();
+            int width = sizes.Max(s => s.Width) + 16, height = sizes.Sum(s => s.Height) + 12;
+            var box = new Rectangle(8, picwinPicture_pic.ClientSize.Height - height - 8, width, height);
+            using (Brush background = new SolidBrush(Color.FromArgb(200, 20, 20, 20)))
+            {
+                g.FillRectangle(background, box);
+            }
+            int y = box.Y + 6;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                Color color = i == 2 && !oneToOne ? Color.FromArgb(255, 210, 0) : Color.White;
+                TextRenderer.DrawText(g, lines[i], LensFont, new Point(box.X + 8, y), color, TextFormatFlags.NoPrefix);
+                y += sizes[i].Height;
+            }
+        }  //畫資訊列
         private static bool IsUniform(Bitmap bitmap, out Color color)
         {
             // 逐列比對整張圖是否同一個顏色
