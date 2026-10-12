@@ -1,69 +1,74 @@
 ﻿名稱,類型,參數,選項
-十字黑圖,				Solid,		Black,				con-white
-白圖,					Solid,		White,
-紅圖,					Solid,		Red,
-綠,						Solid,		Lime,
-藍,						Solid,		Blue,
-127灰,					Solid,		50%Gary,
-64灰,					Solid,		25%Gary,
-黃,						Solid,		Yellow,
-水藍,					Solid,		Aqua,
-紫羅蘭,					Solid,		Magenta,
-6bitXP,					Solid,		14.27.41,
-8bitXP,					Solid,		58.110.165,
-55馬賽克,				Chess,		5*5,
-33馬賽克,				Chess,		3*3,
-77馬賽克,				Chess,		7*7,
-88馬賽克,				Chess,		8*8,
-3232馬賽克,				Chess,		32*32,
-84馬賽克,				Chess,		8*4,
-上白下黑,				Chess,		1*2,
-上黑下白,				Chess,		1*2,				v
-V白漸層,				Gradient,	White,				v-256-1
-H白漸層,				Gradient,	White,				h-256-1
-V白漸層8,				Gradient,	White,				v-8-1
-H白漸層8,				Gradient,	White,				h-8-1
-ColorBar4H,				Gradient,	colorbar-h-4.White.Red.Lime.Blue,
-ColorBar4V,				Gradient,	colorbar-four-v,
-ColorBar8H,				Gradient,	colorbar-eight-h,
-ColorBar8V,				Gradient,	colorbar-eight-v,
-ColorBarV漸層,			Gradient,	colorbar-four-h,	v-256-1
-ColorBarH漸層,			Gradient,	colorbar-four-v,	h-256-1
-pixelonoff127,				Mask,		p-2*2,				20.02
-subpixelonoff127,			Mask,		s-2*2-127,			101010.010101
-2h1v e,					Mask,		p-4*2,				1100.0011
-2h1v o,					Mask,		p-4*2,				1001.0110
-1h2v e,					Mask,		p-2*4,				10.10.01.01
-1h2v o,					Mask,		p-2*4,				10.01.01.10
-aabbba,					Mask,		s-4*2-127,			101001010110.010110101001
-v strip sub 127G,		Mask		,s-2*1-127,			101010
-v strip dot,			Mask		,p-2*2,				10.10
-v strip sub KGBKGK,		Mask		,s-2*2-255,			011010.011010
-h strip 1line,			Mask		,p-1*2,				1.0
+#== 灰階 ==
+十字黑圖,Solid,Black,con-white
+白圖,Solid,White,
+紅圖,Solid,Red,
+綠,Solid,Lime,
+藍,Solid,Blue,
+127灰,Solid,50%Gary,
+64灰,Solid,25%Gary,
+黃,Solid,Yellow,
+水藍,Solid,Aqua,
+紫羅蘭,Solid,Magenta,
+6bitXP,Solid,14.27.41,
+8bitXP,Solid,58.110.165,
+#== 馬賽克 ==
+55馬賽克,Chess,5*5,
+33馬賽克,Chess,3*3,
+77馬賽克,Chess,7*7,
+88馬賽克,Chess,8*8,
+3232馬賽克,Chess,32*32,
+84馬賽克,Chess,8*4,
+上白下黑,Chess,1*2,
+上黑下白,Chess,1*2,v
+#== 漸層 ==
+V白漸層,Gradient,White,v-256-1
+H白漸層,Gradient,White,h-256-1
+V白漸層8,Gradient,White,v-8-1
+H白漸層8,Gradient,White,h-8-1
+ColorBar4H,Gradient,colorbar-h-4.White.Red.Lime.Blue,
+ColorBar4V,Gradient,colorbar-four-v,
+ColorBar8H,Gradient,colorbar-eight-h,
+ColorBar8V,Gradient,colorbar-eight-v,
+ColorBarV漸層,Gradient,colorbar-four-h,v-256-1
+ColorBarH漸層,Gradient,colorbar-four-v,h-256-1
+#== PIXEL ==
+pixelonoff127,Mask,p-2*2,20.02
+subpixelonoff127,Mask,s-2*2-127,101010.010101
+2h1v e,Mask,p-4*2,1100.0011
+2h1v o,Mask,p-4*2,1001.0110
+1h2v e,Mask,p-2*4,10.10.01.01
+1h2v o,Mask,p-2*4,10.01.01.10
+aabbba,Mask,s-4*2-127,101001010110.010110101001
+v strip sub 127G,Mask,s-2*1-127,101010
+v strip dot,Mask,p-2*2,10.10
+v strip sub KGBKGK,Mask,s-2*2-255,011010.011010
+h strip 1line,Mask,p-1*2,1.0
 h strip 1and2line,Mask,p-1*3,1.0.0
-Gray/Black,					Window,		Gray-Black,			50%c
-第一象限白,				Window,		Black-White,		50%xyq_++
-第二象限白,				Window,		Black-White,		50%xy_0.0
-第三象限白,				Window,		Black-White,		50%xyq_--
-第四象限白,				Window,		Black-White,		50%xyq_+-
+#== Crosstalk ==
+Gray/Black,Window,Gray-Black,50%c
+第一象限白,Window,Black-White,50%xyq_++
+第二象限白,Window,Black-White,50%xy_0.0
+第三象限白,Window,Black-White,50%xyq_--
+第四象限白,Window,Black-White,50%xyq_+-
 dot127/Black,Window,Custom-dot1.127-Black,50%c
-Vstripe50%/Black,			Window,		Custom-sub1.127-Black,			50%c
-Vstripe100%/Gray,			Window,		Custom-sub1-Gray,			50%c
-DellCrossTalk,			Window,		Custom-dotDell-dot1,			50%c
-HPCrossTalk,			Window,		Custom-dotDell-col1,			50%c
-zebra/Gray,				Window,		Custom-row1-Gray,			50%c
-CrossTalkB_1,			Window,		excel1,
-CrossTalkB_2,			Window,		excel2,
-CrossTalkB_3,			Window,		excel3,
-CrossTalkB_4,			Window,		excel4,
-CrossTalkB_5,			Window,		excel5,
-CrossTalkB_6,			Window,		excel6,
-CrossTalkB_7,			Window,		excel7,
-HDR_test,Dynamic,Black-White,
+Vstripe50%/Black,Window,Custom-sub1.127-Black,50%c
+Vstripe100%/Gray,Window,Custom-sub1-Gray,50%c
+DellCrossTalk,Window,Custom-dotDell-dot1,50%c
+HPCrossTalk,Window,Custom-dotDell-col1,50%c
+zebra/Gray,Window,Custom-row1-Gray,50%c
+CrossTalkB_1,Window,excel1,
+CrossTalkB_2,Window,excel2,
+CrossTalkB_3,Window,excel3,
+CrossTalkB_4,Window,excel4,
+CrossTalkB_5,Window,excel5,
+CrossTalkB_6,Window,excel6,
+CrossTalkB_7,Window,excel7,
+#== 驗證項目 ==
 1_white,Solid,white,
 2_black,Solid,black,
 3_red,Solid,red,
-4_green,Solid,green,
+4_green,Solid,lime,
 5_blue,Solid,blue,
 6_Gray191,Solid,Silver,
 7_Gray127,Solid,127.127.127,
@@ -72,7 +77,7 @@ HDR_test,Dynamic,Black-White,
 10_Gray24,Solid,24.24.24,
 11_Gray16,Solid,16.16.16,
 12_pixel_onoff_255,Mask,p-2*2,10.01
-13_pixel_onoff_128,Mask,p-2*2,White 127.127.127/127.127.127 White
+13_pixel_onoff_128,Mask,p-2*2,Gray Black/Black Gray
 14_sub_pixel_onoff_255,Mask,s-2*2-255,101010.010101
 15_sub_pixel_onoff_128,Mask,s-2*2-127,101010.010101
 16_one_pixelH_strip_255,Mask,p-2*2,11.00
@@ -93,8 +98,8 @@ HDR_test,Dynamic,Black-White,
 30_GrayScaleH_whie-2,Gradient,White,h-256-1-255.0
 31_GrayScaleH_Red,Gradient,Red,h-256-1
 31_GrayScaleH_Red-2,Gradient,Red,h-256-1-255.0
-32_GrayScaleH_Green,Gradient,Green,h-256-1
-32_GrayScaleH_Green-2,Gradient,Green,h-256-1-255.0
+32_GrayScaleH_Green,Gradient,Lime,h-256-1
+32_GrayScaleH_Green-2,Gradient,Lime,h-256-1-255.0
 32_GrayScaleH_Blue,Gradient,Blue,h-256-1
 32_GrayScaleH_Blue-2,Gradient,Blue,h-256-1-255.0
 34_GrayScaleH_RGBW,Gradient,colorbar-v-4.White.Red.Lime.Blue,h-256-1
@@ -103,8 +108,8 @@ HDR_test,Dynamic,Black-White,
 35_GrayScaleV_white-2,Gradient,White,v-256-1-255.0
 36_GrayScaleV_Red,Gradient,Red,v-256-1
 36_GrayScaleV_Red-2,Gradient,Red,v-256-1-255.0
-37_GrayScaleV_Green,Gradient,Green,v-256-1
-37_GrayScaleV_Green-2,Gradient,Green,v-256-1-255.0
+37_GrayScaleV_Green,Gradient,Lime,v-256-1
+37_GrayScaleV_Green-2,Gradient,Lime,v-256-1-255.0
 38_GrayScaleV_Blue,Gradient,Blue,v-256-1
 38_GrayScaleV_Blue-2,Gradient,Blue,v-256-1-255.0
 39_GrayScaleV_RGBW,Gradient,colorbar-h-4.White.Red.Lime.Blue,v-256-1
@@ -126,10 +131,21 @@ HDR_test,Dynamic,Black-White,
 54_Sub V stripe-L128( Ch7~12 reverse),Mask,s-2*2-127,101010.101010
 55_2line Vstripe-L128,Mask,s-4*2-127,110011001100.110011001100
 55_Hstripe-L128,Mask,p-2*2,127.127.127 127.127.127/Black Black
+#== Test Pattern ==
+HDR_test,Dynamic,Black-White,
 全階V,Gradient,White,all-256
 全階H,Gradient,White,all-h-256
 Text Black-White H/boom,Text,Black-White,H/boom
 Test gamma,Test,gamma,
+Test gamma-r,Test,gamma-r,
+Test gamma-g,Test,gamma-g,
+Test gamma-b,Test,gamma-b,
 Test pluge,Test,pluge,
 Test overscan-20,Test,overscan-20,
 Test resolution,Test,resolution,
+Test hue-h,Test,hue-h,
+Test hue-v,Test,hue-v,
+Test hue-ring,Test,hue-ring,
+Test shading,Test,shading,
+Test banding,Test,banding,
+蒙太奇,Window,127.127.127-127.127.127,50%c|dot1+dot2+sub1+sub2+row1+row2+col1+col2|127

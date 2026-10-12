@@ -176,7 +176,7 @@ namespace Thunder
                 tabiefOtherLoc_hsc.Maximum = (int.Parse(mnsW_txt.Text)-1); // 將 msTxtW.Text 轉換為 int  
             }
         }  // Frame 其他線的選擇HLine/VLine
-        private Bitmap ApplyTransparency(Bitmap originalBitmap, int startAlpha, int endAlpha, bool isH, int steps, int segments, bool reverse)
+        private Bitmap ApplyTransparency(Bitmap originalBitmap, int startAlpha, int endAlpha, bool isH, int steps, int segments, bool reverse, int curve = 0)
         {
             // 複製原始圖片，避免直接修改
             //Bitmap resultBitmap = new Bitmap(originalBitmap);
@@ -225,12 +225,12 @@ namespace Thunder
                         if (positionIndex % 2 == 1)
                         {
                             stepIndex = (int)((float)positionInSegment / segmentLength * (steps));
-                            alpha = (byte)(endAlpha - alphaStep * stepIndex);
+                            alpha = curve == 0 ? (byte)(endAlpha - alphaStep * stepIndex) : CurveLevel(startAlpha, endAlpha, steps - 1 - stepIndex, steps, curve);  // 反向段：曲線左右對稱
                         }
                         else // 計算透明度
                         {
                             stepIndex = (int)((float)positionInSegment / segmentLength * (steps));
-                            alpha = (byte)(startAlpha + alphaStep * stepIndex);
+                            alpha = curve == 0 ? (byte)(startAlpha + alphaStep * stepIndex) : CurveLevel(startAlpha, endAlpha, stepIndex, steps, curve);
                         }
 
                         // 修改 Alpha 值
@@ -265,7 +265,7 @@ namespace Thunder
 
                         // 計算透明度
                         int stepIndex = (int)((float)positionInSegment / segmentLength * (steps));
-                        byte alpha = (byte)(startAlpha + alphaStep * stepIndex);
+                        byte alpha = curve == 0 ? (byte)(startAlpha + alphaStep * stepIndex) : CurveLevel(startAlpha, endAlpha, stepIndex, steps, curve);  // 線性維持原本的算法
 
                         // 修改 Alpha 值
                         pixelValues[index + 3] = alpha; // Alpha 通道
@@ -280,10 +280,11 @@ namespace Thunder
 
             return resultBitmap;
         }  // Grad 透明度處理
-        private Bitmap ConvertARGBToRGB(Bitmap originalBitmap)
+        private Bitmap ConvertARGBToRGB(Bitmap originalBitmap, Color? from = null)
         {
             // 建立與原始圖片相同大小的 RGB Bitmap
             Bitmap rgbBitmap = new Bitmap(originalBitmap.Width, originalBitmap.Height, PixelFormat.Format24bppRgb);
+            int fromR = from?.R ?? 0, fromG = from?.G ?? 0, fromB = from?.B ?? 0;
 
             // 鎖定原始圖片的像素資料
             Rectangle rect = new Rectangle(0, 0, originalBitmap.Width, originalBitmap.Height);
@@ -322,10 +323,10 @@ namespace Thunder
                     byte r = originalPixels[originalIndex + 2];
                     byte a = originalPixels[originalIndex + 3];
 
-                    // 計算與黑色背景混合後的 RGB 值
-                    byte finalR = (byte)((r * a) / 255);
-                    byte finalG = (byte)((g * a) / 255);
-                    byte finalB = (byte)((b * a) / 255);
+                    // 計算與背景（預設黑色；雙色漸層為起點色）混合後的 RGB 值
+                    byte finalR = (byte)(fromR + ((r - fromR) * a) / 255);
+                    byte finalG = (byte)(fromG + ((g - fromG) * a) / 255);
+                    byte finalB = (byte)(fromB + ((b - fromB) * a) / 255);
 
                     // 寫入 RGB 像素資料
                     rgbPixels[rgbIndex] = finalB;
@@ -889,7 +890,8 @@ namespace Thunder
                 else if (targetRadio.Name.Contains("Custom_rdo"))
                 {
                     tabiwCustom_grp.Enabled = true;
-                    tabiwCustom_btn.Text = targetRadio.Name.Contains("Back") ? "背景生成" : "窗口生成";
+                    tabiwCustom_btn.Tag = targetRadio.Name.Contains("Back") ? "back" : "window";  // 判斷用 Tag，文字可能是英文介面
+                    tabiwCustom_btn.Text = T(targetRadio.Name.Contains("Back") ? "背景生成" : "窗口生成");
                 }
             }
         }  // Window 純色、圖片、自製選擇
@@ -1162,7 +1164,7 @@ namespace Thunder
             }
             if (width != 0 || height != 0)
             {
-                if (tabiwCustom_btn.Text == "窗口生成")
+                if ((string)tabiwCustom_btn.Tag == "window")
                 {
                     if (tabiwWinSizePercent_rdo.Checked)
                     {
@@ -1442,7 +1444,7 @@ namespace Thunder
                     // 使用漸層顏色
                 }
             }
-            if (tabiwCustom_btn.Text == "背景生成")
+            if ((string)tabiwCustom_btn.Tag == "back")
             {
                 tabiwBack_pic.Image = bitmap;
             }
@@ -1501,6 +1503,10 @@ namespace Thunder
                 {
                     DrawBlurBar(g, brush, width, height);  // 模糊測試條
                 }
+                else if (DrawDynamicPlus(g, brush, width, height))
+                {
+                    // Overdrive 移動條、跑馬燈、多條長條
+                }
                 else if (tabiedObjectStrip_rdo.Checked)
                 {
                     if (tabiedMoveH_rdo.Checked)
@@ -1530,7 +1536,14 @@ namespace Thunder
             {
                 direction = "b";
             }
-            mypicture.Move(direction, DynamicIsLine);  // 長條與模糊條在邊緣反彈的方式相同;
+            else if (tabiedMoveRandom_rdo != null && tabiedMoveRandom_rdo.Checked)
+            {
+                direction = "r";  // 隨機方向
+            }
+            if (!AdvanceDynamicPlus())  // 跑馬燈、多條長條自己移動
+            {
+                mypicture.Move(direction, DynamicIsLine);  // 長條與模糊條在邊緣反彈的方式相同;
+            }
 
             Bitmap bitmap;
             if (timerDynamic.Tag != null && timerDynamic.Tag.ToString() == "openpic")

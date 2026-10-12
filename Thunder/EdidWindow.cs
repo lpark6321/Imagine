@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -28,6 +28,7 @@ namespace Thunder
             ShowIcon = false;
             KeyPreview = true;
             KeyDown += (s, e) => { if (e.KeyCode == Keys.Escape) Close(); };
+            Load += (s, e) => mainWindow.Localize(this);  // 英文介面
 
             edidHex_txt = new TextBox
             {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -54,6 +54,7 @@ namespace Thunder
         {
             tabilPatternList_lst.ItemDrag += (s, e) =>
             {
+                if (BlockWhileFiltering("拖拉排序")) return;
                 if (e.Button == MouseButtons.Left && e.Item is ListViewItem item) tabilPatternList_lst.DoDragDrop(item, DragDropEffects.Move);
             };
             tabilPatternList_lst.DragOver += (s, e) =>
@@ -99,6 +100,7 @@ namespace Thunder
             {
                 tabilPatternList_lst.Items.RemoveAt(from);
                 tabilPatternList_lst.Items.Insert(to, item);
+                AdoptNeighborGroup(item);  // 分組時跟著放下位置的群組
                 RenumberPatternList();
                 item.Selected = true;
                 item.Focused = true;
@@ -113,9 +115,10 @@ namespace Thunder
         }  // 拖拉移動項目
         private void PushConfigUndo()
         {
-            // 變更前記下整份清單與選取位置
-            var lines = tabilPatternList_lst.Items.Cast<ListViewItem>().Select(i => i.Tag.ToString()).ToList();
-            int selected = tabilPatternList_lst.SelectedIndices.Count > 0 ? tabilPatternList_lst.SelectedIndices[0] : -1;
+            // 變更前記下整份清單（含群組標題、搜尋中被篩掉的項目）與選取項目在完整清單中的位置
+            var lines = ConfigLinesWithGroups();
+            ListViewItem current = tabilPatternList_lst.SelectedItems.Count > 0 ? tabilPatternList_lst.SelectedItems[0] : null;
+            int selected = current == null ? -1 : AllConfigItems().ToList().IndexOf(current);
             _configUndo.Add((lines, selected));
             if (_configUndo.Count > MaxConfigUndo) _configUndo.RemoveAt(0);
         }  // 記錄復原點
@@ -131,15 +134,8 @@ namespace Thunder
             _movingConfigLine = true;
             try
             {
-                tabilPatternList_lst.BeginUpdate();
-                tabilPatternList_lst.Items.Clear();
-                foreach (string line in lines)
-                {
-                    ListViewItem item = CreateConfigItem(line);
-                    if (item != null) tabilPatternList_lst.Items.Add(item);
-                }
-                RenumberPatternList();
-                tabilPatternList_lst.EndUpdate();
+                ClearSearchSilently();  // 復原後顯示完整清單
+                FillPatternList(lines);
                 if (selected >= 0 && selected < tabilPatternList_lst.Items.Count)
                 {
                     tabilPatternList_lst.Items[selected].Selected = true;

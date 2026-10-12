@@ -47,6 +47,7 @@ namespace Thunder
             InitFrameRedBlue();
             InitGradientReverse();
             InitGradientExtras();
+            InitGradientPlus();
             InitWindowDiagonal();
             InitWindowTabs();
             InitQuickButtons();
@@ -57,14 +58,19 @@ namespace Thunder
             InitMaskZoom();
             InitImgListExport();
             InitTestPatternPage();
+            InitTestPatternPlus();
             InitDynamicBlur();
+            InitDynamicPlus();
             InitImageDiff();
             InitImgListTools();
+            InitImgListView();
             InitMaskTemplates();
             InitMontage();
             InitSubPixelOrder();
             InitUserMaskControls();
             InitMultiScreen();
+            InitDisplayMenu();
+            InitLanguage();  // 最後執行：上面建立的介面一起翻譯
             //Mainwindow_Load(this, EventArgs.Empty);
             mypicture = new MyPicture(this);
             Instance = this; // 初始化 Singleton 實例
@@ -346,11 +352,12 @@ namespace Thunder
                 {
                     startY += moveSpeedY;
                 }
-                else if (direction == "b")
+                else if (direction == "b" || direction == "r")
                 {
                     startX += moveSpeedX;
                     startY += moveSpeedY;
                 }
+                int speedX = moveSpeedX, speedY = moveSpeedY;  // 反彈前的速度（判斷有沒有碰到邊界）
                 // 碰撞檢測 (邊界反彈)
                 if (strip)
                 {
@@ -374,7 +381,18 @@ namespace Thunder
                         moveSpeedY = -moveSpeedY; // 垂直反彈
                     }
                 }
+                if (direction == "r" && (speedX != moveSpeedX || speedY != moveSpeedY))
+                {
+                    // 隨機方向：碰到邊界時換一個隨機角度（20°~70°），速度不變，方向仍離開邊界
+                    int speed = Math.Max(Math.Abs(speedX), Math.Abs(speedY));
+                    double angle = (20 + DirectionRandom.NextDouble() * 50) * Math.PI / 180;
+                    moveSpeedX = Math.Sign(moveSpeedX == 0 ? 1 : moveSpeedX) * Math.Max(1, (int)Math.Round(speed * Math.Cos(angle)));
+                    moveSpeedY = Math.Sign(moveSpeedY == 0 ? 1 : moveSpeedY) * Math.Max(1, (int)Math.Round(speed * Math.Sin(angle)));
+                    startX = Math.Max(0, Math.Min(_width - objectSize * 2, startX));
+                    startY = Math.Max(0, Math.Min(_height - objectSize * 2, startY));
+                }
             }
+            private static readonly Random DirectionRandom = new Random();
         }
         //mainwindow本體操控-------------------------------------------------------------------------------------------
         private void Screenlist(object sender, EventArgs e)
@@ -684,6 +702,12 @@ namespace Thunder
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "gradient":
+                        if (tabigSaturation_chk.Checked)
+                        {
+                            CurrentBitmap = DrawSaturationLadder(width, height);  // 飽和度階梯
+                            mypicture.Setpicture(CurrentBitmap);
+                            break;
+                        }
                         if (AllLevelGrid)
                         {
                             // 全畫面格狀全階：每一階一格並標示階數
@@ -750,9 +774,16 @@ namespace Thunder
                             int stepNum = Math.Min(GradientStepCount, divisionSize); // 獲取漸層階數（依漸層條件的全階不超過漸層分幾階）
                             int startColorValue = int.Parse(tabigFirstLevel_cmb.Text); // 開始顏色值  
                             int endColorValue = int.Parse(tabigLastLevel_cmb.Text); // 結束顏色值  
-                            backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions, tabigReverse_chk.Checked);
-                            backBitmap = ConvertARGBToRGB(backBitmap);
-                            if (AllLevelGradient)
+                            if (GradientRadial)
+                            {
+                                backBitmap = ApplyRadialTransparency(backBitmap, startColorValue, endColorValue, GradientStepCount, GradientCurve);  // 放射狀
+                            }
+                            else
+                            {
+                                backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions, tabigReverse_chk.Checked, GradientCurve);
+                            }
+                            backBitmap = ConvertARGBToRGB(backBitmap, GradientFromColor);  // 起點色（雙色漸層）
+                            if (AllLevelGradient && !GradientRadial)
                             {
                                 DrawGradientLabels(backBitmap, tabigHWay_rdo.Checked);
                             }
@@ -1252,6 +1283,7 @@ namespace Thunder
                     case "test":
                         DrawTestPattern(g, width, height);  // Gamma / 黑位白位 / 邊緣刻度
                         mypicture.Setpicture(CurrentBitmap);
+                        UpdateTestBlink(width, height);  // Clipping 閃爍的另一張
                         break;
                     case "adjust":
                         // 這裡可以添加調整圖片的邏輯
@@ -1267,7 +1299,9 @@ namespace Thunder
                             // 填充背景顏色
                             g.Clear(tabiedBackColor_btn.BackColor);
                         }
+                        DrawDynamicBackgroundPlus(g, width, height);  // Overdrive：多種灰階的橫帶
                         mypicture.SetDymanic((int)tabiedMoveSpeed_nud.Value, (int)tabiedMoveSpeed_nud.Value, (int)tabiedObjectSize_nud.Value, 0, 0);
+                        ResetDynamicPlus(width);
 
                         //// 繪製縮圖
                         //using (Brush ballBrush = new SolidBrush(tabiedObjectColor_btn.BackColor))
@@ -1311,7 +1345,7 @@ namespace Thunder
         {
             try
             {
-                if (sender is Button targetbutton && targetbutton.Text == "導入圖片")
+                if (sender is Button targetbutton && targetbutton == tabieaImport_btn)
                 {
                     using (OpenFileDialog openFileDialog = new OpenFileDialog())
                     {
@@ -1455,31 +1489,22 @@ namespace Thunder
 
             //_pictureWindow.setBitmap((Bitmap)showimgPicture_pic.Image);
             _pictureWindow.setBitmap(mypicture.Getpicture());
+            _pictureWindow.SetBlink(BlinkAlternateFor(mypicture.Getpicture()));  // Clipping 閃爍
             _pictureWindow.Caption = CurrentImageName();  // 全螢幕左上角顯示的名稱
 
             if (_pictureWindow != null && !_pictureWindow.IsDisposed)  //存在才執行
             {
-                if (_pictureWindow.Location != secondScreen.Bounds.Location)
+                // 換螢幕或第一次顯示時重新擺放（自動調整縮放時位置為實際像素座標）
+                if (!_pictureWindow.Visible || _pictureWindow.Location != FullScreenBounds(secondScreen).Location)
                 {
-                    //currentScreen.DeviceName
-                    _pictureWindow.WindowState = FormWindowState.Normal;
-                    _pictureWindow.Location = secondScreen.Bounds.Location;
+                    PlaceFullScreenWindow(_pictureWindow, secondScreen);
                 }
-                _pictureWindow.WindowState = FormWindowState.Maximized;
-                _pictureWindow.FormBorderStyle = FormBorderStyle.None;
                 if (!_pictureWindow.Visible)
                 {
-                    // 設置窗口位置和大小  
-                    _pictureWindow.WindowState = FormWindowState.Maximized;
-                    _pictureWindow.StartPosition = FormStartPosition.Manual;
-                    //_pictureWindow.Location = secondScreen.Bounds.Location;
-                    _pictureWindow.Size = secondScreen.Bounds.Size;
-
-                    // 顯示窗口
                     _pictureWindow.Show();
                     _pictureWindow.BringToFront();
-                    //MessageBox.Show("Form 未顯示！");
                 }
+                _pictureWindow.WindowState = FormWindowState.Maximized;
                 // 目前圖片是 Dynamic 產生的背景時，全螢幕才開始播放動畫
                 if (_dynamicBackground != null && ReferenceEquals(mypicture.Getpicture(), _dynamicBackground) && !timerDynamic.Enabled)
                 {
@@ -1523,7 +1548,8 @@ namespace Thunder
         }  // 版本與快捷鍵說明
         private void menuToolStripCmb_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // 獲取選擇的螢幕
+            // 獲取選擇的螢幕（重建清單時會暫時沒有選擇）
+            if (mnsScreenlist_cmb.SelectedItem == null) return;
             string selectedScreen = mnsScreenlist_cmb.SelectedItem.ToString();
             Screen[] screens = Screen.AllScreens;
             // 根據選擇的螢幕更新寬度與高度
@@ -1531,8 +1557,8 @@ namespace Thunder
             {
                 if (screen.DeviceName == selectedScreen)
                 {
-                    mnsW_txt.Text = screen.Bounds.Width.ToString();
-                    mnsH_txt.Text = screen.Bounds.Height.ToString();
+                    mnsW_txt.Text = ScreenPixelSize(screen).Width.ToString();
+                    mnsH_txt.Text = ScreenPixelSize(screen).Height.ToString();
                     break;
                 }
             }
@@ -1816,7 +1842,7 @@ namespace Thunder
                         break;
                     case "dynamic":
                         tabimgeFuncList.SelectedIndex = tabimgeFuncList.Items.IndexOf("Dynamic");
-                        funcDynamic(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        funcDynamic(trimlower(patternVar[2]), patternVar[3].Trim());  // 選項保留大小寫（跑馬燈文字），比對時才轉小寫
                         break;
                     case "test":
                         tabimgeFuncList.SelectedIndex = tabimgeFuncList.Items.IndexOf("Testpattern");
@@ -1886,10 +1912,12 @@ namespace Thunder
         }  // ImgList 欄名
         private void RenumberPatternList()
         {
+            if (IsFiltering) return;  // 搜尋中保留原本的編號
             for (int i = 0; i < tabilPatternList_lst.Items.Count; i++)
             {
                 tabilPatternList_lst.Items[i].Text = (i + 1).ToString();
             }
+            UpdateGroupHeaders();
         }  // 重新編號
         private static string ReadConfigText(string path)
         {
@@ -1906,6 +1934,7 @@ namespace Thunder
         }  // 讀取 config（自動判斷編碼）
         private void LoadConfig(string configText, string source)
         {
+            ClearSearchSilently();  // 換 config 時清除搜尋
             PopulateListBox(configText);
             _configUndo.Clear();  // 換了 config 檔，復原紀錄不再適用
             tabilPatternList_lst.Tag = source;  // 記錄 config 來源
@@ -1932,18 +1961,7 @@ namespace Thunder
         }  // 載入預設 config
         private void PopulateListBox(string configfile)
         {
-            tabilPatternList_lst.BeginUpdate();
-            tabilPatternList_lst.Items.Clear();
-            foreach (string rawLine in configfile.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                ListViewItem item = CreateConfigItem(rawLine);
-                if (item != null)
-                {
-                    tabilPatternList_lst.Items.Add(item);
-                }
-            }
-            RenumberPatternList();
-            tabilPatternList_lst.EndUpdate();
+            FillPatternList(configfile.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries));  // 含 #== 群組 == 標題
         }  // ImgList 載入 config
         private static ListViewItem CreateConfigItem(string rawLine)
         {
@@ -1969,6 +1987,9 @@ namespace Thunder
             if (count == 0) return;
             int current = tabilPatternList_lst.SelectedIndices.Count > 0 ? tabilPatternList_lst.SelectedIndices[0] : (step > 0 ? -1 : 0);
             int next = ((current + step) % count + count) % count;
+            // 跳過收合群組裡的項目（幻燈片只播放展開的群組）；全部收合時維持原本的選擇
+            for (int tries = 0; tries < count && !IsSlideVisible(tabilPatternList_lst.Items[next]); tries++) next = ((next + step) % count + count) % count;
+            if (!IsSlideVisible(tabilPatternList_lst.Items[next])) return;
             tabilPatternList_lst.Items[next].Selected = true;
             tabilPatternList_lst.Items[next].Focused = true;
             tabilPatternList_lst.EnsureVisible(next);
@@ -2118,6 +2139,11 @@ namespace Thunder
         private void tabilPatternList_lst_DragDrop(object sender, DragEventArgs e)
         {
             if (DropConfigItem(e)) return;  // 清單內拖拉排序
+            if (e.Data.GetData(DataFormats.FileDrop) is string[] dropped && !dropped.Any(file => Path.GetExtension(file).ToLower() == ".txt") && dropped.Any(IsImageFile))
+            {
+                AddImageFilesToList(dropped);  // 只拖入圖檔：每張加一行 Image
+                return;
+            }
             // 獲取拖入的檔案  
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files.Length > 0)
@@ -2152,7 +2178,7 @@ namespace Thunder
             // 檢查檔案是否為支援的 config.txt  
             bool IsSupportedFile(string filePath)
             {
-                return Path.GetExtension(filePath).ToLower() == ".txt";
+                return Path.GetExtension(filePath).ToLower() == ".txt" || IsImageFile(filePath);  // config 或圖檔（加成 Image 行）
             }
 
             // 檢查拖入的資料是否包含檔案，並且是支援的 config.txt  

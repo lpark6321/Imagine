@@ -67,6 +67,7 @@ namespace Thunder
         public WindowOverlayDialog(WindowOverlay initial)
         {
             Text = "窗口 / 線條";
+            Load += (s, e) => mainWindow.Localize(this);  // 英文介面
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = MinimizeBox = false;
             ShowIcon = false;

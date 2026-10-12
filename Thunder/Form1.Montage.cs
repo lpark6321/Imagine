@@ -133,11 +133,12 @@ namespace Thunder
             // 依選擇順序排成格狀，避開 50px 邊框；每格上方標示名稱
             List<string> names = MontageSelection;
             if (names.Count == 0) return;
-            var area = Rectangle.FromLTRB(MontageMargin, MontageMargin, width - MontageMargin, height - MontageMargin);
+            int margin = _renderingThumbnail ? Math.Max(1, Math.Min(width, height) / 20) : MontageMargin;  // 縮圖時邊框跟著縮小
+            var area = Rectangle.FromLTRB(margin, margin, width - margin, height - margin);
             if (area.Width <= 0 || area.Height <= 0) return;
             int columns = Math.Max(1, (int)Math.Ceiling(Math.Sqrt(names.Count * (double)area.Width / area.Height)));
             int rows = (int)Math.Ceiling(names.Count / (double)columns);
-            const int gap = 20, labelHeight = 18;
+            int gap = _renderingThumbnail ? 1 : 20, labelHeight = _renderingThumbnail ? 0 : 18;  // 縮圖不畫名稱
             float cellWidth = (area.Width + gap) / (float)columns, cellHeight = (area.Height + gap) / (float)rows;
             GraphicsState state = g.Save();
             g.SmoothingMode = SmoothingMode.None;
@@ -161,7 +162,7 @@ namespace Thunder
                             g.FillRectangle(brush, tile);
                         }
                     }
-                    g.DrawString(_montageButtons.FirstOrDefault(b => (string)b.Tag == names[i])?.Text ?? names[i], font, label, x0, y0 + 2);
+                    if (!_renderingThumbnail) g.DrawString(_montageButtons.FirstOrDefault(b => (string)b.Tag == names[i])?.Text ?? names[i], font, label, x0, y0 + 2);
                 }
             }
             g.Restore(state);
@@ -210,5 +211,31 @@ namespace Thunder
             showimgPicture_pic.Image = mypicture.Getpicture();
             return new Bitmap(mypicture.Getpicture());
         }  // 移動窗口並重新產生
+        public int WindowPatternPercent => (int)tabiwWinSizePercent_nud.Value;
+        public Bitmap ResizeWindowPattern(int percent, int width, int height)
+        {
+            // 窗口大小加減 percent%（config 只支援百分比，指定 Pixel 大小時先換算成百分比），以窗口中心為基準
+            Rectangle before = WindowPatternBounds(width, height);
+            if (!tabiwWinSizePercent_rdo.Checked)
+            {
+                tabiwWinSizePercent_nud.Value = Math.Max(1, Math.Min(100, (int)Math.Round(before.Width * 100.0 / width)));
+                tabiwWinSizePercent_rdo.Checked = true;
+            }
+            decimal next = Math.Max(Math.Max(1, tabiwWinSizePercent_nud.Minimum), Math.Min(tabiwWinSizePercent_nud.Maximum, tabiwWinSizePercent_nud.Value + percent));
+            if (next == tabiwWinSizePercent_nud.Value && tabiwWinSizePercent_rdo.Checked && WindowPatternBounds(width, height) == before) return null;
+            tabiwWinSizePercent_nud.Value = next;
+            if (tabiwWinLocPixcel_rdo.Checked)
+            {
+                // 指定位置時維持窗口中心不動
+                Rectangle after = WindowPatternBounds(width, height);
+                tabiwWinLocPixcelX_nud.Maximum = Math.Max(tabiwWinLocPixcelX_nud.Maximum, width);
+                tabiwWinLocPixcelY_nud.Maximum = Math.Max(tabiwWinLocPixcelY_nud.Maximum, height);
+                tabiwWinLocPixcelX_nud.Value = Math.Max(0, before.X + before.Width / 2 - after.Width / 2);
+                tabiwWinLocPixcelY_nud.Value = Math.Max(0, before.Y + before.Height / 2 - after.Height / 2);
+            }
+            GenerateImage("window", width, height);
+            showimgPicture_pic.Image = mypicture.Getpicture();
+            return new Bitmap(mypicture.Getpicture());
+        }  // 調整窗口大小並重新產生
     }
 }

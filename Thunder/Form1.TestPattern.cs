@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -55,15 +55,91 @@ namespace Thunder
                 new Label { Text = "色版", AutoSize = true, Location = new Point(200, 27) }, new Label { Text = "範圍", AutoSize = true, Location = new Point(200, 87) }, new Label { Text = "px", AutoSize = true, Location = new Point(298, 87) } });
             toolTip.SetToolTip(tabitGammaColor_cmb, "Gamma 檢查使用的色版（灰 = 三色一起）");
             toolTip.SetToolTip(tabitOverscan_cmb, "從邊緣往內畫幾 px 的刻度");
+            // 右欄：Zone plate、隨機雜訊、24 色色票
+            tabitZonePlate_rdo = new RadioButton { Text = "Zone plate（同心圓）", AutoSize = true, Location = new Point(340, 25) };
+            tabitNoise_rdo = new RadioButton { Text = "隨機雜訊", AutoSize = true, Location = new Point(340, 55) };
+            tabitNoise_cmb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(470, 53), Width = 60, ImeMode = ImeMode.Disable };
+            tabitNoise_cmb.Items.AddRange(NoiseKinds);
+            tabitNoise_cmb.SelectedIndex = 0;
+            tabitColorChecker_rdo = new RadioButton { Text = "24 色色票", AutoSize = true, Location = new Point(340, 85) };
+            tabimgeTest.Controls.AddRange(new Control[] { tabitZonePlate_rdo, tabitNoise_rdo, tabitNoise_cmb, tabitColorChecker_rdo });
+            note.Text += "\r\nZone plate：由中心往外頻率越來越高，看摩爾紋與縮放失真；隨機雜訊：每個像素隨機亮度，看殘影與 Mura；24 色色票：ColorChecker 標準色";
+            toolTip.SetToolTip(tabitZonePlate_rdo, "同心圓的頻率由中心往外遞增，到內切圓邊緣剛好 1px 黑白交錯");
+            toolTip.SetToolTip(tabitNoise_cmb, "灰階：每像素隨機灰階；彩色：R、G、B 各自隨機（固定亂數種子，每次產生都一樣）");
+            toolTip.SetToolTip(tabitColorChecker_rdo, "X-Rite ColorChecker 24 色的 sRGB 值，6 x 4 排列");
         }  // 建立 Testpattern 頁
+        private RadioButton tabitZonePlate_rdo, tabitNoise_rdo, tabitColorChecker_rdo;
+        private ComboBox tabitNoise_cmb;
+        private static readonly string[] NoiseKinds = { "灰階", "彩色" };
+        private static readonly (string name, int r, int g, int b)[] ColorCheckerPatches =
+        {
+            ("Dark skin", 115, 82, 68), ("Light skin", 194, 150, 130), ("Blue sky", 98, 122, 157), ("Foliage", 87, 108, 67), ("Blue flower", 133, 128, 177), ("Bluish green", 103, 189, 170),
+            ("Orange", 214, 126, 44), ("Purplish blue", 80, 91, 166), ("Moderate red", 193, 90, 99), ("Purple", 94, 60, 108), ("Yellow green", 157, 188, 64), ("Orange yellow", 224, 163, 46),
+            ("Blue", 56, 61, 150), ("Green", 70, 148, 73), ("Red", 175, 54, 60), ("Yellow", 231, 199, 31), ("Magenta", 187, 86, 149), ("Cyan", 8, 133, 161),
+            ("White", 243, 243, 242), ("Neutral 8", 200, 200, 200), ("Neutral 6.5", 160, 160, 160), ("Neutral 5", 122, 122, 121), ("Neutral 3.5", 85, 85, 85), ("Black", 52, 52, 52),
+        };  // X-Rite ColorChecker 24 色（sRGB）
+        private static void DrawPixels(Graphics g, int width, int height, Func<int, int, int> argb)
+        {
+            // 逐像素計算顏色（LockBits），畫到 (0, 0)
+            using (var bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+            {
+                var data = bitmap.LockBits(new Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                int[] row = new int[width];
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++) row[x] = argb(x, y);
+                    System.Runtime.InteropServices.Marshal.Copy(row, 0, data.Scan0 + y * data.Stride, width);
+                }
+                bitmap.UnlockBits(data);
+                g.DrawImageUnscaled(bitmap, 0, 0);
+            }
+        }  // 逐像素繪圖
+        private static void DrawZonePlate(Graphics g, int width, int height)
+        {
+            // 亮度 = cos(π r² / 2R)：頻率 r / 2R（每 px 幾個週期），到內切圓邊緣（r = R）為 0.5，也就是 1px 黑白交錯
+            double cx = width / 2.0, cy = height / 2.0, radius = Math.Min(width, height) / 2.0;
+            DrawPixels(g, width, height, (x, y) =>
+            {
+                double dx = x + 0.5 - cx, dy = y + 0.5 - cy;
+                int v = (int)Math.Round(127.5 + 127.5 * Math.Cos(Math.PI * (dx * dx + dy * dy) / (2 * radius)));
+                return unchecked((int)0xFF000000) | v << 16 | v << 8 | v;
+            });
+        }  // Zone plate
+
+        private static void DrawColorChecker(Graphics g, int width, int height)
+        {
+            // 黑底 6 x 4 色塊，色塊之間留邊，左上角標示編號與名稱
+            g.Clear(Color.Black);
+            float gap = Math.Min(width, height) / 40f;
+            float cellW = (width - gap * 7) / 6, cellH = (height - gap * 5) / 4;
+            g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+            using (Font font = new Font("Arial", Math.Max(10f, cellH / 12), GraphicsUnit.Pixel))
+            {
+                for (int i = 0; i < ColorCheckerPatches.Length; i++)
+                {
+                    var (name, r, gr, b) = ColorCheckerPatches[i];
+                    var cell = new RectangleF(gap + (i % 6) * (cellW + gap), gap + (i / 6) * (cellH + gap), cellW, cellH);
+                    using (Brush brush = new SolidBrush(Color.FromArgb(r, gr, b)))
+                    {
+                        g.FillRectangle(brush, cell);
+                    }
+                    Brush text = r * 0.299 + gr * 0.587 + b * 0.114 > 128 ? Brushes.Black : Brushes.White;  // 依亮度選字色
+                    g.DrawString($"{i + 1} {name}", font, text, cell.X + font.Size / 2, cell.Y + font.Size / 2);
+                }
+            }
+        }  // 24 色色票
         private void DrawTestPattern(Graphics g, int width, int height)
         {
+            if (DrawTestPatternPlus(g, width, height)) return;  // 雜訊、Clipping、幾何、銳利度、暗部彩色漸層
             if (tabitPluge_rdo.Checked) DrawPluge(g, width, height);
             else if (tabitOverscan_rdo.Checked) DrawOverscan(g, width, height, int.Parse(tabitOverscan_cmb.Text));
             else if (tabitResolution_rdo.Checked) DrawResolution(g, width, height);
             else if (tabitHue_rdo.Checked) DrawHue(g, width, height, tabitHue_cmb.SelectedIndex);
             else if (tabitShading_rdo.Checked) DrawShading(g, width, height);
             else if (tabitBanding_rdo.Checked) DrawBanding(g, width, height);
+            else if (tabitZonePlate_rdo.Checked) DrawZonePlate(g, width, height);
+
+            else if (tabitColorChecker_rdo.Checked) DrawColorChecker(g, width, height);
             else DrawGammaCheck(g, width, height, tabitGammaColor_cmb.SelectedIndex);
         }  // 依選擇畫測試圖
         private static Color HueColor(double hue)
@@ -344,6 +420,7 @@ namespace Thunder
         {
             // 參數：gamma[-r|-g|-b]、pluge、overscan[-範圍]
             string[] parts = param.Split('-');
+            if (FuncTestPlus(parts)) return;  // 雜訊、Clipping、幾何、銳利度、暗部彩色漸層
             switch (parts[0])
             {
                 case "gamma":
@@ -372,6 +449,13 @@ namespace Thunder
                 case "pluge":
                     tabitPluge_rdo.Checked = true;
                     break;
+                case "zoneplate":
+                    tabitZonePlate_rdo.Checked = true;
+                    break;
+
+                case "colorchecker":
+                    tabitColorChecker_rdo.Checked = true;
+                    break;
                 case "overscan":
                     tabitOverscan_rdo.Checked = true;
                     string range = parts.Length > 1 ? parts[1] : "20";
@@ -379,18 +463,22 @@ namespace Thunder
                     tabitOverscan_cmb.SelectedItem = range;
                     break;
                 default:
-                    throw new FormatException($"測試圖「{param}」只能是 gamma、pluge、overscan、resolution、hue、shading、banding");
+                    throw new FormatException($"測試圖「{param}」只能是 gamma、pluge、overscan、resolution、hue、shading、banding、zoneplate、noise、colorchecker、clipping、geometry、sharpness、darkgrad");
             }
         }  // listbox控制測試圖
         private string TestToConfig(out string param, out string option)
         {
             option = "";
+            if (TestPlusToConfig(out param)) return null;  // 新增的測試圖
             if (tabitPluge_rdo.Checked) param = "pluge";
             else if (tabitOverscan_rdo.Checked) param = $"overscan-{tabitOverscan_cmb.Text}";
             else if (tabitResolution_rdo.Checked) param = "resolution";
             else if (tabitHue_rdo.Checked) param = $"hue-{HueConfigNames[tabitHue_cmb.SelectedIndex]}";
             else if (tabitShading_rdo.Checked) param = "shading";
             else if (tabitBanding_rdo.Checked) param = "banding";
+            else if (tabitZonePlate_rdo.Checked) param = "zoneplate";
+
+            else if (tabitColorChecker_rdo.Checked) param = "colorchecker";
             else param = "gamma" + (tabitGammaColor_cmb.SelectedIndex == 0 ? "" : "-" + "rgb"[tabitGammaColor_cmb.SelectedIndex - 1]);
             return null;
         }  // 測試圖轉 config

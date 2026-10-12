@@ -274,7 +274,7 @@ namespace Thunder
             this.Showimage_flp = new System.Windows.Forms.FlowLayoutPanel();
             this.showimgSave_btn = new System.Windows.Forms.Button();
             this.showimgGenerate_btn = new System.Windows.Forms.Button();
-            this.showimgPicture_pic = new System.Windows.Forms.PictureBox();
+            this.showimgPicture_pic = new Thunder.CachedPictureBox();
             this.showimgSize_lbl = new System.Windows.Forms.Label();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.ssrStatus_lbl = new System.Windows.Forms.ToolStripStatusLabel();
@@ -3648,7 +3648,7 @@ namespace Thunder
         private ToolStripTextBox mnsH_txt;
         private ToolStripMenuItem mnsX_lbl;
         private ToolStripTextBox mnsW_txt;
-        private PictureBox showimgPicture_pic;
+        private CachedPictureBox showimgPicture_pic;
         private TabControl tabControl;
         private TabPage tabImgEditor;
         private ComboBox tabimgeFuncList;

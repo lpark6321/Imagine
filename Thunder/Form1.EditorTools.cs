@@ -602,12 +602,16 @@ namespace Thunder
             {
                 return;
             }
-            PushConfigUndo();  // 記錄復原點
-            ListViewItem item = CreateConfigItem(line);
-            tabilPatternList_lst.Items.Add(item);
-            RenumberPatternList();
-            item.EnsureVisible();
-            ssrStatus_lbl.Text = $"已加入 ImgList 第 {item.Index + 1} 列：{item.SubItems[1].Text}";
+            using (SuspendFilter())  // 搜尋中也加在完整清單的最後
+            {
+                PushConfigUndo();  // 記錄復原點
+                ListViewItem item = CreateConfigItem(line);
+                tabilPatternList_lst.Items.Add(item);
+                AdoptNeighborGroup(item);  // 分組時加到最後一組
+                RenumberPatternList();
+                item.EnsureVisible();
+                ssrStatus_lbl.Text = $"已加入 ImgList 第 {item.Index + 1} 列：{item.SubItems[1].Text}";
+            }
         }  // 目前 ImgEditor 設定加入 ImgList
         private string EditorToConfigLine(List<string> ignored, out string error)
         {
@@ -681,7 +685,7 @@ namespace Thunder
             }
             else
             {
-                param = ConfigColorText(tabigBaseColor_lbl.BackColor);
+                param = tabigSaturation_chk.Checked ? "saturation" : ConfigColorText(tabigBaseColor_lbl.BackColor);
             }
             if (AllLevelGrid)
             {
@@ -690,13 +694,14 @@ namespace Thunder
             }
             if (!tabigColorBar_rdo.Checked)
             {
-                option = $"{(tabigReverse_chk.Checked && tabigReverse_chk.Enabled ? "r-" : "")}{(tabigHWay_rdo.Checked ? "h" : "v")}-{GradientStepCount}-{tabigDivid_cmb.Text}";
+                option = $"{(tabigReverse_chk.Checked && tabigReverse_chk.Enabled ? "r-" : "")}{(GradientRadial ? "o" : tabigHWay_rdo.Checked ? "h" : "v")}-{GradientStepCount}-{tabigDivid_cmb.Text}";
                 // 起始.結束灰階不是預設 0.255 時才寫（例：255.0 由亮到暗）
                 if (tabigFirstLevel_cmb.Text.Trim() != "0" || tabigLastLevel_cmb.Text.Trim() != "255")
                 {
                     option += $"-{tabigFirstLevel_cmb.Text.Trim()}.{tabigLastLevel_cmb.Text.Trim()}";
                 }
                 if (AllLevelGradient) option += "-num";  // 依漸層條件標示階數
+                option += GradientPlusTokens();  // 曲線、起點色
             }
             return null;
         }  // Gradient 轉 config
@@ -770,9 +775,10 @@ namespace Thunder
             param = option = "";
             if (mypicture.tag == "image") return "背景使用匯入的截圖，config 只能描述純色背景";
             param = $"{ConfigColorText(tabiedBackColor_btn.BackColor)}-{ConfigColorText(tabiedObjectColor_btn.BackColor)}";
-            string shape = tabiedObjectCube_rdo.Checked ? "cube" : tabiedObjectStrip_rdo.Checked ? "strip" : tabiedObjectBlur_rdo.Checked ? "blur" : "ball";
-            string direction = tabiedMoveH_rdo.Checked ? "h" : tabiedMoveV_rdo.Checked ? "v" : "b";
-            option = $"{shape}-{direction}-size{tabiedObjectSize_nud.Value}-speed{tabiedMoveSpeed_nud.Value}";
+            string shape = tabiedObjectCube_rdo.Checked ? "cube" : tabiedObjectStrip_rdo.Checked ? "strip" : tabiedObjectBlur_rdo.Checked ? "blur"
+                : tabiedObjectOverdrive_rdo.Checked ? "overdrive" : tabiedObjectMarquee_rdo.Checked ? "marquee" : "ball";
+            string direction = tabiedMoveH_rdo.Checked ? "h" : tabiedMoveV_rdo.Checked ? "v" : tabiedMoveRandom_rdo.Checked ? "r" : "b";
+            option = $"{shape}-{direction}-size{tabiedObjectSize_nud.Value}-speed{tabiedMoveSpeed_nud.Value}{DynamicPlusTokens()}";
             return null;
         }  // Dynamic 轉 config
         // Window 疊加清單--------------------------------------------------------------------------------------------

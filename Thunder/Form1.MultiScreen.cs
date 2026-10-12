@@ -103,7 +103,7 @@ namespace Thunder
                 }
                 mnsW_txt.Text = width;
                 mnsH_txt.Text = height;
-                if (lastScreen != null && (lastScreen.Bounds.Width.ToString() != width || lastScreen.Bounds.Height.ToString() != height))
+                if (lastScreen != null && (ScreenPixelSize(lastScreen).Width.ToString() != width || ScreenPixelSize(lastScreen).Height.ToString() != height))
                 {
                     RegenerateCurrent();  // 選的螢幕解析度不同（例如選主螢幕）：主視窗預覽恢復成原本寬高
                 }
@@ -123,8 +123,8 @@ namespace Thunder
         private Bitmap RenderForScreen(Screen screen, int offset, out string caption)
         {
             // 依螢幕解析度產生目前的圖；offset > 0 時改用清單後面第 offset 項（ImgList / DirList）
-            mnsW_txt.Text = screen.Bounds.Width.ToString();
-            mnsH_txt.Text = screen.Bounds.Height.ToString();
+            mnsW_txt.Text = ScreenPixelSize(screen).Width.ToString();
+            mnsH_txt.Text = ScreenPixelSize(screen).Height.ToString();
             if (offset > 0 && _shownItem == null)
             {
                 if (tabControl.SelectedTab == tabImgList && tabilPatternList_lst.SelectedIndices.Count > 0)
@@ -162,7 +162,7 @@ namespace Thunder
         }  // 產生某個螢幕要顯示的圖
         private static Bitmap ErrorBitmap(Screen screen, string message)
         {
-            var bitmap = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
+            var bitmap = new Bitmap(ScreenPixelSize(screen).Width, ScreenPixelSize(screen).Height);
             using (Graphics g = Graphics.FromImage(bitmap))
             using (Font font = new Font("新細明體", 24f))
             {
@@ -181,12 +181,11 @@ namespace Thunder
                 _screenWindows[screen.DeviceName] = window;
             }
             window.setBitmap(bitmap);
+            window.SetBlink(BlinkAlternateFor(mypicture.Getpicture()));  // 這個螢幕的圖是 Clipping 閃爍時
             window.Caption = caption;
             if (!window.Visible)
             {
-                window.FormBorderStyle = FormBorderStyle.None;
-                window.Location = screen.Bounds.Location;
-                window.Size = screen.Bounds.Size;
+                PlaceFullScreenWindow(window, screen);  // 自動調整縮放時為實際像素座標
                 window.Show();
                 window.WindowState = FormWindowState.Maximized;
             }

@@ -92,7 +92,7 @@ namespace Thunder
             Showimage_flp.Controls.Add(recent_grp);  // 最後加入 = 最上方
             Showimage_flp.Resize += (s, e) => LayoutRecent();
             // 工具列最右邊顯示目前螢幕的更新率（右對齊項目中第一個在最右邊）
-            mnsRefresh_lbl = new ToolStripLabel { Alignment = ToolStripItemAlignment.Right, ToolTipText = "目前螢幕的更新率" };
+            mnsRefresh_lbl = new ToolStripLabel { Alignment = ToolStripItemAlignment.Right, ToolTipText = "目前螢幕的更新率（點一下切換）" };
             menuStrip.Items.Insert(0, mnsRefresh_lbl);
             // ImgList 編輯區：取得焦點後 Enter 或 Generate 預覽草稿
             foreach (Control field in new Control[] { cfgName_txt, cfgType_cmb, cfgParam_txt, cfgOption_txt })
@@ -199,8 +199,7 @@ namespace Thunder
             // 顯示下拉選單目前螢幕的更新率（沒有選擇時保留原本顯示）
             string device = mnsScreenlist_cmb.SelectedItem?.ToString();
             if (device == null || mnsRefresh_lbl == null) return;
-            int hz = GetRefreshRate(device);
-            mnsRefresh_lbl.Text = hz > 1 ? $"{hz} Hz" : "? Hz";
+            UpdateScaleIndicator(device, GetRefreshRate(device));  // 一併顯示縮放比例
         }  // 更新螢幕更新率
         public static int GetRefreshRate(string device)
         {
@@ -264,7 +263,7 @@ namespace Thunder
         {
             var export = new ToolStripMenuItem("全部匯出成 PNG...", null, (s, e) => ExportImgList());
             export.ToolTipText = "依目前寬高把 ImgList 每一項存成「編號_名稱.png」";
-            var check = new ToolStripMenuItem("檢查全部設定", null, (s, e) => ValidateAllConfigLines());
+            var check = new ToolStripMenuItem("檢查全部設定", null, (s, e) => { using (SuspendFilter()) ValidateAllConfigLines(); });
             check.ToolTipText = "逐行檢查格式，設定有錯的列標紅（載入 config 時會自動檢查）";
             tabilPatternList_cms.Items.Add(new ToolStripSeparator());
             tabilPatternList_cms.Items.Add(check);
@@ -272,14 +271,17 @@ namespace Thunder
         }  // ImgList 右鍵檢查與匯出
         private void ExportImgList()
         {
-            if (tabilPatternList_lst.Items.Count == 0) return;
-            string folder;
-            using (var dialog = new FolderBrowserDialog { Description = $"選擇匯出資料夾（{mnsW_txt.Text} x {mnsH_txt.Text}，共 {tabilPatternList_lst.Items.Count} 張）", SelectedPath = Application.StartupPath })
+            if (!AllConfigItems().Any()) return;
+            using (SuspendFilter())  // 搜尋中也匯出全部
             {
-                if (dialog.ShowDialog(this) != DialogResult.OK) return;
-                folder = dialog.SelectedPath;
+                string folder;
+                using (var dialog = new FolderBrowserDialog { Description = $"選擇匯出資料夾（{mnsW_txt.Text} x {mnsH_txt.Text}，共 {tabilPatternList_lst.Items.Count} 張）", SelectedPath = Application.StartupPath })
+                {
+                    if (dialog.ShowDialog(this) != DialogResult.OK) return;
+                    folder = dialog.SelectedPath;
+                }
+                ExportImgListTo(folder);
             }
-            ExportImgListTo(folder);
         }  // 選擇資料夾後匯出
         private int ExportImgListTo(string folder)
         {

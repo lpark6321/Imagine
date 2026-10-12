@@ -12,6 +12,23 @@ namespace Thunder
         //全局變數-----------------------------------------------------------------------------------------------------
         private Bitmap _bitmap;
         //pictureWindow類別--------------------------------------------------------------------------------------------
+        protected override void CreateHandle()
+        {
+            // 自動調整縮放：視窗與子控制項都建立成個別螢幕 DPI 感知，Windows 不再放大畫面，圖樣 1:1 顯示
+            using (mainWindow.FullScreenDpiScope())
+            {
+                base.CreateHandle();
+                CreateChildHandles(this);
+            }
+        }  // 建立視窗
+        private static void CreateChildHandles(Control parent)
+        {
+            foreach (Control child in parent.Controls)
+            {
+                _ = child.Handle;  // 在同一個 DPI 範圍內建立
+                CreateChildHandles(child);
+            }
+        }  // 建立子控制項
         public pictureWindow()
         {
             InitializeComponent();
@@ -23,11 +40,17 @@ namespace Thunder
             InitAutoHideCursor();
             InitGrayScanMenu();
             InitDragWindow();
+            InitRuler();
+            InitBurnTimer();
             picwinPicture_pic.PaintScreenOverlay += picwinPicture_PaintInfo;  // I 鍵資訊列
             picwinPicture_pic.PaintOverlay += picwinPicture_PaintGrid;        // G 鍵格線（圖片座標）
             picwinPicture_pic.PaintScreenOverlay += picwinPicture_PaintGridLabels;
-            FormClosed += (s, e) => { _previousBitmap?.Dispose(); _previousBitmap = null; };
+            FormClosed += (s, e) => { _previousBitmap?.Dispose(); _previousBitmap = null; StopRefreshMeter(); };
+            // 全螢幕顯示時防止螢幕關閉 / 休眠（由主視窗統一判斷）
+            VisibleChanged += (s, e) => mainWindow.Instance?.UpdateKeepAwake();
+            FormClosed += (s, e) => mainWindow.Instance?.UpdateKeepAwake();
             MouseWheel += pictureWindow_MouseWheel;  // PictureBox 不會取得焦點，滾輪事件由視窗接收
+            Load += (s, e) => mainWindow.Localize(this);  // 英文介面
             //_bitmap = bitMap; // 將接收到的 Bitmap 儲存到類別屬性中
             //this.Paint += Form2_show; // 綁定 Paint 事件  
         }
@@ -44,6 +67,7 @@ namespace Thunder
         }
         public void setBitmap(Bitmap bitmap)
         {
+            SetBlink(null);    // 換圖時停止閃爍（呼叫端需要時再設定）
             KeepAsPrevious();  // 換圖前的那張留給 B 鍵比對
             _inverted = false;
             _bitmap = (Bitmap)bitmap.Clone();
@@ -53,7 +77,7 @@ namespace Thunder
         //pictureWindow操控--------------------------------------------------------------------------------------------
         private void pictureWindow_DoubleClick(object sender, EventArgs e)
         {
-            if (sender is PictureBox && (_drawTool != DrawTool.None || _pickerOn || _dragWindowMode))
+            if (sender is PictureBox && (_drawTool != DrawTool.None || _pickerOn || _dragWindowMode || ShowLocOn))
             {
                 return;  // 畫圖或吸管時雙擊不切換全螢幕
             }
@@ -103,6 +127,8 @@ namespace Thunder
                     // 訂閱 PictureBox 的 MouseMove 事件  
                     picwinPicture_pic.MouseMove -= PictureBox_MouseMove;
                     cmsShowLoc.ForeColor = Color.Black;
+                    _rulerStart = _rulerMouse = null;  // 關閉座標時一併清除量尺
+                    picwinPicture_pic.Invalidate();
                     Cursor = _drawTool != DrawTool.None ? Cursors.Cross : Cursors.Hand; // 恢復游標為預設
                 }
             }
@@ -114,7 +140,7 @@ namespace Thunder
             {
                 // 更新 ToolTip 的內容為圖片像素座標（已換算縮放）
                 Point? p = targerBox.ToImagePoint(e.Location);
-                toolTip.SetToolTip(targerBox, p.HasValue ? $"X: {p.Value.X}, Y: {p.Value.Y}" : "圖片範圍外");
+                toolTip.SetToolTip(targerBox, p.HasValue ? RulerText(p.Value) : "圖片範圍外");  // 有量尺起點時加上距離
             }
         }  //滑鼠移動顯示座標 tooltip
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -134,13 +160,14 @@ namespace Thunder
         private int _wheelDelta;  // 累積滾動量，觸控板的小幅捲動湊滿一格才切圖
         private void pictureWindow_MouseWheel(object sender, MouseEventArgs e)
         {
-            // 與方向鍵相同：往下滾 = 下一張（→），往上滾 = 上一張（←）
+            // 與方向鍵相同：往下滾 = 下一張（→），往上滾 = 上一張（←）；拖曳窗口時 Ctrl+滾輪調整窗口大小
             _wheelDelta += e.Delta;
             while (Math.Abs(_wheelDelta) >= SystemInformation.MouseWheelScrollDelta)
             {
                 bool previous = _wheelDelta > 0;
                 _wheelDelta -= Math.Sign(_wheelDelta) * SystemInformation.MouseWheelScrollDelta;
-                pictureWindow_KeyDown(this, new KeyEventArgs(previous ? Keys.Left : Keys.Right));
+                if (_dragWindowMode && ModifierKeys.HasFlag(Keys.Control)) ResizeWindowPatternBy((previous ? 1 : -1) * (ModifierKeys.HasFlag(Keys.Shift) ? 1 : 5));  // Ctrl+滾輪調整窗口大小（往上放大），再按 Shift 微調 1%
+                else pictureWindow_KeyDown(this, new KeyEventArgs(previous ? Keys.Left : Keys.Right));
             }
         }  //滾輪切圖
         private void pictureWindow_KeyDown(object sender, KeyEventArgs e)
@@ -148,6 +175,16 @@ namespace Thunder
             if (e.Control && e.KeyCode == Keys.Z)
             {
                 UndoDrawing();
+                return;
+            }
+            if (e.KeyCode == Keys.Back && _rulerStart != null)
+            {
+                ClearRuler();  // Backspace 清除量尺起點
+                return;
+            }
+            if (e.KeyCode == Keys.K && e.Modifiers == Keys.None)
+            {
+                ToggleBurn();  // K 開始 / 停止燒機計時
                 return;
             }
             if (e.Alt && e.KeyCode == Keys.R)
@@ -578,16 +615,22 @@ namespace Thunder
             var twoSeconds = new ToolStripMenuItem("每2秒", null, Slideshow) { Name = "cmsSlideshow2", Tag = 2000 };
             cmsSlideshow.DropDownItems.Insert(cmsSlideshow.DropDownItems.IndexOf(cmsSlideshow1), halfSecond);
             cmsSlideshow.DropDownItems.Insert(cmsSlideshow.DropDownItems.IndexOf(cmsSlideshow1) + 1, twoSeconds);
+            // 隨機順序：每輪打亂、不重複（所有全螢幕視窗共用這個設定）
+            var random = new ToolStripMenuItem("隨機順序") { CheckOnClick = true, ToolTipText = "幻燈片每一輪打亂順序，同一輪不重複" };
+            random.CheckedChanged += (s, e) => SlideRandom = random.Checked;
+            cmsSlideshow.DropDownOpening += (s, e) => random.Checked = SlideRandom;
+            cmsSlideshow.DropDownItems.AddRange(new ToolStripItem[] { new ToolStripSeparator(), random });
         }  //幻燈片間隔選項
+        public static bool SlideRandom;  // 幻燈片隨機順序
         private void timer_Tick(object sender, EventArgs e)
         {
             if (sender is Timer t && t.Tag is string st)
             {
                 if (st == "KeyRight")
                 {
-                    // 模擬按下向右鍵  
-                    // With the corrected line:  
-                    pictureWindow_KeyDown(this, new KeyEventArgs(Keys.Right));
+                    // 模擬按下向右鍵；隨機順序時改由主視窗挑下一張
+                    if (SlideRandom && mainWindow.Instance != null && mainWindow.Instance.ShowRandomSlide(this)) { }
+                    else pictureWindow_KeyDown(this, new KeyEventArgs(Keys.Right));
                     if (t.Enabled && t.Interval != CurrentSlideInterval()) t.Interval = CurrentSlideInterval();  // 下一張有寫 @秒數s 時停留指定時間
                 }
             }
@@ -599,6 +642,7 @@ namespace Thunder
             {
                 throw new ArgumentNullException(nameof(bitmap), "Bitmap 不能為 null。");
             }
+            if (_blinkImage != null) SetBlink(null);  // 動畫播放時不閃爍
 
             if (picwinPicture_pic.Image != null)
             {
@@ -903,9 +947,11 @@ namespace Thunder
         private static bool _magnifierOn;  // 關閉視窗後仍保留設定
         private static bool _pickerOn;
         private static int _magnifierZoom = 8;
-        private const int LensTarget = 240;  // 放大鏡大約邊長（畫面像素）
-        private const int InfoHeight = 46;
-        private static readonly Font LensFont = new Font("Microsoft JhengHei UI", 10F, FontStyle.Bold);
+        private float UiScale => DeviceDpi / 96f;  // 自動調整縮放時全螢幕視窗是 DPI 感知，介面尺寸跟著螢幕縮放
+        private int LensTarget => (int)(280 * UiScale);  // 放大鏡大約邊長（畫面像素）
+        private int InfoHeight => TextRenderer.MeasureText("X 0\nRGB 0", LensFont).Height + (int)(16 * UiScale);  // 兩行文字的高度（字型大小跟著 DPI）
+        private int InfoMinWidth => InfoHeight + TextRenderer.MeasureText("X 00000, Y 00000  已複製 255.255.255", LensFont).Width + (int)(24 * UiScale);
+        private static readonly Font LensFont = new Font("Microsoft JhengHei UI", 11F, FontStyle.Bold);
         private Point _lensMouse = new Point(-1, -1);  // 滑鼠位置（畫面座標），-1 表示不在圖片上
         private Rectangle _lensDrawn;                  // 上次畫的範圍，用來局部重繪
         private string _pickerCopied;                  // 剛複製的顏色（滑鼠移到別的像素後清除）
@@ -980,12 +1026,12 @@ namespace Thunder
             lens = info = Rectangle.Empty;
             if ((!_magnifierOn && !_pickerOn) || _lensMouse.X < 0 || picwinPicture_pic.Image == null) return Rectangle.Empty;
             int side = _magnifierOn ? LensPixels() * _magnifierZoom : 0;
-            int width = Math.Max(side, 230), height = side + InfoHeight;
+            int infoHeight = InfoHeight, width = Math.Max(side, InfoMinWidth), height = side + infoHeight;
             int x = _lensMouse.X + 24, y = _lensMouse.Y + 24;
             if (x + width > picwinPicture_pic.ClientSize.Width) x = _lensMouse.X - 24 - width;
             if (y + height > picwinPicture_pic.ClientSize.Height) y = _lensMouse.Y - 24 - height;
             if (_magnifierOn) lens = new Rectangle(x, y, side, side);
-            info = new Rectangle(x, y + side, width, InfoHeight);
+            info = new Rectangle(x, y + side, width, infoHeight);
             return Rectangle.Inflate(Rectangle.Union(_magnifierOn ? lens : info, info), 3, 3);
         }  //計算放大鏡位置
         private void picwinPicture_PaintLens(object sender, PaintEventArgs e)
@@ -1039,7 +1085,8 @@ namespace Thunder
             if (pixel.HasValue)
             {
                 Color c = bitmap.GetPixel(pixel.Value.X, pixel.Value.Y);
-                Rectangle swatch = new Rectangle(info.X + 6, info.Y + 6, InfoHeight - 12, InfoHeight - 12);
+                int pad = (int)(6 * UiScale);
+                Rectangle swatch = new Rectangle(info.X + pad, info.Y + pad, info.Height - pad * 2, info.Height - pad * 2);
                 using (Brush brush = new SolidBrush(Color.FromArgb(255, c)))
                 {
                     g.FillRectangle(brush, swatch);
@@ -1047,7 +1094,7 @@ namespace Thunder
                 g.DrawRectangle(Pens.White, swatch);
                 string copied = _pickerCopiedAt == pixel ? $"  已複製 {_pickerCopied}" : "";
                 string text = $"X {pixel.Value.X}, Y {pixel.Value.Y}{copied}\nRGB {c.R}.{c.G}.{c.B}   #{c.R:X2}{c.G:X2}{c.B:X2}";
-                TextRenderer.DrawText(g, text, LensFont, new Rectangle(swatch.Right + 6, info.Y + 3, info.Right - swatch.Right - 8, InfoHeight - 6),
+                TextRenderer.DrawText(g, text, LensFont, new Rectangle(swatch.Right + pad, info.Y, info.Right - swatch.Right - pad * 2, info.Height),
                     Color.White, TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix);
             }
             else
@@ -1264,8 +1311,35 @@ namespace Thunder
         private void ToggleInfo()
         {
             _infoOn = !_infoOn;
+            if (_infoOn) StartRefreshMeter();
+            else StopRefreshMeter();
             picwinPicture_pic.Invalidate();
         }  //開關資訊列
+        private System.Threading.CancellationTokenSource _meterCancel;
+        private string _meterText, _colorText;  // 資訊列：實測更新率、HDR / 色深（開啟資訊列時取得，不在每次重畫時查詢）
+        private async void StartRefreshMeter()
+        {
+            // 資訊列開著時持續量測這個螢幕的實際更新率，約每秒更新一次
+            StopRefreshMeter();
+            var cancel = _meterCancel = new System.Threading.CancellationTokenSource();
+            string device = Screen.FromControl(this).DeviceName;
+            _colorText = mainWindow.DisplayTarget(device)?.ColorText;
+            _meterText = "實測：量測中…";
+            int hz = Math.Max(30, mainWindow.GetRefreshRate(device));
+            while (!cancel.IsCancellationRequested && !IsDisposed)
+            {
+                RefreshResult result = await RefreshMeter.MeasureAsync(device, hz, 5000, cancel.Token);
+                if (cancel.IsCancellationRequested || IsDisposed) break;
+                _meterText = result.ShortText;
+                picwinPicture_pic.Invalidate();
+                if (!result.Ok) await System.Threading.Tasks.Task.Delay(1000);  // 量不到時（螢幕關閉）不要一直重試
+            }
+        }  // 開始量測更新率
+        private void StopRefreshMeter()
+        {
+            _meterCancel?.Cancel();
+            _meterCancel = null;
+        }  // 停止量測更新率
         private void picwinPicture_PaintInfo(object sender, PaintEventArgs e)
         {
             // 左下角：位置 / 名稱、圖片與螢幕尺寸、更新率、是否 1:1 顯示
@@ -1276,12 +1350,22 @@ namespace Thunder
             bool oneToOne = shown.Width == image.Width && shown.Height == image.Height;
             string position = mainWindow.Instance?.FullScreenPositionText(this) ?? Caption ?? "";
             int hz = mainWindow.GetRefreshRate(screen.DeviceName);
-            string[] lines =
+            int windowsScale = mainWindow.MonitorScalePercent(screen.DeviceName);
+            Size physical = mainWindow.PhysicalResolution(screen.DeviceName);
+            var lines = new List<string>
             {
                 position,
                 $"圖片 {image.Width} x {image.Height}　螢幕 {screen.Bounds.Width} x {screen.Bounds.Height}{(hz > 1 ? $" @ {hz} Hz" : "")}",
                 oneToOne ? "顯示 1:1" : $"⚠ 縮放 {shown.Width / (double)image.Width:0.###} x {shown.Height / (double)image.Height:0.###}（不是 1:1，1px 圖樣可能失真）",
             };
+            lines.Add(string.Join("　", new[] { _colorText, _meterText }.Where(s => s != null)));  // HDR / 色深、實測更新率
+            if (windowsScale > 0 && windowsScale != 100)
+            {
+                // 視窗看到的螢幕大小等於實際解析度，代表已自動調整（個別螢幕 DPI 感知）
+                lines.Add(screen.Bounds.Size == physical
+                    ? $"Windows 縮放 {windowsScale}%（已自動調整，1:1 輸出）"
+                    : $"⚠ Windows 縮放 {windowsScale}%：畫面再被放大成 {physical.Width} x {physical.Height}，1px 圖樣不準確");
+            }
             Graphics g = e.Graphics;
             var sizes = lines.Select(l => TextRenderer.MeasureText(l, LensFont)).ToList();
             int width = sizes.Max(s => s.Width) + 16, height = sizes.Sum(s => s.Height) + 12;
@@ -1291,7 +1375,7 @@ namespace Thunder
                 g.FillRectangle(background, box);
             }
             int y = box.Y + 6;
-            for (int i = 0; i < lines.Length; i++)
+            for (int i = 0; i < lines.Count; i++)
             {
                 Color color = i == 2 && !oneToOne ? Color.FromArgb(255, 210, 0) : Color.White;
                 TextRenderer.DrawText(g, lines[i], LensFont, new Point(box.X + 8, y), color, TextFormatFlags.NoPrefix);
@@ -1401,7 +1485,7 @@ namespace Thunder
             }
             _dragWindowMode = on;
             Cursor = on ? Cursors.SizeAll : (_drawTool != DrawTool.None || _pickerOn || cmsShowLoc.ForeColor == Color.Red ? Cursors.Cross : Cursors.Hand);
-            FlashCaption(on ? "拖曳窗口：滑鼠拖曳，方向鍵移動 1px（Shift 10px），Q 結束" : "結束拖曳窗口", on ? 2500 : 1000);
+            FlashCaption(on ? "拖曳窗口：滑鼠拖曳，方向鍵移動 1px（Shift 10px），Ctrl+滾輪調整大小 5%（Ctrl+Shift 1%），Q 結束" : "結束拖曳窗口", on ? 2500 : 1000);
         }  //開關拖曳窗口
         private void NudgeWindowPattern(KeyEventArgs e)
         {

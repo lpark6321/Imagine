@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace Thunder
@@ -36,7 +36,9 @@ namespace Thunder
             ("全螢幕視窗", "B", "目前這張與上一張（換圖或調整階數前）互換比對"),
             ("全螢幕視窗", "G", "格線：每 100px → 每 10px → 關，上緣與左緣標示座標"),
             ("全螢幕視窗", "N", "反相（負片），再按一次恢復"),
-            ("全螢幕視窗", "Q", "拖曳窗口（Window 圖樣）：滑鼠拖曳窗口，方向鍵移動 1px（Shift 10px）"),
+            ("全螢幕視窗", "Q", "拖曳窗口（Window 圖樣）：滑鼠拖曳窗口，方向鍵移動 1px（Shift 10px），Ctrl+滾輪調整大小"),
+            ("全螢幕視窗", "K", "燒機 / 殘影計時：開始 / 停止（右鍵選單可設定時間與時間到的動作）"),
+            ("全螢幕視窗", "Backspace", "顯示座標時清除量尺起點"),
             ("全螢幕視窗", "I", "資訊列：位置、圖片 / 螢幕尺寸、更新率、是否 1:1 顯示"),
             ("全螢幕視窗", "T / E", "幻燈片播放中：間隔加 / 減 1 秒"),
             ("全螢幕視窗", "↑ / ↓、PgUp / PgDn", "純色圖：階數 ±1 / ±16（灰階三色一起，單色只調該色）"),
@@ -56,10 +58,11 @@ namespace Thunder
             MaximizeBox = false;
             KeyPreview = true;
             KeyDown += (s, e) => { if (e.KeyCode == Keys.Escape) Close(); };
+            Load += (s, e) => mainWindow.Localize(this);  // 英文介面
 
             var title = new Label
             {
-                Text = $"PatternMagic  版本 {typeof(AboutWindow).Assembly.GetName().Version}",  // 版本來自 AssemblyInfo.cs
+                Text = $"PatternMagic  {mainWindow.T("版本")} {typeof(AboutWindow).Assembly.GetName().Version}",  // 版本來自 AssemblyInfo.cs
                 Dock = DockStyle.Top,
                 Height = 40,
                 Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Bold),
@@ -87,8 +90,8 @@ namespace Thunder
             list.Columns.Add("功能", 420);
             foreach (var (group, key, action) in Shortcuts)
             {
-                ListViewGroup listGroup = list.Groups[group] ?? list.Groups.Add(group, group);
-                list.Items.Add(new ListViewItem(new[] { key, action }, listGroup));
+                ListViewGroup listGroup = list.Groups[group] ?? list.Groups.Add(group, mainWindow.T(group));
+                list.Items.Add(new ListViewItem(new[] { mainWindow.T(key), mainWindow.T(action) }, listGroup));
             }
             Controls.Add(list);
             Controls.Add(title);

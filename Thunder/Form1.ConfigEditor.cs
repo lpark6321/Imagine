@@ -23,7 +23,7 @@ namespace Thunder
     public partial class mainWindow
     {
         // ImgList 編輯區--------------------------------------------------------------------------------------------
-        private const string ConfigColorHelp = "顏色寫法：名稱（White、Red、Lime、Blue、Yellow、Aqua、Magenta…）、R.G.B（58.110.165）、灰階（50%Gray）";
+        private const string ConfigColorHelp = "顏色寫法：名稱（White、Red、Lime、Blue、Yellow、Aqua、Magenta…）、R.G.B（58.110.165）、灰階（50%Gray）、HEX（#FF8000、#F80）";
         private static readonly Dictionary<string, (string param, string option)> ConfigHelp = new Dictionary<string, (string, string)>
         {
             ["Solid"] = (
@@ -51,7 +51,7 @@ namespace Thunder
                 "參數：背景色-物件色（只寫一色時物件為白色）\r\n" + ConfigColorHelp + "\r\n例：Black-White、Gray-Red",
                 "選項：可省略，多項用 - 連接（選取時只預覽，按空白鍵或 Esc 全螢幕播放）\r\n形狀：ball 球、cube 方塊、strip 長條、blur 模糊測試條（預設 ball）\r\n方向：h 水平、v 垂直、b 斜角（預設 b，長條不能斜角）\r\n大小：size 加數字 1~200（預設 50）\r\n速度：speed 加數字 1~256（預設 50）\r\n例：ball-b-size50-speed50、strip-h-size20-speed10"),
             ["Test"] = (
-                "參數：測試圖\r\ngamma：Gamma 檢查（gamma-r / gamma-g / gamma-b 為單一色版）\r\npluge：黑位 1~20 / 白位 235~254\r\noverscan：邊緣刻度（overscan-10 / overscan-20 / overscan-50，預設 20）\r\nresolution：解析度（西門子星與線對）\r\nhue：色相漸層（hue-h 水平、hue-v 垂直、hue-ring 環狀）\r\nshading：高頻 Shading、banding：高對比 Banding",
+                "參數：測試圖\r\ngamma：Gamma 檢查（gamma-r / gamma-g / gamma-b 為單一色版）\r\npluge：黑位 1~20 / 白位 235~254\r\noverscan：邊緣刻度（overscan-10 / overscan-20 / overscan-50，預設 20）\r\nresolution：解析度（西門子星與線對）\r\nhue：色相漸層（hue-h 水平、hue-v 垂直、hue-ring 環狀）\r\nshading：高頻 Shading、banding：高對比 Banding\r\nzoneplate：Zone plate 同心圓、colorchecker：24 色色票\r\nnoise：隨機雜訊，可加 c（彩色）、100pt / 1% / 10% / 50%（數量）、g2 / g4 / g8（顆粒），例：noise-c-10%-g4\r\nclipping-black / clipping-white：截斷條（結尾 -f 閃爍）、geometry：幾何、sharpness：銳利度、darkgrad-32 / darkgrad-64：暗部彩色漸層",
                 "選項：不需要"),
             ["Image"] = (
                 "參數：圖檔路徑（jpg / png / bmp，不能有逗號）\r\n可寫絕對路徑，或相對於 config 檔所在資料夾的路徑（內建設定則相對於程式資料夾）\r\n例：D:\\Pattern\\logo.png、pic\\gray.bmp",
@@ -161,9 +161,9 @@ namespace Thunder
             // 參數與選項的 tooltip 依類型顯示對應寫法
             string type = cfgType_cmb.SelectedItem?.ToString();
             if (type == null || !ConfigHelp.TryGetValue(type, out var help)) return;
-            configHelp_tip.SetToolTip(cfgType_cmb, $"{type}：滑鼠移到參數、選項欄位可看寫法");
-            configHelp_tip.SetToolTip(cfgParam_txt, help.param);
-            configHelp_tip.SetToolTip(cfgOption_txt, help.option + "\r\n\r\n幻燈片停留時間（各類型通用）：結尾加 @秒數s，例：@5s、50%c @2.5s（0.1~3600 秒）");
+            configHelp_tip.SetToolTip(cfgType_cmb, T($"{type}：滑鼠移到參數、選項欄位可看寫法"));  // 英文介面時翻譯
+            configHelp_tip.SetToolTip(cfgParam_txt, T(help.param));
+            configHelp_tip.SetToolTip(cfgOption_txt, T(help.option + "\r\n\r\n幻燈片停留時間（各類型通用）：結尾加 @秒數s，例：@5s、50%c @2.5s（0.1~3600 秒）"));
         }  // 更新寫法提示
         private void FillConfigEditor(ListViewItem item)
         {
@@ -187,55 +187,75 @@ namespace Thunder
                 MessageBox.Show("欄位內容不能包含逗號（逗號是欄位分隔符號）！", "Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            ListViewItem item = CreateConfigItem(string.Join(",", values));
-            int selected = tabilPatternList_lst.SelectedIndices.Count > 0 ? tabilPatternList_lst.SelectedIndices[0] : -1;
-            if (replaceSelected)
+            using (SuspendFilter())  // 搜尋中：先放回完整清單，改完再篩選
             {
-                if (selected < 0)
+                ListViewItem item = CreateConfigItem(string.Join(",", values));
+                int selected = tabilPatternList_lst.SelectedIndices.Count > 0 ? tabilPatternList_lst.SelectedIndices[0] : -1;
+                if (replaceSelected)
                 {
-                    MessageBox.Show("請先在清單選取要修改的項目！", "Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    if (selected < 0)
+                    {
+                        MessageBox.Show("請先在清單選取要修改的項目！", "Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    PushConfigUndo();  // 記錄復原點
+                    ListViewGroup group = tabilPatternList_lst.Items[selected].Group;
+                    tabilPatternList_lst.Items[selected] = item;
+                    if (tabilPatternList_lst.ShowGroups) item.Group = group;  // 維持原本的群組
                 }
-                PushConfigUndo();  // 記錄復原點
-                tabilPatternList_lst.Items[selected] = item;
+                else
+                {
+                    // 加在選取項目的下一列；沒有選取時加在最後
+                    PushConfigUndo();  // 記錄復原點
+                    tabilPatternList_lst.Items.Insert(selected >= 0 ? selected + 1 : tabilPatternList_lst.Items.Count, item);
+                    AdoptNeighborGroup(item);
+                }
+                RenumberPatternList();
+                item.Selected = true;  // 觸發預覽，格式錯誤會提示
+                item.Focused = true;
+                item.EnsureVisible();
             }
-            else
-            {
-                // 加在選取項目的下一列；沒有選取時加在最後
-                PushConfigUndo();  // 記錄復原點
-                tabilPatternList_lst.Items.Insert(selected >= 0 ? selected + 1 : tabilPatternList_lst.Items.Count, item);
-            }
-            RenumberPatternList();
-            item.Selected = true;  // 觸發預覽，格式錯誤會提示
-            item.Focused = true;
-            item.EnsureVisible();
         }  // 新增 / 修改 config 項目
         private void DeleteConfigLine()
         {
             if (tabilPatternList_lst.SelectedItems.Count == 0) return;
-            int index = tabilPatternList_lst.SelectedIndices[0];
-            PushConfigUndo();  // 記錄復原點
-            tabilPatternList_lst.Items.RemoveAt(index);
-            RenumberPatternList();
-            if (tabilPatternList_lst.Items.Count > 0)
+            using (SuspendFilter())
             {
-                tabilPatternList_lst.Items[Math.Min(index, tabilPatternList_lst.Items.Count - 1)].Selected = true;
+                int index = tabilPatternList_lst.SelectedIndices[0];
+                PushConfigUndo();  // 記錄復原點
+                tabilPatternList_lst.Items.RemoveAt(index);
+                RenumberPatternList();
+                if (tabilPatternList_lst.Items.Count > 0)
+                {
+                    tabilPatternList_lst.Items[Math.Min(index, tabilPatternList_lst.Items.Count - 1)].Selected = true;
+                }
             }
         }  // 刪除 config 項目
         private bool _movingConfigLine;  // 移動時重新選取不重新產生圖片
         private void MoveConfigLine(int step)
         {
-            if (tabilPatternList_lst.SelectedItems.Count == 0) return;
+            if (tabilPatternList_lst.SelectedItems.Count == 0 || BlockWhileFiltering("調整順序")) return;
             int index = tabilPatternList_lst.SelectedIndices[0];
             int target = index + step;
             if (target < 0 || target >= tabilPatternList_lst.Items.Count) return;
             ListViewItem item = tabilPatternList_lst.Items[index];
+            ListViewGroup neighborGroup = tabilPatternList_lst.Items[target].Group;
+            if (tabilPatternList_lst.ShowGroups && neighborGroup != item.Group)
+            {
+                // 在群組邊界：先移到相鄰群組（變成上一組的最後一項 / 下一組的第一項），位置不變
+                PushConfigUndo();
+                item.Group = neighborGroup;
+                RenumberPatternList();
+                item.EnsureVisible();
+                return;
+            }
             PushConfigUndo();  // 記錄復原點
             _movingConfigLine = true;
             try
             {
                 tabilPatternList_lst.Items.RemoveAt(index);
                 tabilPatternList_lst.Items.Insert(target, item);
+                if (neighborGroup != null) item.Group = neighborGroup;  // 移除再插入會清掉群組（同一組內移動）
                 RenumberPatternList();
                 item.Selected = true;
                 item.Focused = true;
@@ -279,8 +299,7 @@ namespace Thunder
                         if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
                             // 第一行寫欄名，其餘照原始內容寫回；UTF-8（含 BOM）方便記事本與 Excel 開啟
-                            var lines = new[] { string.Join(",", ConfigColumns) }
-                                .Concat(tabilPatternList_lst.Items.Cast<ListViewItem>().Select(item => item.Tag.ToString()));
+                            var lines = new[] { string.Join(",", ConfigColumns) }.Concat(ConfigLinesWithGroups());  // 含群組標題、搜尋中被篩掉的項目
                             try
                             {
                                 File.WriteAllText(saveFileDialog.FileName, string.Join(Environment.NewLine, lines), Encoding.UTF8);
@@ -317,8 +336,8 @@ namespace Thunder
             bool sizeMissing = !int.TryParse(width, out _) || !int.TryParse(height, out _);
             if (sizeMissing)
             {
-                mnsW_txt.Text = Screen.PrimaryScreen.Bounds.Width.ToString();
-                mnsH_txt.Text = Screen.PrimaryScreen.Bounds.Height.ToString();
+                mnsW_txt.Text = ScreenPixelSize(Screen.PrimaryScreen).Width.ToString();
+                mnsH_txt.Text = ScreenPixelSize(Screen.PrimaryScreen).Height.ToString();
             }
             Cursor = Cursors.WaitCursor;
             tabilPatternList_lst.BeginUpdate();

@@ -25,6 +25,17 @@ namespace Thunder
         // listbox功能-----------------------------------------------------------------------------------
         private Color switchcolor(string sc)
         {
+            if (sc.StartsWith("#"))
+            {
+                // HEX 色碼：#RRGGBB 或簡寫 #RGB
+                string hex = sc.Substring(1);
+                if (hex.Length == 3) hex = string.Concat(hex.Select(c => $"{c}{c}"));
+                if (hex.Length != 6 || !int.TryParse(hex, System.Globalization.NumberStyles.HexNumber, null, out int rgb))
+                {
+                    throw new FormatException($"HEX 色碼「{sc}」格式應為 #RRGGBB 或 #RGB");
+                }
+                return Color.FromArgb(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF);
+            }
             if (sc.Contains("."))
             {
                 // 這裡的 Name 是從 ListBox 中獲取的顏色名稱
@@ -158,10 +169,11 @@ namespace Thunder
             tabiedObjectColor_btn.BackColor = colorParts.Length > 1 ? switchcolor(colorParts[1]) : Color.White;
             RadioButton shape = tabiedObjectBall_rdo;
             RadioButton direction = tabiedMoveBevel_rdo;
+            ResetDynamicPlusOptions();
             decimal size = 50, speed = 50;
             foreach (string token in option.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                string t = token.Trim();
+                string raw = token.Trim(), t = raw.ToLower();  // 跑馬燈文字保留大小寫
                 if (t == "ball") shape = tabiedObjectBall_rdo;
                 else if (t == "cube") shape = tabiedObjectCube_rdo;
                 else if (t == "strip") shape = tabiedObjectStrip_rdo;
@@ -169,6 +181,8 @@ namespace Thunder
                 else if (t == "h") direction = tabiedMoveH_rdo;
                 else if (t == "v") direction = tabiedMoveV_rdo;
                 else if (t == "b") direction = tabiedMoveBevel_rdo;
+                else if (t == "r") direction = tabiedMoveRandom_rdo;  // 隨機方向
+                else if (TakeDynamicPlusToken(raw, ref shape)) { }  // Overdrive、跑馬燈、條數、交錯顏色、文字
                 else if (t.StartsWith("size") && decimal.TryParse(t.Substring(4), out decimal s)) size = s;
                 else if (t.StartsWith("speed") && decimal.TryParse(t.Substring(5), out decimal v)) speed = v;
                 else throw new FormatException($"無法識別選項「{t}」");
@@ -182,10 +196,11 @@ namespace Thunder
                 throw new FormatException($"speed 需在 {tabiedMoveSpeed_nud.Minimum}~{tabiedMoveSpeed_nud.Maximum}");
             }
             shape.Checked = true;  // 先設形狀：選長條時會強制水平並停用斜角
-            if ((shape == tabiedObjectStrip_rdo || shape == tabiedObjectBlur_rdo) && direction == tabiedMoveBevel_rdo)
+            if ((shape == tabiedObjectStrip_rdo || shape == tabiedObjectBlur_rdo) && (direction == tabiedMoveBevel_rdo || direction == tabiedMoveRandom_rdo))
             {
-                direction = tabiedMoveH_rdo;  // 長條、模糊條不能斜角移動
+                direction = tabiedMoveH_rdo;  // 長條、模糊條不能斜角或隨機移動
             }
+            if (shape == tabiedObjectOverdrive_rdo || shape == tabiedObjectMarquee_rdo) direction = tabiedMoveH_rdo;  // 只能水平
             direction.Checked = true;
             tabiedObjectSize_nud.Value = size;
             tabiedMoveSpeed_nud.Value = speed;
@@ -197,6 +212,8 @@ namespace Thunder
             tabigLastLevel_cmb.Text = "255";
             tabigReverse_chk.Checked = false;
             tabigAll_chk.Checked = false;
+            tabigSaturation_chk.Checked = false;
+            hv = TakeGradientPlusTokens(hv);  // 曲線（g22 / ig22）與起點色（from顏色）
             // 全畫面格狀全階：all-階數（直排）或 all-h-階數（橫排）；顏色依參數（單色或 colorbar）
             if (hv.StartsWith("all"))
             {
@@ -235,6 +252,7 @@ namespace Thunder
             {
                 tabigHWay_rdo.Checked = hvs[0].Contains("h") ? true : false;
                 tabigVWay_rdo.Checked = hvs[0].Contains("v") ? true : false;
+                if (hvs[0] == "o") tabigRadial_rdo.Checked = true;  // 放射狀
                 tabigStep_cmb.Text = hvs[1];
                 tabigDivid_cmb.Text = hvs[2];
                 if (hvs.Length >= 5)
@@ -324,6 +342,11 @@ namespace Thunder
                     }
                 }
             }
+            else if (color == "saturation")
+            {
+                tabigOther_chk.Checked = false;
+                tabigSaturation_chk.Checked = true;  // 飽和度階梯
+            }
             else
             {
                 tabigOther_chk.Checked = false;
@@ -332,8 +355,8 @@ namespace Thunder
         }  // 漸層顏色或 ColorBar
         private static bool IsColorMaskOption(string option)
         {
-            // 舊寫法只有 0~2 與 . （例：10.01）；出現 / 、空格、英文字母或 % 就是顏色寫法
-            return option.IndexOfAny(new[] { '/', ' ', '%' }) >= 0 || option.Any(char.IsLetter);
+            // 舊寫法只有 0~2 與 . （例：10.01）；出現 / 、空格、英文字母、% 或 #（HEX）就是顏色寫法
+            return option.IndexOfAny(new[] { '/', ' ', '%', '#' }) >= 0 || option.Any(char.IsLetter);
         }  // 判斷 Mask 選項是否為顏色寫法
         private Color[] ParseMaskColorRows(string option, int w, int h)
         {

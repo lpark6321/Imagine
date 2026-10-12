@@ -66,7 +66,7 @@ namespace Thunder
         {
             // Mask 頁範本按鈕下方：自訂 mask 下拉選單（選了就套用）與「存成自訂」按鈕
             var title = new Label { Text = "自訂", AutoSize = true, Location = new Point(330, 318) };
-            tabiemUserMask_cmb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Bounds = new Rectangle(362, 314, 88, 24), ImeMode = ImeMode.Disable };
+            tabiemUserMask_cmb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Bounds = new Rectangle(376, 314, 74, 24), ImeMode = ImeMode.Disable };
             tabiemUserMask_cmb.DropDown += (s, e) => RefreshUserMaskCombo();  // 展開時依 ImgList 重新整理
             tabiemUserMask_cmb.SelectionChangeCommitted += (s, e) => { if (tabiemUserMask_cmb.SelectedItem is string name) ApplyMaskTemplate(name); };
             var save = new Button { Text = "存成自訂…", Bounds = new Rectangle(330, 344, 120, 24) };
@@ -88,7 +88,7 @@ namespace Thunder
         {
             // 依 ImgList 目前內容重建自訂 mask 表；名稱重複時以第一個為準（重複的那行檢查時會標紅）
             _userMasks.Clear();
-            foreach (ListViewItem item in tabilPatternList_lst.Items)
+            foreach (ListViewItem item in AllConfigItems())  // 搜尋中被篩掉的也算
             {
                 string[] fields = StripDwell(item.Tag.ToString(), out _).Split(',');
                 if (!IsUserMaskLine(fields)) continue;
@@ -153,7 +153,7 @@ namespace Thunder
             if (count > 1) throw new FormatException($"自訂 mask 名稱「{name}」重複了 {count} 次");
             ParseUserMask(param, option, out _, out _);
         }  // 檢查自訂 mask 那一行
-        private IEnumerable<ListViewItem> UserMaskItems(string name) => tabilPatternList_lst.Items.Cast<ListViewItem>().Where(item =>
+        private IEnumerable<ListViewItem> UserMaskItems(string name) => AllConfigItems().Where(item =>
         {
             string[] fields = StripDwell(item.Tag.ToString(), out _).Split(',');
             return IsUserMaskLine(fields) && fields[0].Trim().ToLower() == name;
@@ -187,14 +187,26 @@ namespace Thunder
             {
                 return false;
             }
-            PushConfigUndo();  // 記錄復原點
-            ListViewItem item = CreateConfigItem($"{name},{UserMaskType},p-{width}*{height},{MaskCellsToOption(cells, width, height)}");
-            if (existing != null) tabilPatternList_lst.Items[existing.Index] = item;
-            else tabilPatternList_lst.Items.Add(item);
-            RenumberPatternList();
-            item.EnsureVisible();
-            RefreshUserMasks();
-            ssrStatus_lbl.Text = $"已存成自訂 mask「{name}」（ImgList 第 {item.Index + 1} 列），要保留請存 config 檔";
+            using (SuspendFilter())  // 搜尋中被篩掉的同名項目也要找得到
+            {
+                PushConfigUndo();  // 記錄復原點
+                ListViewItem item = CreateConfigItem($"{name},{UserMaskType},p-{width}*{height},{MaskCellsToOption(cells, width, height)}");
+                if (existing != null)
+                {
+                    ListViewGroup group = existing.Group;
+                    tabilPatternList_lst.Items[existing.Index] = item;
+                    if (tabilPatternList_lst.ShowGroups) item.Group = group;  // 維持原本的群組
+                }
+                else
+                {
+                    tabilPatternList_lst.Items.Add(item);
+                    AdoptNeighborGroup(item);
+                }
+                RenumberPatternList();
+                item.EnsureVisible();
+                RefreshUserMasks();
+                ssrStatus_lbl.Text = $"已存成自訂 mask「{name}」（ImgList 第 {item.Index + 1} 列），要保留請存 config 檔";
+            }
             return true;
         }  // 存成自訂 mask
         private Color[] CurrentMaskCells(out int width, out int height)
@@ -231,6 +243,7 @@ namespace Thunder
                 form.Controls.AddRange(new Control[] { label, box, ok, cancel });
                 form.AcceptButton = ok;
                 form.CancelButton = cancel;
+                Localize(form);
                 return form.ShowDialog(this) == DialogResult.OK ? box.Text : null;
             }
         }  // 輸入文字
