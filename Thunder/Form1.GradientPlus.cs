@@ -69,34 +69,115 @@ namespace Thunder
             return (byte)Math.Round(from + (to - from) * c);
         }  // 曲線取值
         private static double CurveValue(double t, int curve) => curve == 1 ? Math.Pow(t, 1 / 2.2) : curve == 2 ? Math.Pow(t, 2.2) : t;  // 0~1 依曲線分布
-        private Bitmap ApplyRadialTransparency(Bitmap bitmap, int startAlpha, int endAlpha, int steps, int curve)
+        // 快速漸層：每一階的數值只跟「沿漸層方向的位置」（反向時再加上另一方向的奇偶段）有關，
+        // 先算成一維查表，再逐列合成（原本是每個像素各自算透明度、再整張轉一次 RGB，兩次逐像素處理）
+        private Bitmap RenderGradient(Bitmap background, int startAlpha, int endAlpha, bool isH, int steps, int segments, bool reverse, int curve, Color? from)
+        {
+            int width = background.Width, height = background.Height;
+            byte[] even, odd = null;
+            bool[] oddAcross = null;
+            if (reverse)
+            {
+                // 與 ApplyTransparency 的反向分支相同的算式：整個方向為一段，另一方向依等分決定奇偶
+                int segmentLength = isH ? height : width;
+                steps = Math.Min(steps, segmentLength);
+                float alphaStep = (float)(endAlpha - startAlpha) / (steps - 1);
+                even = new byte[segmentLength];
+                odd = new byte[segmentLength];
+                for (int p = 0; p < segmentLength; p++)
+                {
+                    int stepIndex = (int)((float)(p % segmentLength) / segmentLength * steps);
+                    even[p] = curve == 0 ? (byte)(startAlpha + alphaStep * stepIndex) : CurveLevel(startAlpha, endAlpha, stepIndex, steps, curve);
+                    odd[p] = curve == 0 ? (byte)(endAlpha - alphaStep * stepIndex) : CurveLevel(startAlpha, endAlpha, steps - 1 - stepIndex, steps, curve);
+                }
+                int across = isH ? width : height, block = across / segments;
+                oddAcross = new bool[across];
+                for (int c = 0; c < across; c++) oddAcross[c] = block > 0 && c / block % 2 == 1;
+            }
+            else
+            {
+                // 與 ApplyTransparency 的一般分支相同：沿漸層方向切成 segments 段，每段各自從起始到結束
+                int dimension = isH ? height : width, segmentLength = dimension / segments;
+                steps = Math.Min(steps, segmentLength);
+                float alphaStep = (float)(endAlpha - startAlpha) / (steps - 1);
+                even = new byte[dimension];
+                for (int p = 0; p < dimension; p++)
+                {
+                    int stepIndex = (int)((float)(p % segmentLength) / segmentLength * steps);
+                    even[p] = curve == 0 ? (byte)(startAlpha + alphaStep * stepIndex) : CurveLevel(startAlpha, endAlpha, stepIndex, steps, curve);
+                }
+            }
+            return ComposeGradient(background, from, (y, row) =>
+            {
+                if (isH)
+                {
+                    // H：同一列數值相同（反向時依欄的奇偶段）
+                    if (!reverse) { byte value = even[y]; for (int x = 0; x < row.Length; x++) row[x] = value; }
+                    else for (int x = 0; x < row.Length; x++) row[x] = oddAcross[x] ? odd[y] : even[y];
+                }
+                else
+                {
+                    // V：每一列都一樣（反向時依列的奇偶段），直接複製查表
+                    Buffer.BlockCopy(reverse && oddAcross[y] ? odd : even, 0, row, 0, row.Length);
+                }
+            });
+        }  // 快速漸層
+        private Bitmap RenderRadialGradient(Bitmap background, int startAlpha, int endAlpha, int steps, int curve, Color? from)
         {
             // 放射狀：以中心到角落的距離分階，中心為起始灰階
-            int width = bitmap.Width, height = bitmap.Height;
+            int width = background.Width, height = background.Height;
             double cx = width / 2.0, cy = height / 2.0, max = Math.Sqrt(cx * cx + cy * cy);
             steps = Math.Max(1, Math.Min(steps, (int)max));
-            var data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            var levels = new byte[steps];
+            for (int step = 0; step < steps; step++)
+            {
+                levels[step] = curve == 0 && steps > 1 ? (byte)(startAlpha + (float)(endAlpha - startAlpha) / (steps - 1) * step) : CurveLevel(startAlpha, endAlpha, step, steps, curve);
+            }
+            return ComposeGradient(background, from, (y, row) =>
+            {
+                double dy = y + 0.5 - cy;
+                for (int x = 0; x < row.Length; x++)
+                {
+                    double dx = x + 0.5 - cx;
+                    row[x] = levels[Math.Min(steps - 1, (int)(Math.Sqrt(dx * dx + dy * dy) / max * steps))];
+                }
+            });
+        }  // 快速放射狀漸層
+        private static Bitmap ComposeGradient(Bitmap background, Color? from, Action<int, byte[]> fillAlphaRow)
+        {
+            // 逐列合成：結果 = 起點色 + (底色 - 起點色) × 透明度 / 255（與 ConvertARGBToRGB 相同的整數算式），輸出 24 bit
+            int width = background.Width, height = background.Height;
+            var rect = new Rectangle(0, 0, width, height);
+            var result = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            BitmapData source = background.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData target = result.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
             try
             {
-                var row = new byte[width * 4];
+                int fromR = from?.R ?? 0, fromG = from?.G ?? 0, fromB = from?.B ?? 0;
+                var sourceRow = new byte[width * 4];
+                var targetRow = new byte[width * 3];
+                var alpha = new byte[width];
                 for (int y = 0; y < height; y++)
                 {
-                    System.Runtime.InteropServices.Marshal.Copy(data.Scan0 + y * data.Stride, row, 0, row.Length);
-                    for (int x = 0; x < width; x++)
+                    System.Runtime.InteropServices.Marshal.Copy(source.Scan0 + y * source.Stride, sourceRow, 0, sourceRow.Length);
+                    fillAlphaRow(y, alpha);
+                    for (int x = 0, i = 0, o = 0; x < width; x++, i += 4, o += 3)
                     {
-                        double dx = x + 0.5 - cx, dy = y + 0.5 - cy;
-                        int step = Math.Min(steps - 1, (int)(Math.Sqrt(dx * dx + dy * dy) / max * steps));
-                        row[x * 4 + 3] = curve == 0 && steps > 1 ? (byte)(startAlpha + (float)(endAlpha - startAlpha) / (steps - 1) * step) : CurveLevel(startAlpha, endAlpha, step, steps, curve);
+                        int a = alpha[x];
+                        targetRow[o] = (byte)(fromB + ((sourceRow[i] - fromB) * a) / 255);
+                        targetRow[o + 1] = (byte)(fromG + ((sourceRow[i + 1] - fromG) * a) / 255);
+                        targetRow[o + 2] = (byte)(fromR + ((sourceRow[i + 2] - fromR) * a) / 255);
                     }
-                    System.Runtime.InteropServices.Marshal.Copy(row, 0, data.Scan0 + y * data.Stride, row.Length);
+                    System.Runtime.InteropServices.Marshal.Copy(targetRow, 0, target.Scan0 + y * target.Stride, targetRow.Length);
                 }
             }
             finally
             {
-                bitmap.UnlockBits(data);
+                background.UnlockBits(source);
+                result.UnlockBits(target);
             }
-            return bitmap;
-        }  // 放射狀透明度
+            return result;
+        }  // 逐列合成漸層
         private static readonly (string name, int r, int g, int b)[] SaturationColors =
         {
             ("R", 255, 0, 0), ("G", 0, 255, 0), ("B", 0, 0, 255), ("C", 0, 255, 255), ("M", 255, 0, 255), ("Y", 255, 255, 0),

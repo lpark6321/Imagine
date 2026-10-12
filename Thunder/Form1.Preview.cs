@@ -107,8 +107,20 @@ namespace Thunder
         }  // 建立預覽區的 config 文字、最近使用與更新率
         private void LayoutRecent()
         {
-            // 最近使用填滿上方剩餘的高度
+            // 預覽圖與最近使用跟著面板寬度（預覽圖 16:9，最小 256 x 144）；最近使用填滿上方剩餘的高度
             if (recent_grp == null) return;
+            int inner = Showimage_flp.ClientSize.Width - Showimage_flp.Padding.Horizontal - showimgPicture_pic.Margin.Horizontal;
+            int pictureWidth = Math.Max(showimgPicture_pic.MinimumSize.Width, inner);
+            int others = Showimage_flp.Controls.Cast<Control>()
+                .Where(c => c != recent_grp && c != showimgPicture_pic && (c != showimgConfig_lbl || showimgConfig_lbl.Text != ""))
+                .Sum(c => c.Height + c.Margin.Vertical);
+            // 預覽圖高度不擠掉最近使用（最近使用至少保留 120）
+            int maxPictureHeight = Showimage_flp.ClientSize.Height - Showimage_flp.Padding.Vertical - others - showimgPicture_pic.Margin.Vertical - 120 - recent_grp.Margin.Vertical;
+            int pictureHeight = Math.Max(showimgPicture_pic.MinimumSize.Height, Math.Min(pictureWidth * 9 / 16, maxPictureHeight));
+            pictureWidth = Math.Max(showimgPicture_pic.MinimumSize.Width, Math.Min(pictureWidth, pictureHeight * 16 / 9));
+            if (showimgPicture_pic.Size != new Size(pictureWidth, pictureHeight)) showimgPicture_pic.Size = new Size(pictureWidth, pictureHeight);
+            if (recent_grp.Width != Math.Max(pictureWidth, inner)) recent_grp.Width = Math.Max(pictureWidth, inner);
+            showimgConfig_lbl.MaximumSize = new Size(recent_grp.Width, 0);
             int used = Showimage_flp.Controls.Cast<Control>()
                 .Where(c => c != recent_grp && (c != showimgConfig_lbl || showimgConfig_lbl.Text != ""))
                 .Sum(c => c.Height + c.Margin.Vertical);

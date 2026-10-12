@@ -317,6 +317,7 @@ namespace Thunder
             }
             overlayPage.Controls.Add(tabiwOverlay_lvw);
             overlayPage.Controls.Add(buttonBar);  // 後加入的先 Dock，按鈕列先佔底部，清單填滿其餘
+            tabs.SelectedTab = overlayPage;  // 預設顯示「窗口 / 線條」（自製圖頁有大量格子，切到時才排版，載入較快）
         }  // Window 自製圖與窗口 / 線條分頁
         private ComboBox tabiwDiagonal_cmb;
         private void InitWindowDiagonal()

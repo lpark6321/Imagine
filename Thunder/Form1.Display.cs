@@ -56,6 +56,60 @@ namespace Thunder
             Activated += (s, e) => UpdateRefreshRate();
         }  // 建立顯示器選單
         private string SelectedScreenDevice => mnsScreenlist_cmb.SelectedItem?.ToString();
+        // 最外層佈局--------------------------------------------------------------------------------------------------
+        private SplitContainer _mainSplit;
+        private int _mainLayoutTabWidth;
+        private void InitMainLayout()
+        {
+            // 左欄分頁、右欄預覽改放進 SplitContainer（原本是兩個 Dock = Left）：
+            // 兩欄各有寬度下限（原本設計的寬度），視窗大小改變時兩欄依比例自動調整，中間的分隔線也可以直接拖曳；
+            // 程式沒有 DPI 感知，關掉主視窗的自動縮放，避免切換螢幕或全螢幕時被重新縮放
+            int left = tabControl.Width, right = Math.Max(Showimage_flp.Width, Showimage_flp.PreferredSize.Width);
+            _mainLayoutTabWidth = left;
+            const int splitterWidth = 5;
+            // 主視窗最小寬度要放得下兩欄的下限加分隔線
+            int border = Width - ClientSize.Width;
+            MinimumSize = new Size(Math.Max(MinimumSize.Width, left + right + splitterWidth + border), MinimumSize.Height);
+            if (Width < MinimumSize.Width) Width = MinimumSize.Width;
+            _mainSplit = new SplitContainer
+            {
+                Dock = DockStyle.Fill, Orientation = Orientation.Vertical, FixedPanel = FixedPanel.None, SplitterWidth = splitterWidth,
+                Margin = Padding.Empty, TabStop = false,
+            };
+            SuspendLayout();
+            Controls.Remove(tabControl);
+            Controls.Remove(Showimage_flp);
+            tabControl.Dock = DockStyle.Fill;
+            tabControl.Margin = Padding.Empty;
+            Showimage_flp.AutoSize = false;
+            Showimage_flp.Dock = DockStyle.Fill;
+            _mainSplit.Panel1.Controls.Add(tabControl);
+            _mainSplit.Panel2.Controls.Add(Showimage_flp);
+            Controls.Add(_mainSplit);
+            _mainSplit.BringToFront();  // Fill 要最後停靠（選單、狀態列先佔上下）
+            AutoScaleMode = AutoScaleMode.None;
+            AutoSize = false;
+            ResumeLayout(true);
+            // 停靠完成、容器已有寬度後才能設定下限與分隔線位置
+            _mainSplit.Panel1MinSize = left;
+            _mainSplit.Panel2MinSize = right;
+            _mainSplit.SplitterDistance = Math.Max(left, Math.Min(_mainSplit.Width - right - splitterWidth, left));
+            toolTip.SetToolTip(_mainSplit, "拖曳中間的分隔線調整左右寬度");
+            tabControl.SizeChanged += (s, e) =>
+            {
+                // 偵測：分頁寬度不該小於下限；萬一發生，記下呼叫堆疊（找原因用）
+                if (tabControl.Width >= _mainLayoutTabWidth || WindowState == FormWindowState.Minimized || tabControl.Width == 0) return;
+                try
+                {
+                    System.IO.File.AppendAllText(System.IO.Path.Combine(Application.StartupPath, "layout_debug.log"),
+                        $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} 分頁寬度 {tabControl.Width}（下限 {_mainLayoutTabWidth}）分隔線 {_mainSplit.SplitterDistance}{Environment.NewLine}{Environment.StackTrace}{Environment.NewLine}{Environment.NewLine}");
+                }
+                catch (Exception)
+                {
+                    // 無法寫入記錄檔時略過
+                }
+            };
+        }  // 建立最外層佈局
         private void OnDisplaySettingsChanged(object sender, EventArgs e)
         {
             if (IsDisposed) return;
@@ -313,6 +367,26 @@ namespace Thunder
             public bool Active => _previous != IntPtr.Zero;
             public void Dispose() { if (_previous != IntPtr.Zero) SetThreadDpiAwarenessContext(_previous); }
         }  // 範圍內為個別螢幕 DPI 感知
+        private sealed class MainDpiContext : IDisposable
+        {
+            private readonly IntPtr _previous;
+            public MainDpiContext()
+            {
+                try
+                {
+                    _previous = SetThreadDpiAwarenessContext(new IntPtr(-1));  // DPI_AWARENESS_CONTEXT_UNAWARE：與主視窗相同
+                }
+                catch (EntryPointNotFoundException)
+                {
+                    // 舊版 Windows 沒有混合 DPI，不用切換
+                }
+            }
+            public void Dispose() { if (_previous != IntPtr.Zero) SetThreadDpiAwarenessContext(_previous); }
+        }
+        public static IDisposable MainDpiScope() => new MainDpiContext();
+        // 從全螢幕視窗（個別螢幕 DPI 感知）呼叫主視窗時用：Windows 處理全螢幕視窗的訊息期間，執行緒是全螢幕視窗的 DPI 模式，
+        // 這時直接操作主視窗（換螢幕、選清單、重新產生）會讓主視窗在錯誤的 DPI 下排版（例如 150% 螢幕上分頁被縮成 2/3），
+        // 所以先切回主視窗的模式（無感知）再執行
         // 自動調整縮放：全螢幕視窗改成個別螢幕 DPI 感知、寬高用實際解析度，縮放不是 100% 也能 1:1 輸出
         public static bool AutoDpiScaling { get; private set; } = true;
         public static IDisposable FullScreenDpiScope() => new DpiScope(AutoDpiScaling);  // 建立、擺放全螢幕視窗時使用

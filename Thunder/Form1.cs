@@ -70,6 +70,7 @@ namespace Thunder
             InitUserMaskControls();
             InitMultiScreen();
             InitDisplayMenu();
+            InitMainLayout();  // 最外層改用固定欄寬的表格
             InitLanguage();  // 最後執行：上面建立的介面一起翻譯
             //Mainwindow_Load(this, EventArgs.Empty);
             mypicture = new MyPicture(this);
@@ -774,15 +775,12 @@ namespace Thunder
                             int stepNum = Math.Min(GradientStepCount, divisionSize); // 獲取漸層階數（依漸層條件的全階不超過漸層分幾階）
                             int startColorValue = int.Parse(tabigFirstLevel_cmb.Text); // 開始顏色值  
                             int endColorValue = int.Parse(tabigLastLevel_cmb.Text); // 結束顏色值  
-                            if (GradientRadial)
-                            {
-                                backBitmap = ApplyRadialTransparency(backBitmap, startColorValue, endColorValue, GradientStepCount, GradientCurve);  // 放射狀
-                            }
-                            else
-                            {
-                                backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions, tabigReverse_chk.Checked, GradientCurve);
-                            }
-                            backBitmap = ConvertARGBToRGB(backBitmap, GradientFromColor);  // 起點色（雙色漸層）
+                            // 先算好每一階的數值再逐列合成（起點色為雙色漸層）；底色圖用完就釋放
+                            Bitmap rendered = GradientRadial
+                                ? RenderRadialGradient(backBitmap, startColorValue, endColorValue, GradientStepCount, GradientCurve, GradientFromColor)
+                                : RenderGradient(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions, tabigReverse_chk.Checked, GradientCurve, GradientFromColor);
+                            backBitmap.Dispose();
+                            backBitmap = rendered;
                             if (AllLevelGradient && !GradientRadial)
                             {
                                 DrawGradientLabels(backBitmap, tabigHWay_rdo.Checked);
@@ -1939,7 +1937,11 @@ namespace Thunder
             _configUndo.Clear();  // 換了 config 檔，復原紀錄不再適用
             tabilPatternList_lst.Tag = source;  // 記錄 config 來源
             if (cfgFile_cmb != null) RefreshConfigFiles();  // 檔案下拉選單顯示目前來源
-            ValidateAllConfigLines();  // 先檢查每一行，有錯的標紅
+            // 載入時不逐行檢查（行數多時很花時間）：點選項目時才檢查並標紅，右鍵「檢查全部設定」可一次檢查
+            if (showimgPicture_pic != null) showimgPicture_pic.Image = null;
+            if (showimgSize_lbl != null) showimgSize_lbl.Text = "";
+            if (showimgConfig_lbl != null) ShowConfigNote(null);
+            ssrStatus_lbl.Text = $"Config：{source}（{tabilPatternList_lst.Items.Count} 行，點選時檢查格式；右鍵可檢查全部設定）";
         }  // 載入 config
         private void LoadDefaultConfig()
         {

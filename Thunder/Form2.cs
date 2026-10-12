@@ -217,6 +217,7 @@ namespace Thunder
                         break;
                     case Keys.Right:
                         //MessageBox.Show("Right 鍵被按下");
+                        using (mainWindow.MainDpiScope())  // 主視窗的操作要在主視窗的 DPI 模式下做，否則主視窗排版會亂
                         if (mainWindow.Instance != null)
                         {
                             TabControl tabControl = mainWindow.Instance.MainTabControl;
@@ -253,6 +254,7 @@ namespace Thunder
                         break;
                     case Keys.Left:
                         //MessageBox.Show("Left 鍵被按下");
+                        using (mainWindow.MainDpiScope())  // 主視窗的操作要在主視窗的 DPI 模式下做，否則主視窗排版會亂
                         if (mainWindow.Instance != null)
                         {
                             TabControl tabControl = mainWindow.Instance.MainTabControl;
@@ -386,13 +388,19 @@ namespace Thunder
                     case Keys.Add:      // 數字鍵盤 +
                     case Keys.Oemplus:  // 主鍵盤 =
                         // 切換螢幕（主視窗會依分頁重新產生圖片），並把全螢幕移到新螢幕
-                        mainWindow.Instance.SwitchScreen(+1);
-                        mainWindow.Instance.FullScreen(sender, e);
+                        using (mainWindow.MainDpiScope())
+                        {
+                            mainWindow.Instance.SwitchScreen(+1);
+                            mainWindow.Instance.FullScreen(sender, e);
+                        }
                         break;
                     case Keys.Subtract: // 數字鍵盤 -
                     case Keys.OemMinus: // 主鍵盤 -
-                        mainWindow.Instance.SwitchScreen(-1);
-                        mainWindow.Instance.FullScreen(sender, e);
+                        using (mainWindow.MainDpiScope())
+                        {
+                            mainWindow.Instance.SwitchScreen(-1);
+                            mainWindow.Instance.FullScreen(sender, e);
+                        }
                         break;
                 }
                
@@ -423,6 +431,11 @@ namespace Thunder
             }
         }    //獲取所有螢幕
         private void cmsScreenlist_cmb_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            using (mainWindow.MainDpiScope())
+                ScreenlistSelected(sender, e);
+        }
+        private void ScreenlistSelected(object sender, EventArgs e)
         {
             mainWindow.Instance.mnsScreenlist_cmb.SelectedText = cmsScreenlist.SelectedItem?.ToString();
             //// 獲取選擇的螢幕  
@@ -629,7 +642,7 @@ namespace Thunder
                 if (st == "KeyRight")
                 {
                     // 模擬按下向右鍵；隨機順序時改由主視窗挑下一張
-                    if (SlideRandom && mainWindow.Instance != null && mainWindow.Instance.ShowRandomSlide(this)) { }
+                    if (SlideRandom && mainWindow.Instance != null && ShowRandomSlideInMainDpi()) { }
                     else pictureWindow_KeyDown(this, new KeyEventArgs(Keys.Right));
                     if (t.Enabled && t.Interval != CurrentSlideInterval()) t.Interval = CurrentSlideInterval();  // 下一張有寫 @秒數s 時停留指定時間
                 }
@@ -1500,7 +1513,8 @@ namespace Thunder
         {
             if (!(picwinPicture_pic.Image is Image image) || mainWindow.Instance == null) return;
             int width = image.Width, height = image.Height;  // 舊圖等一下會釋放，先記下尺寸
-            Bitmap moved = mainWindow.Instance.MoveWindowPattern(x, y, width, height);
+            Bitmap moved;
+            using (mainWindow.MainDpiScope()) moved = mainWindow.Instance.MoveWindowPattern(x, y, width, height);
             Bitmap old = _bitmap;
             _bitmap = moved;
             picwinPicture_pic.Image = moved;

@@ -226,11 +226,16 @@ namespace Thunder
             picwinPicture_pic.Image = _blinkShowingAlternate ? _blinkImage : _bitmap;
         }  // 切換閃爍
         // 拖曳窗口時以滾輪調整大小------------------------------------------------------------------------------------------
+        private bool ShowRandomSlideInMainDpi()
+        {
+            using (mainWindow.MainDpiScope()) return mainWindow.Instance.ShowRandomSlide(this);
+        }
         private void ResizeWindowPatternBy(int percent)
         {
             if (!(picwinPicture_pic.Image is Image image) || mainWindow.Instance == null) return;
             int width = image.Width, height = image.Height;  // 舊圖等一下會釋放，先記下尺寸
-            Bitmap resized = mainWindow.Instance.ResizeWindowPattern(percent, width, height);
+            Bitmap resized;
+            using (mainWindow.MainDpiScope()) resized = mainWindow.Instance.ResizeWindowPattern(percent, width, height);
             if (resized == null) return;
             Bitmap old = _bitmap;
             _bitmap = resized;

@@ -147,7 +147,14 @@ namespace Thunder
             {
                 _movingConfigLine = false;
             }
-            ValidateAllConfigLines();  // 重新標示錯誤列，並預覽選取的項目
+            if (tabilPatternList_lst.SelectedItems.Count > 0)
+            {
+                // 預覽並檢查選取的項目（不逐行檢查整份清單）
+                ListViewItem item = tabilPatternList_lst.SelectedItems[0];
+                var errors = new List<string>();
+                bool ok = ApplyConfigLine(item.Tag.ToString(), errors);
+                MarkConfigItem(item, ok ? null : errors.FirstOrDefault() ?? "無法產生圖片");
+            }
             ssrStatus_lbl.Text = $"已復原（還可復原 {_configUndo.Count} 步）";
         }  // 復原上一步
     }

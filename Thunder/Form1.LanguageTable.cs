@@ -69,6 +69,7 @@ namespace Thunder
             ["作者：Ethan Huang"] = "Author: Ethan Huang",
             ["點擊開啟程式資料夾"] = "Click to open the program folder",
             ["顯示器"] = "Display",
+            ["拖曳中間的分隔線調整左右寬度"] = "Drag the divider to resize the two sides",
             ["主視窗"] = "Main window",
             ["全螢幕視窗"] = "Full-screen window",
             ["EDID 視窗"] = "EDID window",

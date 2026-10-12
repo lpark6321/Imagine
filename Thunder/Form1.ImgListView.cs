@@ -385,6 +385,7 @@ namespace Thunder
         private readonly Timer _thumbnailTimer = new Timer { Interval = 40 };
         private static readonly Size ThumbnailSize = new Size(128, 72);
         private bool _renderingThumbnail;  // 產生縮圖中（蒙太奇縮小邊框與標籤）
+        private string _lastThumbnailError;  // 上一張縮圖的錯誤（沒有錯誤為 null）
         private void InitThumbnails()
         {
             tabilPatternList_lst.LargeImageList = _thumbnails;
@@ -438,6 +439,7 @@ namespace Thunder
             bool savedNoteVisible = showimgConfig_lbl.Visible;
             Image savedPreview = showimgPicture_pic.Image;
             _renderingThumbnail = true;
+            _lastThumbnailError = null;
             try
             {
                 using (Graphics g = Graphics.FromImage(thumbnail))
@@ -447,7 +449,7 @@ namespace Thunder
                     if (type == "mask" || type == "usermask")
                     {
                         if (ApplyConfigLine(line, errors, parseOnly: true)) DrawMaskSchematic(g, size);
-                        else DrawThumbnailError(g, size);
+                        else { DrawThumbnailError(g, size); _lastThumbnailError = errors.FirstOrDefault() ?? "無法產生圖片"; }
                     }
                     else
                     {
@@ -456,7 +458,7 @@ namespace Thunder
                         mnsW_txt.Text = renderW.ToString();
                         mnsH_txt.Text = renderH.ToString();
                         Bitmap picture = ApplyConfigLine(line, errors) ? showimgPicture_pic.Image as Bitmap ?? mypicture.Getpicture() : null;
-                        if (picture == null) DrawThumbnailError(g, size);
+                        if (picture == null) { DrawThumbnailError(g, size); _lastThumbnailError = errors.FirstOrDefault() ?? "無法產生圖片"; }
                         else
                         {
                             g.InterpolationMode = small ? InterpolationMode.NearestNeighbor : InterpolationMode.HighQualityBicubic;
@@ -469,9 +471,10 @@ namespace Thunder
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 using (Graphics g = Graphics.FromImage(thumbnail)) DrawThumbnailError(g, size);
+                _lastThumbnailError = ex.Message;
             }
             finally
             {
@@ -576,9 +579,10 @@ namespace Thunder
                         thumbnail.Save(stream, ImageFormat.Png);
                         image = Convert.ToBase64String(stream.ToArray());
                     }
-                    // 錯誤沿用載入 / 編輯時的檢查結果（MarkConfigItem 的提示文字）
-                    bool ok = !item.ToolTipText.StartsWith("設定有誤");
-                    string note = (ConfigTypeNames.TryGetValue(type, out string typeName) ? typeName : type) + (dwell != null ? $"，幻燈片停留 {dwell / 1000.0:0.#} 秒" : "") + (ok ? "" : $"<br>{E(item.ToolTipText)}");
+                    // 錯誤取自產生縮圖時的檢查（載入時不再逐行檢查）
+                    bool ok = _lastThumbnailError == null;
+                    MarkConfigItem(item, _lastThumbnailError);
+                    string note = (ConfigTypeNames.TryGetValue(type, out string typeName) ? typeName : type) + (dwell != null ? $"，幻燈片停留 {dwell / 1000.0:0.#} 秒" : "") + (ok ? "" : $"<br>設定有誤：{E(_lastThumbnailError)}");
                     html.AppendLine($"<tr{(ok ? "" : " class=\"bad\"")}><td class=\"n\">{i + 1}</td><td><img src=\"data:image/png;base64,{image}\" width=\"192\" height=\"108\" alt=\"\"></td>" +
                         $"<td>{E(fields[0].Trim())}</td><td>{E(type)}</td><td>{E(fields.Length > 2 ? fields[2].Trim() : "")}</td><td>{E(string.Join(",", fields.Skip(3)).Trim())}{(dwell != null ? E($" @{dwell / 1000.0:0.#}s") : "")}</td><td>{(ok ? E(note) : note)}</td></tr>");
                     ssrProgressbar_prg.Value = i + 1;
