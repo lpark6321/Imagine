@@ -29,6 +29,18 @@ $target = Join-Path $repo ("Thunder\Thunder_v{0}{1}.exe" -f $version.FileMajorPa
 Copy-Item $output $target -Force
 Write-Host "完成：$target（版本 $($version.FileVersion)）" -ForegroundColor Green
 
+# 3.5 有程式碼簽章憑證時自動簽章（優先用 IT / 正式憑證，其次是測試用自簽憑證）
+$signing = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.NotAfter -gt (Get-Date) } |
+    Sort-Object { $_.Subject -like '*PatternMagic Test Signing*' } | Select-Object -First 1
+if ($signing) {
+    $result = Set-AuthenticodeSignature -FilePath $target -Certificate $signing -HashAlgorithm SHA256
+    $trusted = if ($result.Status -eq 'Valid') { '受信任' } else { '未受信任（自簽憑證在其他電腦上不被信任）' }
+    Write-Host "已簽章：$($signing.Subject)，$trusted"
+}
+else {
+    Write-Host '沒有程式碼簽章憑證，exe 未簽章' -ForegroundColor Yellow
+}
+
 # 4. 檢查是否為單一 exe（不應參考額外的 DLL）
 $assembly = [Reflection.Assembly]::ReflectionOnlyLoadFrom($target)
 $extra = $assembly.GetReferencedAssemblies() | Where-Object { $_.Name -notin 'mscorlib', 'System', 'System.Core', 'System.Drawing', 'System.Windows.Forms', 'System.Deployment', 'System.Data', 'System.Xml', 'System.Xml.Linq', 'Microsoft.CSharp', 'System.Net.Http', 'System.Data.DataSetExtensions' }

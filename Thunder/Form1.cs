@@ -46,6 +46,7 @@ namespace Thunder
             InitFrameTextMode();
             InitFrameRedBlue();
             InitGradientReverse();
+            InitGradientExtras();
             InitWindowDiagonal();
             InitWindowTabs();
             InitQuickButtons();
@@ -55,6 +56,14 @@ namespace Thunder
             InitMassTooltip();
             InitMaskZoom();
             InitImgListExport();
+            InitTestPatternPage();
+            InitDynamicBlur();
+            InitImageDiff();
+            InitImgListTools();
+            InitMaskTemplates();
+            InitMontage();
+            InitSubPixelOrder();
+            InitUserMaskControls();
             InitMultiScreen();
             //Mainwindow_Load(this, EventArgs.Empty);
             mypicture = new MyPicture(this);
@@ -128,9 +137,15 @@ namespace Thunder
 
             LoadDefaultConfig();  // 啟動時自動載入程式資料夾的 config.txt
             Screenlist(this, EventArgs.Empty);
-            if (mnsScreenlist_cmb.Items.Count > 1)
+            // 預設輸出到主螢幕以外的第一個螢幕（由左到右）；只有一個螢幕時用主螢幕
+            Screen second = OtherScreens().FirstOrDefault();
+            if (second != null && mnsScreenlist_cmb.Items.Contains(second.DeviceName))
             {
-                mnsScreenlist_cmb.SelectedIndex = 1;
+                mnsScreenlist_cmb.SelectedItem = second.DeviceName;
+            }
+            else if (mnsScreenlist_cmb.Items.Contains(Screen.PrimaryScreen.DeviceName))
+            {
+                mnsScreenlist_cmb.SelectedItem = Screen.PrimaryScreen.DeviceName;
             }
             else if (mnsScreenlist_cmb.Items.Count > 0)
             {
@@ -385,6 +400,7 @@ namespace Thunder
             tabimgeMask.Visible = false;
             tabimgeAdjust.Visible = false;
             tabimgeDynamic.Visible = false;
+            if (tabimgeTest != null) tabimgeTest.Visible = false;
 
             // 根據選擇的項目顯示對應的 GroupBox
             switch (tabimgeFuncList.Text)
@@ -417,6 +433,10 @@ namespace Thunder
                     tabimgeAdjust.Visible = true;
                     tabimgeAdjust.Dock = DockStyle.Fill;
                     break;
+                case "Testpattern":
+                    tabimgeTest.Visible = true;
+                    tabimgeTest.Dock = DockStyle.Fill;
+                    break;
                 case "Dynamic":
                     tabimgeDynamic.Visible = true;
                     tabimgeDynamic.Dock = DockStyle.Fill;
@@ -432,7 +452,7 @@ namespace Thunder
             _shownItem = null;  // 換分頁後空白鍵依新分頁重新產生
             if (tabControl.SelectedTab == tabDirList)
             {
-                ssrStatus_lbl.Text = Application.StartupPath;
+                ssrStatus_lbl.Text = _dirListFolder;
                 // 只在第一次切換時讀取資料夾，之後按「重新讀取」更新
                 if (!_dirListLoaded)
                 {
@@ -478,6 +498,9 @@ namespace Thunder
                     break;
                 case "ImageAdjust":
                     type = "adjust";
+                    break;
+                case "Testpattern":
+                    type = "test";
                     break;
                 case "Dynamic":
                     type = "dynamic";
@@ -570,7 +593,12 @@ namespace Thunder
                         if (tabiefText_chk.Checked && tabiefText_txt.Text.Trim() != "")
                         {
                             string tileText = tabiefText_txt.Text.Trim();
-                            using (Font tileFont = new Font("Microsoft JhengHei", (float)tabiefTextSize_nud.Value, FontStyle.Bold, GraphicsUnit.Pixel))
+                            if (tabiefTextBoom_chk.Checked)
+                            {
+                                DrawBoomText(g, tileText, tabiefTextColor_btn.BackColor, width, height, size => FrameTextFont(size, GraphicsUnit.Point, "Arial", FontStyle.Regular));  // 爆炸模式
+                            }
+                            else
+                            using (Font tileFont = FrameTextFont((float)tabiefTextSize_nud.Value, GraphicsUnit.Pixel, "Microsoft JhengHei", FontStyle.Bold))
                             {
                                 DrawTiledText(g, tileText.Length > 10 ? tileText.Substring(0, 10) : tileText, tileFont, tabiefTextColor_btn.BackColor,
                                     (float)tabiefTextCharGap_nud.Value, (float)tabiefTextLineGap_nud.Value, (float)tabiefTextStringGap_nud.Value, width, height);
@@ -656,6 +684,13 @@ namespace Thunder
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "gradient":
+                        if (AllLevelGrid)
+                        {
+                            // 全畫面格狀全階：每一階一格並標示階數
+                            CurrentBitmap = DrawAllLevels(width, height, int.Parse(tabigAll_cmb.Text));
+                            mypicture.Setpicture(CurrentBitmap);
+                            break;
+                        }
                         Bitmap backBitmap = new Bitmap(width, height);
                         int divisions = int.Parse(tabigDivid_cmb.Text); // 獲取畫面等分數  
                         int divisionSize = tabigHWay_rdo.Checked ? width / divisions : height / divisions; // 計算每個分區的寬度或高度
@@ -712,11 +747,15 @@ namespace Thunder
 
                         if (!tabigColorBar_rdo.Checked)
                         {
-                            int stepNum = Math.Min(int.Parse(tabigStep_cmb.Text), divisionSize); // 獲取漸層階數
+                            int stepNum = Math.Min(GradientStepCount, divisionSize); // 獲取漸層階數（依漸層條件的全階不超過漸層分幾階）
                             int startColorValue = int.Parse(tabigFirstLevel_cmb.Text); // 開始顏色值  
                             int endColorValue = int.Parse(tabigLastLevel_cmb.Text); // 結束顏色值  
                             backBitmap = ApplyTransparency(backBitmap, startColorValue, endColorValue, tabigHWay_rdo.Checked, stepNum, divisions, tabigReverse_chk.Checked);
                             backBitmap = ConvertARGBToRGB(backBitmap);
+                            if (AllLevelGradient)
+                            {
+                                DrawGradientLabels(backBitmap, tabigHWay_rdo.Checked);
+                            }
                         }
                         CurrentBitmap = backBitmap;
                         mypicture.Setpicture(CurrentBitmap);
@@ -870,6 +909,7 @@ namespace Thunder
                                 ((WindowOverlay)overlayItem.Tag).Draw(g, width, height);
                             }
                         }
+                        DrawMontage(g, width, height);  // 蒙太奇（config 也可指定，所以一律畫）
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "mask":
@@ -985,9 +1025,10 @@ namespace Thunder
                                                             int index = (y * stride) + (x * 4) + i * stride + j * 4;
 
                                                             // 設置像素顏色
-                                                            pixelBuffer[index] = panel3.BackColor.B;      // 藍色
-                                                            pixelBuffer[index + 1] = panel2.BackColor.G;  // 綠色
-                                                            pixelBuffer[index + 2] = panel1.BackColor.R;  // 紅色
+                                                            Color combinedColor = CombineSubPixels(panel1, panel2, panel3);  // 三格各自的色版合成一個像素（RGB / BGR 皆可）
+                                                            pixelBuffer[index] = combinedColor.B;      // 藍色
+                                                            pixelBuffer[index + 1] = combinedColor.G;  // 綠色
+                                                            pixelBuffer[index + 2] = combinedColor.R;  // 紅色
                                                             pixelBuffer[index + 3] = 255;  // 透明度不透明
                                                         }
                                                     }
@@ -1091,11 +1132,7 @@ namespace Thunder
                                                 if (panel1 != null && panel2 != null && panel3 != null)
                                                 {
                                                     // 根據 Panel 的背景顏色組合成 Color
-                                                    int subpixelr = panel1.BackColor.R;
-                                                    int subpixelg = panel2.BackColor.G;
-                                                    int subpixelb = panel3.BackColor.B;
-
-                                                    Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
+                                                    Color combinedColor = CombineSubPixels(panel1, panel2, panel3);  // 三格各自的色版合成一個像素（RGB / BGR 皆可）
 
                                                     // 解析 Panel 的座標 (Tag 格式為 "x,y")
                                                     string[] coordinates = panel1.Tag.ToString().Split(',');
@@ -1186,11 +1223,7 @@ namespace Thunder
                                             if (panel1 != null && panel2 != null && panel3 != null)
                                             {
                                                 // 根據 Panel 的背景顏色組合成 Color  
-                                                int subpixelr = panel1.BackColor.R;
-                                                int subpixelg = panel2.BackColor.G;
-                                                int subpixelb = panel3.BackColor.B;
-
-                                                Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
+                                                Color combinedColor = CombineSubPixels(panel1, panel2, panel3);  // 三格各自的色版合成一個像素（RGB / BGR 皆可）
 
                                                 // 解析 Panel 的座標 (Tag 格式為 "x,y")  
                                                 string[] coordinates = panel1.Tag.ToString().Split(',');
@@ -1214,6 +1247,10 @@ namespace Thunder
                                 }
                             }
                         }  // Setpixel方法
+                        mypicture.Setpicture(CurrentBitmap);
+                        break;
+                    case "test":
+                        DrawTestPattern(g, width, height);  // Gamma / 黑位白位 / 邊緣刻度
                         mypicture.Setpicture(CurrentBitmap);
                         break;
                     case "adjust":
@@ -1587,7 +1624,7 @@ namespace Thunder
         {
             try
             {
-                Process.Start("explorer.exe", $"\"{Application.StartupPath}\"");
+                Process.Start("explorer.exe", $"\"{(tabControl.SelectedTab == tabDirList ? _dirListFolder : Application.StartupPath)}\"");  // DirList 開圖片資料夾，其他開程式資料夾
             }
             catch (Exception ex)
             {
@@ -1615,8 +1652,8 @@ namespace Thunder
             tabdlPatternList_lvw.Groups.Add(pngGroup);
             tabdlPatternList_lvw.Groups.Add(bmpGroup);
 
-            // 獲取程式所在的資料夾
-            string folderPath = Application.StartupPath;
+            // DirList 讀取的資料夾（預設程式資料夾，可用「選擇資料夾」更換）
+            string folderPath = _dirListFolder;
 
             // 獲取資料夾中的所有 JPG、PNG 和 BMP 檔案
             string[] imageFiles = Directory.GetFiles(folderPath, "*.*")
@@ -1726,7 +1763,13 @@ namespace Thunder
                 else if (caption == "") MessageBox.Show(message);
                 else MessageBox.Show(message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            string[] patternVar = line.Split(',');
+            RefreshUserMasks();  // 自訂 mask 名稱依 ImgList 目前內容
+            string[] patternVar = StripDwell(line, out int? dwell).Split(',');  // 結尾的 @秒數s 是幻燈片停留時間，不屬於各類型的選項
+            if (dwell != null && (dwell < MinDwell || dwell > MaxDwell))
+            {
+                Report($"「{patternVar[0].Trim()}」的停留時間需為 0.1~3600 秒，例：@5s", "Config 錯誤");
+                return false;
+            }
             if (patternVar.Length < 4)
             {
                 // 選項欄可省略
@@ -1765,14 +1808,31 @@ namespace Thunder
                         tabimgeFuncList.SelectedIndex = 4;
                         funcMask(trimlower(patternVar[2]), trimlower(patternVar[3]));
                         break;
+                    case "usermask":
+                        // 自訂 mask：檢查名稱與格式，畫面與 Mask 相同
+                        CheckUserMaskLine(patternVar[0], patternVar[2], patternVar[3]);
+                        tabimgeFuncList.SelectedIndex = 4;
+                        funcMask(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        break;
                     case "dynamic":
                         tabimgeFuncList.SelectedIndex = tabimgeFuncList.Items.IndexOf("Dynamic");
                         funcDynamic(trimlower(patternVar[2]), trimlower(patternVar[3]));
+                        break;
+                    case "test":
+                        tabimgeFuncList.SelectedIndex = tabimgeFuncList.Items.IndexOf("Testpattern");
+                        funcTest(trimlower(patternVar[2]));
                         break;
                     case "text":
                         tabimgeFuncList.SelectedIndex = 0;  // 文字模式屬於 Frame
                         funcText(trimlower(patternVar[2]), patternVar[3].Trim());  // 文字保留大小寫
                         break;
+                    case "image":
+                        // 圖檔：直接讀檔縮放到目前寬高，不經過 ImgEditor
+                        if (!LoadConfigImage(patternVar[2].Trim(), trimlower(patternVar[3]), width, height, parseOnly)) return true;  // 只檢查格式
+                        showimgPicture_pic.Image = mypicture.Getpicture();
+                        showimgPicture_pic.SizeMode = PictureBoxSizeMode.Zoom;
+                        ShowPreviewInfo(width, height, line);
+                        return true;
                     default:
                         Report($"「{patternVar[0].Trim()}」的類型「{patternVar[1].Trim()}」不支援！");
                         return false;
@@ -1782,7 +1842,7 @@ namespace Thunder
                 _generatingFromConfig = true;  // Dynamic 只預覽（空白鍵 / Esc 全螢幕時才播放）；Window 不疊加 ImgEditor 的清單
                 try
                 {
-                    GenerateImage(type == "text" ? "solid" : type, width, height, tag); // 重新生成圖片（Text 由 Frame 產生）
+                    GenerateImage(type == "text" ? "solid" : type == "usermask" ? "mask" : type, width, height, tag); // 重新生成圖片（Text 由 Frame 產生、自訂 mask 由 Mask 產生）
                 }
                 finally
                 {
@@ -1847,6 +1907,7 @@ namespace Thunder
         private void LoadConfig(string configText, string source)
         {
             PopulateListBox(configText);
+            _configUndo.Clear();  // 換了 config 檔，復原紀錄不再適用
             tabilPatternList_lst.Tag = source;  // 記錄 config 來源
             if (cfgFile_cmb != null) RefreshConfigFiles();  // 檔案下拉選單顯示目前來源
             ValidateAllConfigLines();  // 先檢查每一行，有錯的標紅
@@ -1916,6 +1977,13 @@ namespace Thunder
         private void mainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             //MessageBox.Show($"按下了其他鍵：{e.KeyCode}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // ImgList 分頁 Ctrl+Z 復原清單變更（文字框裡的 Ctrl+Z 維持原本的復原文字）
+            if (e.Control && e.KeyCode == Keys.Z && tabControl.SelectedTab == tabImgList && !IsTextInputFocused())
+            {
+                UndoConfigEdit();
+                e.Handled = e.SuppressKeyPress = true;
+                return;
+            }
             // 判斷是否按下鍵
             switch (e.KeyCode)
             {
@@ -1959,6 +2027,10 @@ namespace Thunder
                 case Keys.F7:
                     tabControl.SelectedTab = tabImgEditor; // 切換到第一個 Tab 頁面
                     tabimgeFuncList.SelectedIndex = 6; // 選擇第7個功能
+                    break;
+                case Keys.F8:
+                    tabControl.SelectedTab = tabImgEditor;
+                    tabimgeFuncList.SelectedItem = "Testpattern";  // 第 8 個功能
                     break;
                 case Keys.F11:
                     tabControl.SelectedTab = tabDirList; // 切換到第二個 Tab 頁面
@@ -2045,6 +2117,7 @@ namespace Thunder
         }  // pictureBox拖放後執行
         private void tabilPatternList_lst_DragDrop(object sender, DragEventArgs e)
         {
+            if (DropConfigItem(e)) return;  // 清單內拖拉排序
             // 獲取拖入的檔案  
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files.Length > 0)
@@ -2071,6 +2144,11 @@ namespace Thunder
         }  // tabilPatternList_lst拖放後執行
         private void tabilPatternList_lst_DragEnter(object sender, DragEventArgs e)
         {
+            if (e.Data.GetDataPresent(typeof(ListViewItem)))
+            {
+                e.Effect = DragDropEffects.Move;  // 清單內拖拉排序
+                return;
+            }
             // 檢查檔案是否為支援的 config.txt  
             bool IsSupportedFile(string filePath)
             {

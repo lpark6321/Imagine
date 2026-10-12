@@ -28,7 +28,7 @@ namespace Thunder
             // 將 targetButton 修改為事件的觸發按鈕  
             if (sender is Button targetButton)
             {
-                using (ColorDialog colorDialog = new ColorDialog())
+                using (ColorDialog colorDialog = new PatternColorDialog())
                 {
                     colorDialog.FullOpen = true; // 顯示進階選項  
                                                  // 顯示顏色選擇對話框  
@@ -503,6 +503,11 @@ namespace Thunder
         }  // Grad ColorBar 標準四色/八色
         private async void tabieaTrans_btn_Click(object sender, EventArgs e)
         {
+            if (tabieaDiff_rdo.Checked)
+            {
+                RunImageDiff();  // 差異比對：勾選的兩張圖
+                return;
+            }
             ssrProgressbar_prg.Visible = true;
             ssrProgressbar_prg.Maximum = tabieaPatternList_chl.CheckedItems.Count;
             ssrProgressbar_prg.Value = 0; // 初始化進度條值
@@ -773,7 +778,7 @@ namespace Thunder
                 {
                     if (tabiwBackColor_rdo.Checked)
                     {
-                        using (ColorDialog colorDialog = new ColorDialog())
+                        using (ColorDialog colorDialog = new PatternColorDialog())
                         {
                             colorDialog.FullOpen = true; // 顯示進階選項  
                                                          // 顯示顏色選擇對話框  
@@ -806,7 +811,7 @@ namespace Thunder
                 {
                     if (tabiwWinColor_rdo.Checked)
                     {
-                        using (ColorDialog colorDialog = new ColorDialog())
+                        using (ColorDialog colorDialog = new PatternColorDialog())
                         {
                             colorDialog.FullOpen = true; // 顯示進階選項  
                                                          // 顯示顏色選擇對話框  
@@ -840,7 +845,7 @@ namespace Thunder
             {
                 if (targetRadio.Name.Contains("Color_rdo"))
                 {
-                    using (ColorDialog colorDialog = new ColorDialog())
+                    using (ColorDialog colorDialog = new PatternColorDialog())
                     {
                         colorDialog.FullOpen = true; // 顯示進階選項  
                                                      // 顯示顏色選擇對話框  
@@ -1049,7 +1054,7 @@ namespace Thunder
                             {
                                 Size = new Size(blockWidth, blockHeight),
                                 Location = new Point(x * blockWidth, y * blockHeight),
-                                BackColor = x % 3 == 0 ? Color.FromArgb(255 - brightnessvsc.Value, 0, 0) : x % 3 == 1 ? Color.FromArgb(0, 255 - brightnessvsc.Value, 0) : Color.FromArgb(0, 0, 255 - brightnessvsc.Value),
+                                BackColor = SubPixelColumnColor(x, 255 - brightnessvsc.Value),
                                 BorderStyle = BorderStyle.FixedSingle,
                                 Tag = $"{x},{y}" // 儲存區塊的座標
                             };
@@ -1060,7 +1065,7 @@ namespace Thunder
                                 if (args.Button == MouseButtons.Right)
                                 {
                                     int locx = int.Parse(block.Tag.ToString().Split(',')[0]);
-                                    block.BackColor = locx % 3 == 0 ? Color.FromArgb(255 - brightnessvsc.Value, 0, 0) : locx % 3 == 1 ? Color.FromArgb(0, 255 - brightnessvsc.Value, 0) : Color.FromArgb(0, 0, 255 - brightnessvsc.Value);
+                                    block.BackColor = SubPixelColumnColor(locx, 255 - brightnessvsc.Value);
                                 }
                                 else if (args.Button == MouseButtons.Left)
                                 {
@@ -1121,7 +1126,7 @@ namespace Thunder
                         if (control is Panel panel && panel.BackColor != Color.Black)
                         {
                             int x = int.Parse(panel.Tag.ToString().Split(',')[0]);
-                            panel.BackColor = x % 3 == 0 ? Color.FromArgb(255 - targetvsc.Value, 0, 0) : x % 3 == 1 ? Color.FromArgb(0, 255 - targetvsc.Value, 0) : Color.FromArgb(0, 0, 255 - targetvsc.Value);
+                            panel.BackColor = SubPixelColumnColor(x, 255 - targetvsc.Value);
                         }
                     }
                 }
@@ -1284,9 +1289,10 @@ namespace Thunder
                                                     int index = (y * stride) + (x * 4) + i * stride + j * 4;
 
                                                     // 設置像素顏色
-                                                    pixelBuffer[index] = panel3.BackColor.B;      // 藍色
-                                                    pixelBuffer[index + 1] = panel2.BackColor.G;  // 綠色
-                                                    pixelBuffer[index + 2] = panel1.BackColor.R;  // 紅色
+                                                    Color combinedColor = CombineSubPixels(panel1, panel2, panel3);  // 三格各自的色版合成一個像素（RGB / BGR 皆可）
+                                                    pixelBuffer[index] = combinedColor.B;      // 藍色
+                                                    pixelBuffer[index + 1] = combinedColor.G;  // 綠色
+                                                    pixelBuffer[index + 2] = combinedColor.R;  // 紅色
                                                     pixelBuffer[index + 3] = 255;  // 透明度不透明
                                                 }
                                             }
@@ -1349,11 +1355,7 @@ namespace Thunder
                                         if (panel1 != null && panel2 != null && panel3 != null)
                                         {
                                             // 根據 Panel 的背景顏色組合成 Color  
-                                            int subpixelr = panel1.BackColor.R;
-                                            int subpixelg = panel2.BackColor.G;
-                                            int subpixelb = panel3.BackColor.B;
-
-                                            Color combinedColor = Color.FromArgb(subpixelr, subpixelg, subpixelb);
+                                            Color combinedColor = CombineSubPixels(panel1, panel2, panel3);  // 三格各自的色版合成一個像素（RGB / BGR 皆可）
 
                                             // 解析 Panel 的座標 (Tag 格式為 "x,y")  
                                             string[] coordinates = panel1.Tag.ToString().Split(',');
@@ -1495,6 +1497,10 @@ namespace Thunder
                 {
                     g.FillRectangle(brush, mypicture.startX, mypicture.startY, mypicture.objectSize * 2, mypicture.objectSize * 2);
                 }
+                else if (tabiedObjectBlur_rdo != null && tabiedObjectBlur_rdo.Checked)
+                {
+                    DrawBlurBar(g, brush, width, height);  // 模糊測試條
+                }
                 else if (tabiedObjectStrip_rdo.Checked)
                 {
                     if (tabiedMoveH_rdo.Checked)
@@ -1524,7 +1530,7 @@ namespace Thunder
             {
                 direction = "b";
             }
-            mypicture.Move(direction, tabiedObjectStrip_rdo.Checked);
+            mypicture.Move(direction, DynamicIsLine);  // 長條與模糊條在邊緣反彈的方式相同;
 
             Bitmap bitmap;
             if (timerDynamic.Tag != null && timerDynamic.Tag.ToString() == "openpic")

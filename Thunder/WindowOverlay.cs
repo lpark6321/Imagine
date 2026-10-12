@@ -79,7 +79,7 @@ namespace Thunder
             kind_cmb.SelectedIndexChanged += (s, e) => UpdateFields();
             color_btn.Click += (s, e) =>
             {
-                using (ColorDialog dialog = new ColorDialog { Color = color_btn.BackColor, FullOpen = true })
+                using (ColorDialog dialog = new PatternColorDialog())
                 {
                     if (dialog.ShowDialog(this) == DialogResult.OK) color_btn.BackColor = dialog.Color;
                 }

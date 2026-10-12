@@ -226,12 +226,40 @@ namespace Thunder
         }  // 全螢幕資訊列的位置文字
         private void InitDirListReload()
         {
-            var reload = new Button { Text = "重新讀取", AutoSize = true, Dock = DockStyle.Top };
-            reload.Click += (s, e) => { PopulateListView(); ssrStatus_lbl.Text = $"已重新讀取：{Application.StartupPath}"; };
-            toolTip.SetToolTip(reload, "重新掃描程式資料夾的圖檔（新增 / 刪除檔案後使用）");
-            tabDirList.Controls.Add(reload);
+            // 上方一列：重新讀取、選擇資料夾、目前資料夾路徑
+            var bar = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, WrapContents = false };
+            var reload = new Button { Text = "重新讀取", AutoSize = true };
+            reload.Click += (s, e) => { PopulateListView(); ssrStatus_lbl.Text = $"已重新讀取：{_dirListFolder}"; };
+            toolTip.SetToolTip(reload, "重新掃描目前資料夾的圖檔（新增 / 刪除檔案後使用）");
+            var choose = new Button { Text = "選擇資料夾...", AutoSize = true };
+            choose.Click += (s, e) => ChooseDirListFolder();
+            toolTip.SetToolTip(choose, "讀取其他資料夾的圖片（不必把程式放到圖片所在的資料夾）");
+            dirListFolder_lbl = new Label { AutoSize = true, Margin = new Padding(6, 8, 3, 0), UseMnemonic = false };
+            bar.Controls.AddRange(new Control[] { reload, choose, dirListFolder_lbl });
+            tabDirList.Controls.Add(bar);
             tabdlPatternList_lvw.BringToFront();  // 清單最後 Dock，填滿按鈕以外的空間
-        }  // DirList 重新讀取按鈕
+            ShowDirListFolder();
+        }  // DirList 重新讀取與選擇資料夾
+        private string _dirListFolder = Application.StartupPath;  // DirList 讀取的資料夾（預設為程式資料夾）
+        private Label dirListFolder_lbl;
+        private void ChooseDirListFolder()
+        {
+            using (var dialog = new FolderBrowserDialog { Description = "選擇要讀取圖片的資料夾", SelectedPath = _dirListFolder })
+            {
+                if (dialog.ShowDialog(this) != DialogResult.OK) return;
+                _dirListFolder = dialog.SelectedPath;
+            }
+            _dirListLoaded = true;
+            ShowDirListFolder();
+            PopulateListView();
+            ssrStatus_lbl.Text = $"已讀取：{_dirListFolder}（{tabdlPatternList_lvw.Items.Count} 張）";
+        }  // 選擇 DirList 資料夾
+        private void ShowDirListFolder()
+        {
+            dirListFolder_lbl.Text = string.Equals(_dirListFolder.TrimEnd('\\'), Application.StartupPath.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)
+                ? $"程式資料夾：{_dirListFolder}" : _dirListFolder;
+            toolTip.SetToolTip(dirListFolder_lbl, _dirListFolder);
+        }  // 顯示目前資料夾
         private void InitImgListExport()
         {
             var export = new ToolStripMenuItem("全部匯出成 PNG...", null, (s, e) => ExportImgList());

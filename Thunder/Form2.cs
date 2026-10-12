@@ -22,7 +22,11 @@ namespace Thunder
             InitLens();
             InitAutoHideCursor();
             InitGrayScanMenu();
+            InitDragWindow();
             picwinPicture_pic.PaintScreenOverlay += picwinPicture_PaintInfo;  // I 鍵資訊列
+            picwinPicture_pic.PaintOverlay += picwinPicture_PaintGrid;        // G 鍵格線（圖片座標）
+            picwinPicture_pic.PaintScreenOverlay += picwinPicture_PaintGridLabels;
+            FormClosed += (s, e) => { _previousBitmap?.Dispose(); _previousBitmap = null; };
             MouseWheel += pictureWindow_MouseWheel;  // PictureBox 不會取得焦點，滾輪事件由視窗接收
             //_bitmap = bitMap; // 將接收到的 Bitmap 儲存到類別屬性中
             //this.Paint += Form2_show; // 綁定 Paint 事件  
@@ -40,11 +44,8 @@ namespace Thunder
         }
         public void setBitmap(Bitmap bitmap)
         {
-            if (_bitmap != null)
-            {
-                _bitmap.Dispose();
-                _bitmap = null;
-            }
+            KeepAsPrevious();  // 換圖前的那張留給 B 鍵比對
+            _inverted = false;
             _bitmap = (Bitmap)bitmap.Clone();
             picwinPicture_pic.Image = _bitmap;
 
@@ -52,7 +53,7 @@ namespace Thunder
         //pictureWindow操控--------------------------------------------------------------------------------------------
         private void pictureWindow_DoubleClick(object sender, EventArgs e)
         {
-            if (sender is PictureBox && (_drawTool != DrawTool.None || _pickerOn))
+            if (sender is PictureBox && (_drawTool != DrawTool.None || _pickerOn || _dragWindowMode))
             {
                 return;  // 畫圖或吸管時雙擊不切換全螢幕
             }
@@ -153,6 +154,11 @@ namespace Thunder
             {
                 ToggleGrayScan();  // Alt+R 自動掃灰階
                 e.SuppressKeyPress = true;
+                return;
+            }
+            if (_dragWindowMode && (e.KeyCode == Keys.Left || e.KeyCode == Keys.Right || e.KeyCode == Keys.Up || e.KeyCode == Keys.Down))
+            {
+                NudgeWindowPattern(e);  // 拖曳窗口模式：方向鍵移動窗口（Shift 一次 10px）
                 return;
             }
             if (HandleLevelInput(e))
@@ -272,6 +278,24 @@ namespace Thunder
                     case Keys.I:
                         ToggleInfo();
                         break;
+                    case Keys.D1:
+                    case Keys.D2:
+                    case Keys.D3:
+                    case Keys.D4:
+                        SetChannel(e.KeyCode - Keys.D0);  // 1 R、2 G、3 B、4 灰階
+                        break;
+                    case Keys.B:
+                        ToggleCompare();
+                        break;
+                    case Keys.G:
+                        ToggleGrid();
+                        break;
+                    case Keys.Q:
+                        SetDragWindowMode(!_dragWindowMode);  // 拖曳窗口
+                        break;
+                    case Keys.N:
+                        ToggleInvert();  // 反相（負片）
+                        break;
                     case Keys.R:
                         // 每 1 秒幻燈片：播放中按 R 停止
                         _scanTimer?.Stop();  // 不和自動掃灰階同時跑
@@ -284,9 +308,10 @@ namespace Thunder
                         // 幻燈片播放中：T 間隔加 1 秒、E 減 1 秒（最少 1 秒）
                         if (timerSlideshow.Enabled)
                         {
-                            int interval = timerSlideshow.Interval + (e.KeyCode == Keys.T ? 1000 : -1000);
-                            timerSlideshow.Interval = Math.Max(Math.Min(1000, timerSlideshow.Interval), interval);
-                            FlashCaption($"幻燈片 每 {timerSlideshow.Interval / 1000.0:0.#} 秒");
+                            int interval = _slideInterval + (e.KeyCode == Keys.T ? 1000 : -1000);
+                            _slideInterval = Math.Max(Math.Min(1000, _slideInterval), interval);
+                            if (timerSlideshow.Interval != CurrentSlideInterval()) timerSlideshow.Interval = CurrentSlideInterval();  // 這張有自己的停留時間時不變
+                            FlashCaption($"幻燈片 每 {_slideInterval / 1000.0:0.#} 秒");
                         }
                         break;
                     case Keys.Up:
@@ -450,12 +475,15 @@ namespace Thunder
                         return;
                     }
                     // 開始幻燈片放映
-                    timerSlideshow.Interval = interval;
+                    _slideInterval = interval;
+                    timerSlideshow.Interval = CurrentSlideInterval();
                     timerSlideshow.Tag = "KeyRight";
                     timerSlideshow.Start();
                 }
             }
         }  //開始幻燈片放映
+        private int _slideInterval = 1000;  // 全域間隔（毫秒）；ImgList 那行有寫 @秒數s 時改用那行的停留時間
+        private int CurrentSlideInterval() => mainWindow.Instance?.SelectedSlideDwell() ?? _slideInterval;  // 目前這張要停留多久
         //左上角圖片名稱------------------------------------------------------------------------------------------
         private static readonly Font CaptionFont = new Font("Microsoft JhengHei", 36F, FontStyle.Bold);
         private static readonly Rectangle CaptionTriggerArea = new Rectangle(0, 0, 200, 100);  // 滑鼠在此範圍內才顯示
@@ -560,6 +588,7 @@ namespace Thunder
                     // 模擬按下向右鍵  
                     // With the corrected line:  
                     pictureWindow_KeyDown(this, new KeyEventArgs(Keys.Right));
+                    if (t.Enabled && t.Interval != CurrentSlideInterval()) t.Interval = CurrentSlideInterval();  // 下一張有寫 @秒數s 時停留指定時間
                 }
             }
         } //定時器事件
@@ -573,6 +602,7 @@ namespace Thunder
 
             if (picwinPicture_pic.Image != null)
             {
+                if (ReferenceEquals(picwinPicture_pic.Image, _bitmap)) _bitmap = null;  // 已釋放，不能再留給 B 鍵比對
                 picwinPicture_pic.Image.Dispose(); // 釋放舊的圖片資源
             }
 
@@ -1095,7 +1125,7 @@ namespace Thunder
                 g.Clear(color);
             }
             picwinPicture_pic.Image = solid;
-            if (_bitmap != null) _bitmap.Dispose();
+            KeepAsPrevious();  // 調整前的那張留給 B 鍵比對
             _bitmap = solid;
             _solidChecked = solid;  // 新圖仍是純色，保留色版設定
             bool gray = _solidChannels.All(on => on);
@@ -1111,7 +1141,9 @@ namespace Thunder
             // 數字鍵輸入階數、Enter 套用、Backspace 刪一碼、Esc 取消；3 秒沒輸入自動清除
             if ((DateTime.Now - _levelInputTime).TotalSeconds > 3) _levelInput = "";
             int digit = DigitOf(e.KeyCode);
-            if (digit >= 0 && !e.Alt && !e.Control)
+            bool numPad = e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9;
+            // 數字鍵盤開始輸入階數；主鍵盤數字只在輸入中接續（沒在輸入時 1~4 用來切換色版）
+            if (digit >= 0 && !e.Alt && !e.Control && (numPad || _levelInput != ""))
             {
                 _levelInput = _levelInput.Length >= 3 ? digit.ToString() : _levelInput + digit;
             }
@@ -1266,6 +1298,212 @@ namespace Thunder
                 y += sizes[i].Height;
             }
         }  //畫資訊列
+        //色版切換------------------------------------------------------------------------------------------------------
+        private void SetChannel(int key)
+        {
+            // 1 R、2 G、3 B、4 灰階（三色一起），之後 ↑↓、輸入階數、Alt+R 都作用在選的色版
+            if (!PrepareSolid(false))
+            {
+                FlashCaption("不是純色圖，無法切換色版");
+                return;
+            }
+            _solidChannels = key == 4 ? new[] { true, true, true } : new[] { key == 1, key == 2, key == 3 };
+            SetSolidLevel(_solidLevel);
+        }  //切換色版
+        //A/B 比對-------------------------------------------------------------------------------------------------------
+        private Bitmap _previousBitmap;  // 上一張（換圖或調整階數前）
+        private string _previousCaption;
+        private void KeepAsPrevious()
+        {
+            // 目前這張移到「上一張」，原本的上一張釋放
+            if (_bitmap == null) return;
+            if (_previousBitmap != null && !ReferenceEquals(_previousBitmap, picwinPicture_pic.Image)) _previousBitmap.Dispose();
+            _previousBitmap = _bitmap;
+            _previousCaption = _caption;
+            _bitmap = null;
+        }  //保留上一張
+        private void ToggleCompare()
+        {
+            // B：目前這張與上一張互換，再按一次換回來
+            if (_previousBitmap == null || _bitmap == null)
+            {
+                FlashCaption("沒有上一張可以比對");
+                return;
+            }
+            Bitmap current = _bitmap;
+            string currentCaption = _caption;
+            _bitmap = _previousBitmap;
+            _caption = _previousCaption;  // 名稱跟著圖走（不經過 Caption 屬性，避免再閃一次名稱）
+            _previousBitmap = current;
+            _previousCaption = currentCaption;
+            picwinPicture_pic.Image = _bitmap;
+            FlashCaption($"B 比對：{PreviousLabel(_bitmap)}");
+        }  //A/B 比對
+        private string PreviousLabel(Bitmap bitmap)
+        {
+            // 比對時顯示這張是什麼：純色顯示階數，其他顯示名稱
+            if (IsUniform(bitmap, out Color c))
+            {
+                return c.R == c.G && c.G == c.B ? $"灰階 {c.R}" : $"R{c.R} G{c.G} B{c.B}";
+            }
+            return _caption ?? "上一張";
+        }  //比對名稱
+        //拖曳窗口----------------------------------------------------------------------------------------------------
+        private bool _dragWindowMode;    // Q：滑鼠拖曳 / 方向鍵移動 Window 的窗口
+        private bool _draggingWindow;
+        private Point _dragOffset;       // 按下時滑鼠相對窗口左上角的位置
+        private readonly System.Diagnostics.Stopwatch _dragThrottle = System.Diagnostics.Stopwatch.StartNew();
+        private ToolStripMenuItem cmsDragWindow;
+        private void InitDragWindow()
+        {
+            cmsDragWindow = new ToolStripMenuItem("拖曳窗口（Window 圖樣）", null, (s, e) => SetDragWindowMode(!_dragWindowMode)) { ShortcutKeyDisplayString = "Q" };
+            contextMenuStrip.Items.Insert(contextMenuStrip.Items.IndexOf(cmsPicker) + 1, cmsDragWindow);
+            picwinPicture_pic.MouseDown += (s, e) =>
+            {
+                if (!_dragWindowMode || e.Button != MouseButtons.Left || !(picwinPicture_pic.Image is Image image)) return;
+                Point? point = picwinPicture_pic.ToImagePoint(e.Location);
+                if (!point.HasValue) return;
+                Rectangle window = mainWindow.Instance.WindowPatternBounds(image.Width, image.Height);
+                // 點在窗口內就照原本的相對位置拖；點在外面就把窗口中心移到滑鼠位置
+                _dragOffset = window.Contains(point.Value)
+                    ? new Point(point.Value.X - window.X, point.Value.Y - window.Y)
+                    : new Point(window.Width / 2, window.Height / 2);
+                _draggingWindow = true;
+                MoveWindowPatternTo(point.Value.X - _dragOffset.X, point.Value.Y - _dragOffset.Y);
+            };
+            picwinPicture_pic.MouseMove += (s, e) =>
+            {
+                if (!_draggingWindow || _dragThrottle.ElapsedMilliseconds < 30) return;  // 最多每 30ms 重新產生一次
+                Point? point = picwinPicture_pic.ToImagePoint(e.Location);
+                if (point.HasValue) MoveWindowPatternTo(point.Value.X - _dragOffset.X, point.Value.Y - _dragOffset.Y);
+            };
+            picwinPicture_pic.MouseUp += (s, e) =>
+            {
+                if (!_draggingWindow) return;
+                _draggingWindow = false;
+                Point? point = picwinPicture_pic.ToImagePoint(e.Location);
+                if (point.HasValue) MoveWindowPatternTo(point.Value.X - _dragOffset.X, point.Value.Y - _dragOffset.Y);
+            };
+            contextMenuStrip.Opening += (s, e) => cmsDragWindow.Checked = _dragWindowMode;
+        }  //建立拖曳窗口
+        private void SetDragWindowMode(bool on)
+        {
+            if (on && (mainWindow.Instance == null || !mainWindow.Instance.CanDragWindowPattern))
+            {
+                FlashCaption("目前不是可移動的 Window 圖樣（斜角、兩組窗口不能移動）", 2000);
+                return;
+            }
+            if (on)
+            {
+                // 拖曳與畫圖、吸管都用左鍵，只能擇一
+                if (_drawTool != DrawTool.None) { _drawTool = DrawTool.None; UpdateDrawMenu(); }
+                if (_pickerOn) SetPicker(false);
+            }
+            _dragWindowMode = on;
+            Cursor = on ? Cursors.SizeAll : (_drawTool != DrawTool.None || _pickerOn || cmsShowLoc.ForeColor == Color.Red ? Cursors.Cross : Cursors.Hand);
+            FlashCaption(on ? "拖曳窗口：滑鼠拖曳，方向鍵移動 1px（Shift 10px），Q 結束" : "結束拖曳窗口", on ? 2500 : 1000);
+        }  //開關拖曳窗口
+        private void NudgeWindowPattern(KeyEventArgs e)
+        {
+            if (!(picwinPicture_pic.Image is Image image)) return;
+            int step = e.Shift ? 10 : 1;
+            Rectangle window = mainWindow.Instance.WindowPatternBounds(image.Width, image.Height);
+            int dx = e.KeyCode == Keys.Left ? -step : e.KeyCode == Keys.Right ? step : 0;
+            int dy = e.KeyCode == Keys.Up ? -step : e.KeyCode == Keys.Down ? step : 0;
+            MoveWindowPatternTo(window.X + dx, window.Y + dy);
+        }  //方向鍵移動窗口
+        private void MoveWindowPatternTo(int x, int y)
+        {
+            if (!(picwinPicture_pic.Image is Image image) || mainWindow.Instance == null) return;
+            int width = image.Width, height = image.Height;  // 舊圖等一下會釋放，先記下尺寸
+            Bitmap moved = mainWindow.Instance.MoveWindowPattern(x, y, width, height);
+            Bitmap old = _bitmap;
+            _bitmap = moved;
+            picwinPicture_pic.Image = moved;
+            old?.Dispose();
+            _dragThrottle.Restart();
+            Rectangle window = mainWindow.Instance.WindowPatternBounds(width, height);
+            FlashCaption($"窗口 X {window.X}, Y {window.Y}（{window.Width} x {window.Height}）", 1500);
+        }  //移動窗口並更新畫面
+        //反相------------------------------------------------------------------------------------------------------
+        private bool _inverted;  // 目前畫面是否為反相（換圖後重設）
+        private void ToggleInvert()
+        {
+            // N：RGB 全部反轉（負片），再按一次反轉回來
+            if (!(picwinPicture_pic.Image is Bitmap source)) return;
+            var result = new Bitmap(source.Width, source.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var rect = new Rectangle(0, 0, source.Width, source.Height);
+            var from = source.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var to = result.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            try
+            {
+                int[] row = new int[source.Width];
+                for (int y = 0; y < source.Height; y++)
+                {
+                    System.Runtime.InteropServices.Marshal.Copy(from.Scan0 + y * from.Stride, row, 0, row.Length);
+                    for (int x = 0; x < row.Length; x++) row[x] ^= 0x00FFFFFF;  // 保留透明度，RGB 反轉
+                    System.Runtime.InteropServices.Marshal.Copy(row, 0, to.Scan0 + y * to.Stride, row.Length);
+                }
+            }
+            finally
+            {
+                source.UnlockBits(from);
+                result.UnlockBits(to);
+            }
+            picwinPicture_pic.Image = result;
+            if (ReferenceEquals(source, _bitmap)) source.Dispose();
+            _bitmap = result;
+            _inverted = !_inverted;
+            FlashCaption(_inverted ? "反相" : "恢復正片");
+        }  //反相
+        //格線------------------------------------------------------------------------------------------------------
+        private static int _gridMode;  // 0 關、1 每 100px、2 每 10px（每 100px 加深）
+        private void ToggleGrid()
+        {
+            _gridMode = (_gridMode + 1) % 3;
+            picwinPicture_pic.Invalidate();
+            FlashCaption(_gridMode == 0 ? "格線 關" : _gridMode == 1 ? "格線 每 100px" : "格線 每 10px");
+        }  //切換格線
+        private void picwinPicture_PaintGrid(object sender, PaintEventArgs e)
+        {
+            // 圖片座標：線條對齊圖片像素，縮放時一起縮放；線寬固定 1 個螢幕像素
+            if (_gridMode == 0 || picwinPicture_pic.Image == null) return;
+            Image image = picwinPicture_pic.Image;
+            Rectangle shown = picwinPicture_pic.GetImageRectangle();
+            if (shown.Width <= 0) return;
+            float penWidth = (float)image.Width / shown.Width;
+            Graphics g = e.Graphics;
+            GraphicsState state = g.Save();
+            g.SmoothingMode = SmoothingMode.None;
+            using (Pen major = new Pen(Color.FromArgb(220, 0, 255, 255), penWidth))
+            using (Pen minor = new Pen(Color.FromArgb(90, 0, 255, 255), penWidth))
+            {
+                int step = _gridMode == 1 ? 100 : 10;
+                for (int x = step; x < image.Width; x += step) g.DrawLine(x % 100 == 0 ? major : minor, x, 0, x, image.Height);
+                for (int y = step; y < image.Height; y += step) g.DrawLine(y % 100 == 0 ? major : minor, 0, y, image.Width, y);
+            }
+            g.Restore(state);
+        }  //畫格線
+        private void picwinPicture_PaintGridLabels(object sender, PaintEventArgs e)
+        {
+            // 畫面座標：沿上緣、左緣標示每 100px 的座標
+            if (_gridMode == 0 || picwinPicture_pic.Image == null) return;
+            Image image = picwinPicture_pic.Image;
+            Rectangle shown = picwinPicture_pic.GetImageRectangle();
+            if (shown.Width <= 0) return;
+            Graphics g = e.Graphics;
+            using (Brush background = new SolidBrush(Color.FromArgb(160, 0, 0, 0)))
+            {
+                void Label(string text, float x, float y)
+                {
+                    Size size = TextRenderer.MeasureText(text, LensFont);
+                    g.FillRectangle(background, x, y, size.Width, size.Height);
+                    TextRenderer.DrawText(g, text, LensFont, new Point((int)x, (int)y), Color.Cyan, TextFormatFlags.NoPrefix);
+                }
+                for (int x = 100; x < image.Width; x += 100) Label(x.ToString(), shown.X + x * (float)shown.Width / image.Width + 2, Math.Max(0, shown.Y) + 2);
+                for (int y = 100; y < image.Height; y += 100) Label(y.ToString(), Math.Max(0, shown.X) + 2, shown.Y + y * (float)shown.Height / image.Height + 2);
+            }
+        }  //格線座標
         private static bool IsUniform(Bitmap bitmap, out Color color)
         {
             // 逐列比對整張圖是否同一個顏色
@@ -1301,7 +1539,7 @@ namespace Thunder
             _cursorTimer.Tick += (s, e) =>
             {
                 _cursorTimer.Stop();
-                if (!_cursorHidden && _drawTool == DrawTool.None && !_pickerOn && !contextMenuStrip.Visible && Bounds.Contains(Cursor.Position))
+                if (!_cursorHidden && _drawTool == DrawTool.None && !_pickerOn && !_dragWindowMode && !contextMenuStrip.Visible && Bounds.Contains(Cursor.Position))
                 {
                     Cursor.Hide();
                     _cursorHidden = true;

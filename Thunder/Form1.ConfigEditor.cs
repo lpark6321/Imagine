@@ -31,22 +31,31 @@ namespace Thunder
                 "選項：框線（可省略）\r\n格式：線種-線色\r\n線種可組合：c 中心十字、o 外框、n 九點、r 左紅右藍（上下白線）\r\nr 不使用線色，只有 r 時可省略線色\r\n例：con-white、c-red、r、cr-yellow"),
             ["Gradient"] = (
                 "參數：漸層顏色或 ColorBar\r\n單色：White（" + ConfigColorHelp + "）\r\n四色 ColorBar：colorbar-four-h、colorbar-four-v\r\n八色 ColorBar：colorbar-eight-h、colorbar-eight-v\r\n自訂 ColorBar：colorbar-h-數量.色1.色2…\r\n　例：colorbar-h-4.White.Red.Lime.Blue",
-                "選項：漸層（省略則不漸層，只畫 ColorBar）\r\n格式：[r-]方向-階數-分割[-起始.結束]\r\nr-：反向，奇數等分反轉漸層方向（分割需 ≥ 2）\r\n方向：v（Vertical 漸層）、h（Horizontal 漸層）\r\n起始.結束：灰階 0~255，用 . 連接，省略為 0.255\r\n例：v-256-1、h-8-1、h-256-1-255.0（由亮到暗）、r-h-256-2"),
+                "選項：漸層（省略則不漸層，只畫 ColorBar）\r\n格式：[r-]方向-階數-分割[-起始.結束]\r\nr-：反向，奇數等分反轉漸層方向（分割需 ≥ 2）\r\n方向：v（Vertical 漸層）、h（Horizontal 漸層）\r\n起始.結束：灰階 0~255，用 . 連接，省略為 0.255\r\n結尾加 -num：在每一階上標示階數\r\n例：v-256-1、h-8-1、h-256-1-255.0（由亮到暗）、r-h-256-2、v-16-1-num\r\n全階（全畫面格狀）：all-階數 直排、all-h-階數 橫排（16、32、64、128、256、1024），顏色可用單色或 colorbar，例：all-256"),
             ["Chess"] = (
                 "參數：格數  寬*高\r\n例：8*8、5*5、1*2",
                 "選項：可省略，多項用 - 連接\r\n顏色：格子顏色，另一色固定黑色，預設白色\r\n" + ConfigColorHelp + "\r\n翻轉：h 水平、v 垂直、hv 兩者\r\n例：Red、255.255.0-hv、v"),
             ["Window"] = (
-                "參數：背景與窗口\r\n純色：背景色-窗口色，例：Gray-Black、Black-White\r\n自製圖：Custom-背景-窗口\r\n　背景：dotG、vstripeG、vstripeW、dotDell、rowW 或顏色\r\n　窗口：Black、Gray、dotW 或顏色\r\n　例：Custom-dotG-Black\r\nCrossTalk：excel1 ~ excel7",
-                "選項：窗口大小%＋位置\r\nc：置中，例：50%c\r\nxy_X.Y：窗口左上角像素，例：50%xy_0.0\r\nxyq_象限：++ 右上、-+ 左上、-- 左下、+- 右下，例：50%xyq_++\r\ntwo：兩組窗口，例：50%two"),
+                "參數：背景與窗口\r\n純色：背景色-窗口色，例：Gray-Black、Black-White\r\n自製圖：Custom-背景-窗口，背景與窗口都可以是 mask 名稱或顏色\r\n　dot1 點棋盤、dot2 2×2 點棋盤、sub1 子像素棋盤、sub2 2×2 子像素棋盤\r\n　row1 / row2 1 列 / 2 列橫條、col1 / col2 1 行 / 2 行直條、rdiag1~3 / ldiag1~3 右斜 / 左斜線（數字為線寬）、dotDell\r\n　自訂 mask：ImgList 中 UserMask 那行的名稱，例：Custom-my1-Black\r\n　幾h幾v：每格幾點寬、幾點高的棋盤（1~8），例：2h1v、1h2v\r\n　名稱後加 .亮度（0~255）調整亮度，不寫為 255，例：Custom-dot1.127-Black、Custom-Gray-2h1v.64\r\nCrossTalk：excel1 ~ excel7",
+                "選項：窗口大小%＋位置\r\nc：置中，例：50%c\r\nxy_X.Y：窗口左上角像素，例：50%xy_0.0\r\nxyq_象限：++ 右上、-+ 左上、-- 左下、+- 右下，例：50%xyq_++\r\ntwo：兩組窗口，例：50%two\r\n蒙太奇：結尾加 |名稱+名稱|亮度（亮度省略為 255），例：50%c|dot1+row2+ldiag2|127（也可用自訂 mask 名稱）"),
             ["Mask"] = (
                 "參數：單位與大小\r\np-寬*高：以像素為單位，例：p-2*2\r\ns-寬*高-亮度：以子像素 (RGB) 為單位，亮度 0~255，例：s-2*2-127",
-                "選項：每一格的顏色\r\np 顏色寫法：每格寫一個顏色，格之間空格、列之間 /\r\n　" + ConfigColorHelp + "\r\n　也可寫 0 黑、1 白、2 灰，例：red lime/blue 127.127.127\r\n　（只有 1 格且用 R.G.B 時，結尾加 /，例：255.0.0/）\r\np 精簡寫法：每格 1 個字元 0 黑、1 白、2 灰，列之間 .，例：10.01\r\ns：每像素 3 個字元 (R G B)，1 亮、0 暗，列之間 .，例：101010.010101"),
+                "選項：每一格的顏色\r\np 顏色寫法：每格寫一個顏色，格之間空格、列之間 /\r\n　" + ConfigColorHelp + "\r\n　也可寫 0 黑、1 白、2 灰，例：red lime/blue 127.127.127\r\n　（只有 1 格且用 R.G.B 時，結尾加 /，例：255.0.0/）\r\np 精簡寫法：每格 1 個字元 0 黑、1 白、2 灰，列之間 .，例：10.01\r\ns：每像素 3 個字元（子像素由左到右，BGR 面板為 B G R），1 亮、0 暗，列之間 .，例：101010.010101"),
+            [UserMaskType] = (
+                "自訂 mask：名稱就是之後使用的名稱（英文字母開頭，可用英文、數字、_）\r\n參數：p-寬*高（1~64），例：p-2*2\r\n可在 Mask 頁畫好後按「存成自訂…」自動產生這一行",
+                "選項：每一格的顏色，與 Mask 的 p 寫法相同\r\n精簡寫法：0 黑、1 白、2 灰，列之間 .，例：10.01\r\n顏色寫法：格之間空格、列之間 /，例：red black/black red\r\n使用：Window Custom-my1-Black、蒙太奇 |my1、Mask 頁「自訂」下拉選單\r\n名稱後加 .亮度（0~255）依比例調暗，例：Custom-my1.127-Black"),
             ["Text"] = (
                 "參數：背景色-文字色\r\n" + ConfigColorHelp + "\r\n例：Black-White、Navy-Yellow",
-                "選項：文字/大小/字距/行距/串距（大小之後可省略）\r\n文字：最多 10 個字，不能有逗號 , 與斜線 /，保留大小寫\r\n大小：像素 1~500（預設 12）\r\n間距：筆畫之間的空白像素 0~500，0 = 貼齊\r\n　預設 字距 大小/5、行距 大小/3、串距 大小/2\r\n例：測試ABC、ABC/24、ABC/24/0/0/10"),
+                "選項：文字/大小/字距/行距/串距（大小之後可省略）\r\n爆炸模式：文字/boom（字級由 4pt 遞增，最多 30 個字）\r\n字型：再加 /f:字型名稱（例 /f:Arial），粗體再加 /b；不寫為預設字型\r\n文字：最多 10 個字，不能有逗號 , 與斜線 /，保留大小寫\r\n大小：像素 1~500（預設 12）\r\n間距：筆畫之間的空白像素 0~500，0 = 貼齊\r\n　預設 字距 大小/5、行距 大小/3、串距 大小/2\r\n例：測試ABC、ABC/24、ABC/24/0/0/10"),
             ["Dynamic"] = (
                 "參數：背景色-物件色（只寫一色時物件為白色）\r\n" + ConfigColorHelp + "\r\n例：Black-White、Gray-Red",
-                "選項：可省略，多項用 - 連接（選取時只預覽，按空白鍵或 Esc 全螢幕播放）\r\n形狀：ball 球、cube 方塊、strip 長條（預設 ball）\r\n方向：h 水平、v 垂直、b 斜角（預設 b，長條不能斜角）\r\n大小：size 加數字 1~200（預設 50）\r\n速度：speed 加數字 1~256（預設 50）\r\n例：ball-b-size50-speed50、strip-h-size20-speed10"),
+                "選項：可省略，多項用 - 連接（選取時只預覽，按空白鍵或 Esc 全螢幕播放）\r\n形狀：ball 球、cube 方塊、strip 長條、blur 模糊測試條（預設 ball）\r\n方向：h 水平、v 垂直、b 斜角（預設 b，長條不能斜角）\r\n大小：size 加數字 1~200（預設 50）\r\n速度：speed 加數字 1~256（預設 50）\r\n例：ball-b-size50-speed50、strip-h-size20-speed10"),
+            ["Test"] = (
+                "參數：測試圖\r\ngamma：Gamma 檢查（gamma-r / gamma-g / gamma-b 為單一色版）\r\npluge：黑位 1~20 / 白位 235~254\r\noverscan：邊緣刻度（overscan-10 / overscan-20 / overscan-50，預設 20）\r\nresolution：解析度（西門子星與線對）\r\nhue：色相漸層（hue-h 水平、hue-v 垂直、hue-ring 環狀）\r\nshading：高頻 Shading、banding：高對比 Banding",
+                "選項：不需要"),
+            ["Image"] = (
+                "參數：圖檔路徑（jpg / png / bmp，不能有逗號）\r\n可寫絕對路徑，或相對於 config 檔所在資料夾的路徑（內建設定則相對於程式資料夾）\r\n例：D:\\Pattern\\logo.png、pic\\gray.bmp",
+                "選項：縮放方式（省略為 fit）\r\nfit 等比例（留黑邊）、stretch 拉伸填滿、fill 填滿裁切、1:1 原尺寸置中"),
         };
         private ToolTip configHelp_tip;
         private TextBox cfgName_txt, cfgParam_txt, cfgOption_txt;
@@ -154,7 +163,7 @@ namespace Thunder
             if (type == null || !ConfigHelp.TryGetValue(type, out var help)) return;
             configHelp_tip.SetToolTip(cfgType_cmb, $"{type}：滑鼠移到參數、選項欄位可看寫法");
             configHelp_tip.SetToolTip(cfgParam_txt, help.param);
-            configHelp_tip.SetToolTip(cfgOption_txt, help.option);
+            configHelp_tip.SetToolTip(cfgOption_txt, help.option + "\r\n\r\n幻燈片停留時間（各類型通用）：結尾加 @秒數s，例：@5s、50%c @2.5s（0.1~3600 秒）");
         }  // 更新寫法提示
         private void FillConfigEditor(ListViewItem item)
         {
@@ -187,11 +196,13 @@ namespace Thunder
                     MessageBox.Show("請先在清單選取要修改的項目！", "Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
+                PushConfigUndo();  // 記錄復原點
                 tabilPatternList_lst.Items[selected] = item;
             }
             else
             {
                 // 加在選取項目的下一列；沒有選取時加在最後
+                PushConfigUndo();  // 記錄復原點
                 tabilPatternList_lst.Items.Insert(selected >= 0 ? selected + 1 : tabilPatternList_lst.Items.Count, item);
             }
             RenumberPatternList();
@@ -203,6 +214,7 @@ namespace Thunder
         {
             if (tabilPatternList_lst.SelectedItems.Count == 0) return;
             int index = tabilPatternList_lst.SelectedIndices[0];
+            PushConfigUndo();  // 記錄復原點
             tabilPatternList_lst.Items.RemoveAt(index);
             RenumberPatternList();
             if (tabilPatternList_lst.Items.Count > 0)
@@ -218,6 +230,7 @@ namespace Thunder
             int target = index + step;
             if (target < 0 || target >= tabilPatternList_lst.Items.Count) return;
             ListViewItem item = tabilPatternList_lst.Items[index];
+            PushConfigUndo();  // 記錄復原點
             _movingConfigLine = true;
             try
             {
@@ -297,6 +310,8 @@ namespace Thunder
             if (tabilPatternList_lst.Items.Count == 0 || mypicture == null) return 0;
             int function = tabimgeFuncList.SelectedIndex;
             int bad = 0;
+            // 解析時會改到 ImgEditor 的設定，先記下來，檢查完全部還原
+            Action restoreEditor = SnapshotEditor();
             // 啟動時先載入 config、之後才依螢幕填入寬高：寬高還沒設定時暫時用主螢幕解析度檢查
             string width = mnsW_txt.Text, height = mnsH_txt.Text;
             bool sizeMissing = !int.TryParse(width, out _) || !int.TryParse(height, out _);
@@ -326,6 +341,7 @@ namespace Thunder
                     mnsW_txt.Text = width;
                     mnsH_txt.Text = height;
                 }
+                restoreEditor();
             }
             if (tabilPatternList_lst.SelectedItems.Count > 0)
             {
@@ -343,5 +359,76 @@ namespace Thunder
                 : $"Config：{tabilPatternList_lst.Tag}（有 {bad} 行設定錯誤，已標紅，滑鼠移上去看原因）";
             return bad;
         }  // 檢查 ImgList 全部設定
+        private Action SnapshotEditor()
+        {
+            // 記下 ImgEditor 分頁所有輸入欄位的值，回傳還原用的動作
+            var setters = new List<Action>();
+            var blockColors = new List<(Panel panel, Color[] colors)>();
+            void Walk(Control parent)
+            {
+                foreach (Control c in parent.Controls)
+                {
+                    switch (c)
+                    {
+                        case NumericUpDown nud:
+                            decimal value = nud.Value;
+                            setters.Add(() => { if (nud.Value != value) nud.Value = Math.Max(nud.Minimum, Math.Min(nud.Maximum, value)); });
+                            continue;  // 不往內找（內含的文字框不用記）
+                        case ComboBox combo when combo.DropDownStyle == ComboBoxStyle.DropDownList:
+                            int index = combo.SelectedIndex;
+                            setters.Add(() => { if (combo.SelectedIndex != index && index < combo.Items.Count) combo.SelectedIndex = index; });
+                            continue;
+                        case ComboBox combo:
+                            string comboText = combo.Text;
+                            setters.Add(() => { if (combo.Text != comboText) combo.Text = comboText; });
+                            continue;
+                        case RadioButton radio:
+                            if (radio.Checked) setters.Add(() => { if (!radio.Checked) radio.Checked = true; });
+                            continue;
+                        case CheckBox check:
+                            bool isChecked = check.Checked;
+                            setters.Add(() => { if (check.Checked != isChecked) check.Checked = isChecked; });
+                            continue;
+                        case ScrollBar scroll:
+                            int scrollValue = scroll.Value;
+                            setters.Add(() => { if (scroll.Value != scrollValue) scroll.Value = scrollValue; });
+                            continue;
+                        case TextBox box:
+                            string text = box.Text;
+                            setters.Add(() => { if (box.Text != text) box.Text = text; });
+                            continue;
+                        case PictureBox picture:
+                            Color pictureBack = picture.BackColor;
+                            Image image = picture.Image;
+                            setters.Add(() => { picture.BackColor = pictureBack; picture.Image = image; });
+                            continue;
+                        case Label _:
+                        case Button _:
+                            Color back = c.BackColor;
+                            setters.Add(() => { if (c.BackColor != back) c.BackColor = back; });
+                            continue;
+                        case Panel panel when panel.Controls.Count > 0 && panel.Controls.Cast<Control>().All(b => b is Panel && b.Tag != null):
+                            // Mask 格子、ColorBar 色條：面板會依格數重建，最後再依序套回顏色
+                            blockColors.Add((panel, panel.Controls.Cast<Control>().Select(b => b.BackColor).ToArray()));
+                            continue;
+                    }
+                    Walk(c);
+                }
+            }
+            Walk(tabImgEditor);
+            string pictureTag = mypicture.tag;
+            return () =>
+            {
+                // 跑兩次：前一次設定可能觸發連動（例如選長條會改方向），第二次蓋回原值
+                for (int pass = 0; pass < 2; pass++) setters.ForEach(set => set());
+                foreach (var (panel, colors) in blockColors)
+                {
+                    var blocks = panel.Controls.Cast<Control>().ToList();
+                    if (blocks.Count != colors.Length) continue;  // 格數不同就不套
+                    for (int i = 0; i < blocks.Count; i++) blocks[i].BackColor = colors[i];
+                }
+                mypicture.tag = pictureTag;
+            };
+        }  // 記錄 / 還原 ImgEditor 設定
     }
 }

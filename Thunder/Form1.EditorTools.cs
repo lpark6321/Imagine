@@ -105,6 +105,175 @@ namespace Thunder
             subPixelRadio.CheckedChanged += (s, e) => UpdateVisible();
             UpdateVisible();
         }  // 加入 Mask 快速按鈕
+        private CheckBox tabigAll_chk;
+        private ComboBox tabigAll_cmb;
+        private RadioButton tabigAllGrid_rdo;  // 全畫面格狀（每階一格）
+        private RadioButton tabigAllGrad_rdo;  // 依左側漸層條件，階數改為全階並標示
+        private static readonly int[] AllLevelCounts = { 16, 32, 64, 128, 256, 1024 };
+        private bool AllLevelGrid => tabigAll_chk.Checked && tabigAllGrid_rdo.Checked;
+        private bool AllLevelGradient => tabigAll_chk.Checked && tabigAllGrad_rdo.Checked;
+        // 漸層實際階數：依漸層條件的全階取「全階」與「漸層分幾階」較小的那個
+        private int GradientStepCount => AllLevelGradient ? Math.Min(int.Parse(tabigAll_cmb.Text), int.Parse(tabigStep_cmb.Text)) : int.Parse(tabigStep_cmb.Text);
+        private void InitGradientExtras()
+        {
+            // Gradient 右側：全階顯示（全畫面格狀 / 依漸層條件）
+            var group = new GroupBox { Text = "全階 / 階數", Location = new Point(445, 8), Size = new Size(175, 100) };
+            tabigAll_chk = new CheckBox { Text = "顯示", AutoSize = true, Location = new Point(10, 22) };
+            tabigAll_cmb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Location = new Point(70, 20), Width = 70, ImeMode = ImeMode.Disable };
+            tabigAll_cmb.Items.AddRange(AllLevelCounts.Select(n => (object)n.ToString()).ToArray());
+            tabigAll_cmb.SelectedItem = "256";
+            var unit = new Label { Text = "階", AutoSize = true, Location = new Point(144, 24) };
+            tabigAllGrid_rdo = new RadioButton { Text = "全畫面格狀", AutoSize = true, Location = new Point(26, 48), Checked = true };
+            tabigAllGrad_rdo = new RadioButton { Text = "依漸層條件", AutoSize = true, Location = new Point(26, 70) };
+            group.Controls.AddRange(new Control[] { tabigAll_chk, tabigAll_cmb, unit, tabigAllGrid_rdo, tabigAllGrad_rdo });
+            tabimgeGradient.Controls.Add(group);
+            group.BringToFront();
+            toolTip.SetToolTip(tabigAll_chk, "勾選後顯示全部階數（16~256 階標示 8 bit 階數；1024 階標示 10 bit 代碼 0~1023）");
+            toolTip.SetToolTip(tabigAll_cmb, "全階的階數");
+            toolTip.SetToolTip(tabigAllGrid_rdo, "每一階一格，依畫面比例排成多行多列並標示階數\r\nV 漸層由上往下排、H 漸層由左往右排；顏色依基底色彩或其他顏色（每個顏色一區）");
+            toolTip.SetToolTip(tabigAllGrad_rdo, "依左側漸層設定（方向、分割、起始結束、顏色或其他顏色）產生，並在每一階標示階數\r\n階數取「全階」與「漸層分幾階」較小的那個");
+            void Update()
+            {
+                // ColorBar 模式沒有漸層，全階不能用
+                if (tabigColorBar_rdo.Checked && tabigAll_chk.Checked) tabigAll_chk.Checked = false;
+                tabigAll_chk.Enabled = !tabigColorBar_rdo.Checked;
+                tabigAll_cmb.Enabled = tabigAllGrid_rdo.Enabled = tabigAllGrad_rdo.Enabled = tabigAll_chk.Checked;
+                tabigStep_cmb.Enabled = tabigDivid_cmb.Enabled = !AllLevelGrid;  // 全畫面格狀用全階的階數並鋪滿整個畫面，漸層分幾階、畫面幾等分都不使用
+            }
+            tabigAll_chk.CheckedChanged += (s, e) => Update();
+            tabigAllGrid_rdo.CheckedChanged += (s, e) => Update();
+            tabigColorBar_rdo.CheckedChanged += (s, e) => Update();
+            Update();
+        }  // 建立全階與顯示階數
+        private static void PickAllLevelGrid(int count, int width, int height, out int columns, out int rows)
+        {
+            // 在 2 的次方的組合中挑「欄 / 列」最接近畫面寬高比的（例：1920x1080 的 256 階 → 16 x 16）
+            columns = count;
+            rows = 1;
+            double best = double.MaxValue, target = Math.Log((double)width / height);
+            for (int c = 1; c <= count; c *= 2)
+            {
+                if (count % c != 0) continue;
+                int r = count / c;
+                double diff = Math.Abs(Math.Log((double)c / r) - target);
+                if (diff < best - 1e-9)
+                {
+                    best = diff;
+                    columns = c;
+                    rows = r;
+                }
+            }
+        }  // 決定全階的欄列數
+        private Bitmap DrawAllLevels(int width, int height, int count)
+        {
+            // 全畫面格狀：每個顏色一區（單色時整個畫面），區內每一階一格並標示階數
+            var colors = new List<Color>();
+            bool splitVertically = true;  // 多個顏色時上下排列
+            if (tabigOther_chk.Checked)
+            {
+                var panels = tabigOtherSplit_pnl.Controls.OfType<Panel>()
+                    .Where(p => p.BackColor != Color.Transparent && p.Tag != null)
+                    .OrderBy(p => BlockCell(p).x + BlockCell(p).y).ToList();
+                colors.AddRange(panels.Select(p => p.BackColor));
+                splitVertically = panels.Count == 0 || panels[0].Tag.ToString().StartsWith("H");
+            }
+            if (colors.Count == 0) colors.Add(tabigBaseColor_lbl.BackColor);
+            bool rowMajor = tabigHWay_rdo.Checked;  // H 漸層由左往右排，其他由上往下排
+            var bitmap = new Bitmap(width, height);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+                for (int i = 0; i < colors.Count; i++)
+                {
+                    Rectangle area = splitVertically
+                        ? Rectangle.FromLTRB(0, height * i / colors.Count, width, height * (i + 1) / colors.Count)
+                        : Rectangle.FromLTRB(width * i / colors.Count, 0, width * (i + 1) / colors.Count, height);
+                    DrawAllLevelArea(g, area, count, colors[i], rowMajor);
+                }
+            }
+            return bitmap;
+        }  // 產生全階圖
+        private static void DrawAllLevelArea(Graphics g, Rectangle area, int count, Color baseColor, bool rowMajor)
+        {
+            // 每一階一格；格子左上標示階數，深色格用白字、淺色格用黑字
+            PickAllLevelGrid(count, area.Width, area.Height, out int columns, out int rows);
+            float cellWidth = (float)area.Width / columns, cellHeight = (float)area.Height / rows;
+            float fontSize = Math.Max(7f, Math.Min(20f, Math.Min(cellHeight / 4f, cellWidth / 6f)));
+            using (Font font = new Font("Times New Roman", fontSize, GraphicsUnit.Pixel))
+            using (var format = new StringFormat(StringFormat.GenericTypographic))
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    int column = rowMajor ? i % columns : i / rows, row = rowMajor ? i / columns : i % rows;
+                    int x0 = area.X + (int)Math.Round(column * cellWidth), x1 = area.X + (int)Math.Round((column + 1) * cellWidth);
+                    int y0 = area.Y + (int)Math.Round(row * cellHeight), y1 = area.Y + (int)Math.Round((row + 1) * cellHeight);
+                    int level = (int)Math.Round(i * 255.0 / (count - 1));  // 實際顯示的 8 bit 灰階
+                    Color color = Color.FromArgb(baseColor.R * level / 255, baseColor.G * level / 255, baseColor.B * level / 255);
+                    using (Brush brush = new SolidBrush(color))
+                    {
+                        g.FillRectangle(brush, x0, y0, x1 - x0, y1 - y0);
+                    }
+                    string label = (count > 256 ? i : level).ToString();
+                    double luminance = color.R * 0.299 + color.G * 0.587 + color.B * 0.114;
+                    g.DrawString(label, font, luminance < 128 ? Brushes.White : Brushes.Black, x0 + fontSize * 0.5f, y0 + fontSize * 0.5f, format);
+                }
+            }
+        }  // 畫一區全階
+        private static void DrawGradientLabels(Bitmap bitmap, bool horizontalBands)
+        {
+            // 依實際像素找出每一階（顏色相同的連續區段），在放得下的階上標示階數
+            // horizontalBands：H 漸層（往下變化，每階是一條橫帶）
+            // 另一方向先找出「色條」（ColorBar 的每個顏色、反向的每一段），每條各自標示
+            int along = horizontalBands ? bitmap.Height : bitmap.Width;
+            int across = horizontalBands ? bitmap.Width : bitmap.Height;
+            Color Pixel(int a, int c) => horizontalBands ? bitmap.GetPixel(c, a) : bitmap.GetPixel(a, c);
+            // 色條：在漸層方向的 1/4 與 3/4 處沿另一方向掃描，兩處顏色都相同的連續區段為一條
+            // （只看中間的話，反向的兩段在中間亮度相同會被誤判成同一條）
+            var strips = new List<(int start, int end)>();
+            int quarter = along / 4, threeQuarter = along * 3 / 4;
+            (int, int) Key(int c) => (Pixel(quarter, c).ToArgb(), Pixel(threeQuarter, c).ToArgb());
+            for (int c = 0; c < across; c++)
+            {
+                if (strips.Count > 0 && Key(c) == Key(strips[strips.Count - 1].start)) strips[strips.Count - 1] = (strips[strips.Count - 1].start, c);
+                else strips.Add((c, c));
+            }
+            // 每條色條沿漸層方向找出每一階
+            var labels = new List<(float x, float y, string text, Brush brush)>();
+            using (Graphics g = Graphics.FromImage(bitmap))
+            using (Font font = new Font("Times New Roman", 18f, GraphicsUnit.Pixel))
+            {
+                g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+                foreach (var (stripStart, stripEnd) in strips)
+                {
+                    int sample = (stripStart + stripEnd) / 2;
+                    int stripWidth = stripEnd - stripStart + 1;
+                    var runs = new List<(int start, int end, Color color)>();
+                    for (int p = 0; p < along; p++)
+                    {
+                        Color color = Pixel(p, sample);
+                        if (runs.Count > 0 && runs[runs.Count - 1].color.ToArgb() == color.ToArgb()) runs[runs.Count - 1] = (runs[runs.Count - 1].start, p, color);
+                        else runs.Add((p, p, color));
+                    }
+                    int lastEnd = int.MinValue;
+                    foreach (var (start, end, color) in runs)
+                    {
+                        string text = Math.Max(color.R, Math.Max(color.G, color.B)).ToString();
+                        SizeF size = g.MeasureString(text, font);
+                        if ((horizontalBands ? size.Width : size.Height) > stripWidth) continue;  // 色條太窄放不下
+                        float need = horizontalBands ? size.Height : size.Width;
+                        float begin = (start + end + 1) / 2f - need / 2f;
+                        if (begin < lastEnd + 2) continue;  // 跟前一個標示重疊就跳過
+                        float x = horizontalBands ? sample - size.Width / 2f : begin;
+                        float y = horizontalBands ? begin : sample - size.Height / 2f;
+                        double luminance = color.R * 0.299 + color.G * 0.587 + color.B * 0.114;
+                        labels.Add((x, y, text, luminance < 128 ? Brushes.White : Brushes.Black));
+                        lastEnd = (int)Math.Ceiling(begin + need);
+                    }
+                }
+                // 全部量完再畫，標示不會影響其他色條的判斷
+                foreach (var (x, y, text, brush) in labels) g.DrawString(text, font, brush, x, y);
+            }
+        }  // 漸層標示階數
         private void InitGradientReverse()
         {
             // 反向是讓奇數等分反轉漸層方向，畫面等分 < 2 時沒有作用，停用並取消勾選
@@ -130,7 +299,8 @@ namespace Thunder
             tabiwCustom_grp.Dock = DockStyle.Fill;
             customPage.Controls.Add(tabiwCustom_grp);
             // 窗口 / 線條清單與按鈕移入第二頁
-            var overlayButtons = tabimgeWindow.Controls.OfType<Button>().Where(b => b.Text == "新增" || b.Text == "修改" || b.Text == "移除").OrderBy(b => b.Left).ToList();
+            string[] overlayButtonTexts = { "新增", "修改", "複製", "上移", "下移", "移除", "全清" };
+            var overlayButtons = tabimgeWindow.Controls.OfType<Button>().Where(b => overlayButtonTexts.Contains(b.Text)).OrderBy(b => b.Left).ToList();
             // 用 Dock 排版：清單填滿，按鈕列在底部（不依賴分頁當下的尺寸）
             overlayPage.Padding = new Padding(6);
             tabimgeWindow.Controls.Remove(tabiwOverlay_lvw);
@@ -141,7 +311,8 @@ namespace Thunder
             foreach (Button button in overlayButtons)
             {
                 tabimgeWindow.Controls.Remove(button);
-                button.Size = new Size(70, 26);
+                button.Size = new Size(48, 26);
+                button.Margin = new Padding(2, 3, 2, 3);  // 7 個按鈕排成一列
                 buttonBar.Controls.Add(button);
             }
             overlayPage.Controls.Add(tabiwOverlay_lvw);
@@ -173,6 +344,11 @@ namespace Thunder
             tabiefRedBlue_chk.BringToFront();
         }  // 建立左紅右藍
         private CheckBox tabiefText_chk;
+        private CheckBox tabiefTextBoom_chk;  // 爆炸模式：字級由小到大逐行排列
+        private ComboBox tabiefTextFont_cmb;  // 文字模式字型（預設：鋪滿用微軟正黑體粗體、爆炸用 Arial）
+        private CheckBox tabiefTextBold_chk;
+        private const string DefaultTextFont = "預設";
+        private static readonly string[] TextFontChoices = { "Microsoft JhengHei", "PMingLiU", "DFKai-SB", "Arial", "Times New Roman", "Verdana", "Tahoma", "Segoe UI", "Consolas", "Courier New" };
         private TextBox tabiefText_txt;
         private NumericUpDown tabiefTextSize_nud, tabiefTextCharGap_nud, tabiefTextLineGap_nud, tabiefTextStringGap_nud;
         private Button tabiefTextColor_btn;
@@ -188,7 +364,8 @@ namespace Thunder
                 ImeMode = ImeMode.Disable, Anchor = AnchorStyles.Left, Margin = new Padding(0, 2, 6, 2),
             };
             tabiefText_chk = new CheckBox { Text = "文字模式", AutoSize = true, Location = new Point(x, 57) };
-            tabiefText_txt = new TextBox { MaxLength = 10, Width = 150, Location = new Point(x, 80), ImeMode = ImeMode.NoControl };  // 最多 10 個字，可打中文
+            tabiefText_txt = new TextBox { MaxLength = 30, Width = 150, Location = new Point(x, 80), ImeMode = ImeMode.NoControl };  // 鋪滿模式最多 10 個字、爆炸模式最多 30 個字，可打中文
+            tabiefText_txt.Text = "H";  // 預設文字
             tabiefTextSize_nud = Nud(1, 500, 0);            // 大小 1~500 px
             tabiefTextCharGap_nud = Nud(0, 500, 1);         // 間距 0~500 px（以筆畫邊緣計算，0 = 貼齊）
             tabiefTextLineGap_nud = Nud(0, 500, 1);
@@ -201,28 +378,45 @@ namespace Thunder
             grid.Controls.Add(labels[2], 0, 1); grid.Controls.Add(tabiefTextCharGap_nud, 1, 1);
             grid.Controls.Add(labels[3], 0, 2); grid.Controls.Add(tabiefTextLineGap_nud, 1, 2);
             grid.Controls.Add(labels[4], 0, 3); grid.Controls.Add(tabiefTextStringGap_nud, 1, 3);
+            // 字型：只列出這台電腦有安裝的字型
+            var installed = new System.Drawing.Text.InstalledFontCollection().Families.Select(f => f.GetName(1033)).ToList();
+            tabiefTextFont_cmb = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 130, ImeMode = ImeMode.Disable, Anchor = AnchorStyles.Left, Margin = new Padding(0, 2, 0, 2) };
+            tabiefTextFont_cmb.Items.Add(DefaultTextFont);
+            tabiefTextFont_cmb.Items.AddRange(TextFontChoices.Where(f => installed.Contains(f, StringComparer.OrdinalIgnoreCase)).ToArray<object>());
+            tabiefTextFont_cmb.SelectedIndex = 0;
+            tabiefTextBold_chk = new CheckBox { Text = "粗體", AutoSize = true, Anchor = AnchorStyles.Left, Margin = new Padding(0, 4, 0, 2) };
+            var fontLabel = Caption("字型");
+            grid.Controls.Add(fontLabel, 2, 1); grid.Controls.Add(tabiefTextFont_cmb, 3, 1);
+            grid.Controls.Add(tabiefTextBold_chk, 3, 2);
+            tabiefTextFont_cmb.SelectedIndexChanged += (s, e) => UpdateFrameTextEnabled();
+            toolTip.SetToolTip(tabiefTextFont_cmb, "文字字型；「預設」為鋪滿模式用微軟正黑體粗體、爆炸模式用 Arial");
+            toolTip.SetToolTip(tabiefTextBold_chk, "選了字型後可設定粗體");
             tabiefTextSize_nud.Value = 12;
             ResetFrameTextGaps();
             // 改大小時間距依比例重設為預設值（之後仍可個別調整）
             tabiefTextSize_nud.ValueChanged += (s, e) => ResetFrameTextGaps();
             tabiefTextColor_btn.Click += (s, e) =>
             {
-                using (ColorDialog dialog = new ColorDialog { Color = tabiefTextColor_btn.BackColor, FullOpen = true })
+                using (ColorDialog dialog = new PatternColorDialog())
                 {
                     if (dialog.ShowDialog(this) == DialogResult.OK) tabiefTextColor_btn.BackColor = dialog.Color;
                 }
             };
-            _frameTextSettings = new Control[] {tabiefText_txt, tabiefTextSize_nud, tabiefTextColor_btn, tabiefTextCharGap_nud, tabiefTextLineGap_nud, tabiefTextStringGap_nud }.Concat(labels).ToArray();
+            _frameTextSettings = new Control[] {tabiefText_txt, tabiefTextSize_nud, tabiefTextColor_btn, tabiefTextCharGap_nud, tabiefTextLineGap_nud, tabiefTextStringGap_nud, tabiefTextFont_cmb, fontLabel }.Concat(labels).ToArray();
             tabiefText_chk.CheckedChanged += (s, e) => UpdateFrameTextEnabled();
             UpdateFrameTextEnabled();
             toolTip.SetToolTip(tabiefText_chk, "勾選後以文字依座標重複鋪滿整個畫面");
-            toolTip.SetToolTip(tabiefText_txt, "最多 10 個字（不能有逗號 , 與斜線 /）");
+            toolTip.SetToolTip(tabiefText_txt, "鋪滿模式最多 10 個字、爆炸模式最多 30 個字（不能有逗號 , 與斜線 /）");
             toolTip.SetToolTip(tabiefTextSize_nud, "字的大小（像素），改變時間距會依比例重設");
             toolTip.SetToolTip(tabiefTextCharGap_nud, "字與字筆畫之間的空白，0 = 貼齊（預設 大小/5）");
             toolTip.SetToolTip(tabiefTextLineGap_nud, "上下兩行筆畫之間的空白，0 = 貼齊（預設 大小/3）");
             toolTip.SetToolTip(tabiefTextStringGap_nud, "重複字串之間的空白，0 = 貼齊（預設 大小/2）");
-            tabimgeFrame.Controls.AddRange(new Control[] { tabiefText_chk, tabiefText_txt, grid });
-            foreach (Control control in new Control[] { tabiefText_chk, tabiefText_txt, grid }) control.BringToFront();  // 避免被其他控制項蓋住
+            tabiefTextBoom_chk = new CheckBox { Text = "爆炸模式", AutoSize = true, Location = new Point(x + 80, 57) };
+            tabiefTextBoom_chk.CheckedChanged += (s, e) => UpdateFrameTextEnabled();
+            toolTip.SetToolTip(tabiefTextBoom_chk, "每行字級由 4pt 起，20pt 前每次 +2、40pt 前 +4、80pt 前 +8、之後 +16；左邊標示字級，排到畫面底為止（文字最多 30 個字）");
+            UpdateFrameTextEnabled();
+            tabimgeFrame.Controls.AddRange(new Control[] { tabiefText_chk, tabiefTextBoom_chk, tabiefText_txt, grid });
+            foreach (Control control in new Control[] { tabiefText_chk, tabiefTextBoom_chk, tabiefText_txt, grid }) control.BringToFront();  // 避免被其他控制項蓋住
             // 逗號是 config 欄位分隔、/ 是 Text 選項分隔，文字裡不能有
             tabiefText_txt.KeyPress += (s, e) => { if (e.KeyChar == ',' || e.KeyChar == '/') e.Handled = true; };
             tabiefText_txt.TextChanged += (s, e) =>
@@ -241,6 +435,14 @@ namespace Thunder
         private void UpdateFrameTextEnabled()
         {
             foreach (Control control in _frameTextSettings) control.Enabled = tabiefText_chk.Checked;
+            if (tabiefTextBoom_chk == null) return;
+            tabiefTextBold_chk.Enabled = tabiefText_chk.Checked && tabiefTextFont_cmb.SelectedIndex > 0;  // 預設字型的粗細固定
+            tabiefTextBoom_chk.Enabled = tabiefText_chk.Checked;
+            // 爆炸模式的字級固定，大小與間距不使用
+            foreach (Control control in new Control[] { tabiefTextSize_nud, tabiefTextCharGap_nud, tabiefTextLineGap_nud, tabiefTextStringGap_nud })
+            {
+                control.Enabled = tabiefText_chk.Checked && !tabiefTextBoom_chk.Checked;
+            }
         }  // 未勾選時停用設定
         private static void DrawTiledText(Graphics g, string text, Font font, Color color, float charGap, float lineGap, float stringGap, int width, int height)
         {
@@ -297,6 +499,60 @@ namespace Thunder
                 }
             }
         }  // 文字鋪滿畫面
+        private static void DrawBoomText(Graphics g, string text, Color color, int width, int height, Func<float, Font> makeFont)
+        {
+            // 爆炸模式：每行字級由 4pt 起，20pt 前每次 +2、40pt 前 +4、80pt 前 +8、之後 +16；左邊標示字級，排到畫面底為止（最後一行可被切掉）
+            GraphicsState state = g.Save();
+            g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+            using (Brush brush = new SolidBrush(color))
+            using (var format = new StringFormat(StringFormat.GenericTypographic))
+            {
+                float y = 0;
+                for (int size = 4; y < height && size <= 400; size += size < 20 ? 2 : size < 40 ? 4 : size < 80 ? 8 : 16)
+                {
+                    using (Font font = makeFont(size))
+                    {
+                        float lineHeight = font.GetHeight(g);
+                        float pixelSize = size * g.DpiY / 72f;
+                        string label = $"{size}pt";
+                        float x = pixelSize * 0.15f + 2;
+                        g.DrawString(label, font, brush, x, y, format);
+                        g.DrawString(text, font, brush, x + pixelSize * 4.2f, y, format);  // 字級標示寬度約 4 個字寬
+                        y += lineHeight;
+                    }
+                }
+            }
+            g.Restore(state);
+        }  // 文字爆炸模式
+        private Font FrameTextFont(float size, GraphicsUnit unit, string defaultFamily, FontStyle defaultStyle)
+        {
+            // 「預設」時依模式的預設字型，否則用選的字型與粗體設定
+            if (tabiefTextFont_cmb.SelectedIndex <= 0) return new Font(defaultFamily, size, defaultStyle, unit);
+            return new Font(tabiefTextFont_cmb.Text, size, tabiefTextBold_chk.Checked ? FontStyle.Bold : FontStyle.Regular, unit);
+        }  // 文字模式字型
+        private string TextFontTokens() =>
+            tabiefTextFont_cmb.SelectedIndex <= 0 ? "" : $"/f:{tabiefTextFont_cmb.Text}" + (tabiefTextBold_chk.Checked ? "/b" : "");  // 寫進 config 的字型段
+        private void ApplyTextFontTokens(IEnumerable<string> tokens)
+        {
+            // f:字型名稱、b 粗體；沒寫時為預設字型
+            tabiefTextFont_cmb.SelectedIndex = 0;
+            tabiefTextBold_chk.Checked = false;
+            foreach (string token in tokens)
+            {
+                if (token.StartsWith("f:", StringComparison.OrdinalIgnoreCase))
+                {
+                    string name = token.Substring(2).Trim();
+                    int index = tabiefTextFont_cmb.Items.Cast<object>().ToList().FindIndex(i => string.Equals(i.ToString(), name, StringComparison.OrdinalIgnoreCase));
+                    if (index < 0) throw new FormatException($"字型「{name}」不在清單或這台電腦沒有安裝，可用：{string.Join("、", tabiefTextFont_cmb.Items.Cast<object>().Skip(1))}");
+                    tabiefTextFont_cmb.SelectedIndex = index;
+                }
+                else if (token.Equals("b", StringComparison.OrdinalIgnoreCase))
+                {
+                    tabiefTextBold_chk.Checked = true;
+                }
+            }
+        }  // 套用 config 的字型段
+        private static bool IsTextFontToken(string token) => token.StartsWith("f:", StringComparison.OrdinalIgnoreCase) || token.Equals("b", StringComparison.OrdinalIgnoreCase);
         private static Rectangle InkBounds(Bitmap probe, int origin)
         {
             // 找出非白色像素的範圍，回傳相對於繪製原點 (origin, origin) 的矩形；沒有筆畫回傳 Empty
@@ -346,6 +602,7 @@ namespace Thunder
             {
                 return;
             }
+            PushConfigUndo();  // 記錄復原點
             ListViewItem item = CreateConfigItem(line);
             tabilPatternList_lst.Items.Add(item);
             RenumberPatternList();
@@ -368,6 +625,7 @@ namespace Thunder
                 case "Window": type = "Window"; error = WindowToConfig(ignored, out param, out option); break;
                 case "Mask(FlickerPattern)": type = "Mask"; error = MaskToConfig(out param, out option); break;
                 case "Dynamic": type = "Dynamic"; error = DynamicToConfig(out param, out option); break;
+                case "Testpattern": type = "Test"; error = TestToConfig(out param, out option); break;
                 default: error = null; return null;
             }
             if (error != null) return null;
@@ -396,7 +654,13 @@ namespace Thunder
             if (tabiefOther_chk.Checked) ignored.Add("其他(H&V) 線條");
             string Num(NumericUpDown nud) => nud.Value.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
             param = $"{ConfigColorText(tabiefBack_btn.BackColor)}-{ConfigColorText(tabiefTextColor_btn.BackColor)}";
-            option = $"{text}/{Num(tabiefTextSize_nud)}/{Num(tabiefTextCharGap_nud)}/{Num(tabiefTextLineGap_nud)}/{Num(tabiefTextStringGap_nud)}";
+            if (tabiefTextBoom_chk.Checked)
+            {
+                option = $"{text}/boom{TextFontTokens()}";  // 爆炸模式
+                return null;
+            }
+            if (text.Length > 10) return "鋪滿模式的文字最多 10 個字";
+            option = $"{text}/{Num(tabiefTextSize_nud)}/{Num(tabiefTextCharGap_nud)}/{Num(tabiefTextLineGap_nud)}/{Num(tabiefTextStringGap_nud)}{TextFontTokens()}";
             return null;
         }  // Frame 文字模式轉 config
         private string GradientToConfig(List<string> ignored, out string param, out string option)
@@ -419,14 +683,20 @@ namespace Thunder
             {
                 param = ConfigColorText(tabigBaseColor_lbl.BackColor);
             }
+            if (AllLevelGrid)
+            {
+                option = $"all{(tabigHWay_rdo.Checked ? "-h" : "")}-{tabigAll_cmb.Text}";  // 全畫面格狀全階（H 漸層為橫排）
+                return null;
+            }
             if (!tabigColorBar_rdo.Checked)
             {
-                option = $"{(tabigReverse_chk.Checked && tabigReverse_chk.Enabled ? "r-" : "")}{(tabigHWay_rdo.Checked ? "h" : "v")}-{tabigStep_cmb.Text}-{tabigDivid_cmb.Text}";
+                option = $"{(tabigReverse_chk.Checked && tabigReverse_chk.Enabled ? "r-" : "")}{(tabigHWay_rdo.Checked ? "h" : "v")}-{GradientStepCount}-{tabigDivid_cmb.Text}";
                 // 起始.結束灰階不是預設 0.255 時才寫（例：255.0 由亮到暗）
                 if (tabigFirstLevel_cmb.Text.Trim() != "0" || tabigLastLevel_cmb.Text.Trim() != "255")
                 {
                     option += $"-{tabigFirstLevel_cmb.Text.Trim()}.{tabigLastLevel_cmb.Text.Trim()}";
                 }
+                if (AllLevelGradient) option += "-num";  // 依漸層條件標示階數
             }
             return null;
         }  // Gradient 轉 config
@@ -454,7 +724,7 @@ namespace Thunder
             param = $"{ConfigColorText(tabiwBack_pic.BackColor)}-{ConfigColorText(tabiwWin_pic.BackColor)}";
             string location = tabiwWinLocPixcel_rdo.Checked ? $"xy_{tabiwWinLocPixcelX_nud.Value}.{tabiwWinLocPixcelY_nud.Value}"
                 : tabiwWinLocTwo_rdo.Checked ? "two" : "c";
-            option = $"{tabiwWinSizePercent_nud.Value}%{location}";
+            option = $"{tabiwWinSizePercent_nud.Value}%{location}{MontageConfigSuffix()}";  // 蒙太奇接在後面：|名稱+名稱|亮度
             return null;
         }  // Window 轉 config
         private string MaskToConfig(out string param, out string option)
@@ -479,26 +749,28 @@ namespace Thunder
                     new string(colors.Skip(row * columns).Take(columns).Select(c => c.ToArgb() == Color.Black.ToArgb() ? '0' : '1').ToArray())));
                 return null;
             }
+            option = MaskCellsToOption(colors, w, h);
+            return null;
+        }  // Mask 轉 config
+        private static string MaskCellsToOption(Color[] colors, int w, int h)
+        {
             char Code(Color c) => c.ToArgb() == Color.Black.ToArgb() ? '0' : c.ToArgb() == Color.White.ToArgb() ? '1' : c.ToArgb() == Color.Gray.ToArgb() ? '2' : '?';
             if (colors.All(c => Code(c) != '?'))
             {
                 // 只有黑、白、灰時用精簡寫法，例：10.01
-                option = string.Join(".", Enumerable.Range(0, h).Select(row => new string(colors.Skip(row * w).Take(w).Select(Code).ToArray())));
+                return string.Join(".", Enumerable.Range(0, h).Select(row => new string(colors.Skip(row * w).Take(w).Select(Code).ToArray())));
             }
-            else
-            {
-                // 其他顏色用顏色寫法，例：red lime/blue 127.127.127
-                option = string.Join("/", Enumerable.Range(0, h).Select(row => string.Join(" ", colors.Skip(row * w).Take(w).Select(ConfigColorText))));
-                if (!IsColorMaskOption(option)) option += "/";  // 只有 1 格且為 R.G.B 時補 /，避免被當成精簡寫法
-            }
-            return null;
-        }  // Mask 轉 config
+            // 其他顏色用顏色寫法，例：red lime/blue 127.127.127
+            string option = string.Join("/", Enumerable.Range(0, h).Select(row => string.Join(" ", colors.Skip(row * w).Take(w).Select(ConfigColorText))));
+            if (!IsColorMaskOption(option)) option += "/";  // 只有 1 格且為 R.G.B 時補 /，避免被當成精簡寫法
+            return option;
+        }  // Mask 格子顏色轉 config 選項
         private string DynamicToConfig(out string param, out string option)
         {
             param = option = "";
             if (mypicture.tag == "image") return "背景使用匯入的截圖，config 只能描述純色背景";
             param = $"{ConfigColorText(tabiedBackColor_btn.BackColor)}-{ConfigColorText(tabiedObjectColor_btn.BackColor)}";
-            string shape = tabiedObjectCube_rdo.Checked ? "cube" : tabiedObjectStrip_rdo.Checked ? "strip" : "ball";
+            string shape = tabiedObjectCube_rdo.Checked ? "cube" : tabiedObjectStrip_rdo.Checked ? "strip" : tabiedObjectBlur_rdo.Checked ? "blur" : "ball";
             string direction = tabiedMoveH_rdo.Checked ? "h" : tabiedMoveV_rdo.Checked ? "v" : "b";
             option = $"{shape}-{direction}-size{tabiedObjectSize_nud.Value}-speed{tabiedMoveSpeed_nud.Value}";
             return null;
@@ -525,14 +797,26 @@ namespace Thunder
             tabiwOverlay_lvw.Columns.Add("設定", 99);  // 剛好填滿清單寬度，完整內容用 tooltip 顯示
             var add = new Button { Text = "新增", Location = new Point(68, 357), Size = new Size(47, 23) };
             var edit = new Button { Text = "修改", Location = new Point(118, 357), Size = new Size(47, 23) };
-            var remove = new Button { Text = "移除", Location = new Point(168, 357), Size = new Size(47, 23) };
+            var copy = new Button { Text = "複製", Location = new Point(168, 357), Size = new Size(47, 23) };
+            var moveUp = new Button { Text = "上移", Location = new Point(218, 357), Size = new Size(47, 23) };
+            var moveDown = new Button { Text = "下移", Location = new Point(268, 357), Size = new Size(47, 23) };
+            var remove = new Button { Text = "移除", Location = new Point(318, 357), Size = new Size(47, 23) };
+            var clear = new Button { Text = "全清", Location = new Point(368, 357), Size = new Size(47, 23) };
             add.Click += (s, e) => EditWindowOverlay(null);
             edit.Click += (s, e) => { if (tabiwOverlay_lvw.SelectedItems.Count > 0) EditWindowOverlay(tabiwOverlay_lvw.SelectedItems[0]); };
+            copy.Click += (s, e) => CopyWindowOverlay();
+            moveUp.Click += (s, e) => MoveWindowOverlay(-1);
+            moveDown.Click += (s, e) => MoveWindowOverlay(+1);
             remove.Click += (s, e) => RemoveWindowOverlay();
+            clear.Click += (s, e) => tabiwOverlay_lvw.Items.Clear();
+            toolTip.SetToolTip(copy, "複製選取的項目，加在它的下一列");
+            toolTip.SetToolTip(moveUp, "選取項目往上移（越下面的越晚畫，會蓋住上面的）");
+            toolTip.SetToolTip(moveDown, "選取項目往下移（越下面的越晚畫，會蓋住上面的）");
             tabiwOverlay_lvw.DoubleClick += (s, e) => { if (tabiwOverlay_lvw.SelectedItems.Count > 0) EditWindowOverlay(tabiwOverlay_lvw.SelectedItems[0]); };
             tabiwOverlay_lvw.KeyDown += (s, e) => { if (e.KeyCode == Keys.Delete) { RemoveWindowOverlay(); e.Handled = true; } };
             toolTip.SetToolTip(add, "新增額外疊加的窗口或線條，按 Generate 時依清單順序畫上（雙擊項目修改、Delete 移除）");
-            tabimgeWindow.Controls.AddRange(new Control[] { tabiwOverlay_lvw, add, edit, remove });
+            toolTip.SetToolTip(clear, "清除清單上所有窗口 / 線條");
+            tabimgeWindow.Controls.AddRange(new Control[] { tabiwOverlay_lvw, add, edit, copy, moveUp, moveDown, remove, clear });
         }  // 建立 Window 疊加清單
         private void EditWindowOverlay(ListViewItem item)
         {
@@ -554,14 +838,44 @@ namespace Thunder
                     item = new ListViewItem(new[] { "", "" });
                     tabiwOverlay_lvw.Items.Add(item);
                 }
-                item.Tag = result;
-                item.SubItems[0].Text = WindowOverlay.KindText(result.Kind);
-                item.SubItems[1].Text = result.Description();
-                item.ToolTipText = $"{item.SubItems[0].Text} {item.SubItems[1].Text}";
+                SetWindowOverlayItem(item, result);
                 item.Selected = true;
                 item.EnsureVisible();
             }
         }  // 新增 / 修改疊加項目
+        private static void SetWindowOverlayItem(ListViewItem item, WindowOverlay overlay)
+        {
+            item.Tag = overlay;
+            item.SubItems[0].Text = WindowOverlay.KindText(overlay.Kind);
+            item.SubItems[1].Text = overlay.Description();
+            item.ToolTipText = $"{item.SubItems[0].Text} {item.SubItems[1].Text}";
+        }  // 疊加項目顯示內容
+        private void CopyWindowOverlay()
+        {
+            if (tabiwOverlay_lvw.SelectedItems.Count == 0) return;
+            int index = tabiwOverlay_lvw.SelectedIndices[0];
+            var source = (WindowOverlay)tabiwOverlay_lvw.Items[index].Tag;
+            var copy = new WindowOverlay { Kind = source.Kind, X = source.X, Y = source.Y, Width = source.Width, Height = source.Height, Color = source.Color };
+            var item = new ListViewItem(new[] { "", "" });
+            SetWindowOverlayItem(item, copy);
+            tabiwOverlay_lvw.Items.Insert(index + 1, item);
+            item.Selected = true;
+            item.EnsureVisible();
+        }  // 複製疊加項目（加在下一列）
+        private void MoveWindowOverlay(int step)
+        {
+            // 清單順序就是繪製順序，往下移代表較晚畫、蓋在上面
+            if (tabiwOverlay_lvw.SelectedItems.Count == 0) return;
+            int index = tabiwOverlay_lvw.SelectedIndices[0];
+            int target = index + step;
+            if (target < 0 || target >= tabiwOverlay_lvw.Items.Count) return;
+            ListViewItem item = tabiwOverlay_lvw.Items[index];
+            tabiwOverlay_lvw.Items.RemoveAt(index);
+            tabiwOverlay_lvw.Items.Insert(target, item);
+            item.Selected = true;
+            item.Focused = true;
+            item.EnsureVisible();
+        }  // 上移 / 下移疊加項目
         private void RemoveWindowOverlay()
         {
             if (tabiwOverlay_lvw.SelectedItems.Count == 0) return;

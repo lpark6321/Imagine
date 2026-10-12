@@ -111,12 +111,26 @@ namespace Thunder
         }  // listbox控制棋盤格
         private void funcText(string colors, string option)
         {
-            // 參數：背景色-文字色；選項：文字/大小/字距/行距/串距（大小以後可省略，用預設值）
+            // 參數：背景色-文字色；選項：文字/大小/字距/行距/串距（大小以後可省略，用預設值），可加 f:字型、b 粗體
             string[] colorParts = colors.Split('-');
             funcFrame(colorParts[0], "");  // 背景與框線（重設為無線條、關閉文字模式）
             string[] parts = option.Split('/');
+            // 字型段（f:字型、b 粗體）可放在任何位置，先取出來，剩下的照原本順序解析
+            ApplyTextFontTokens(parts.Skip(1).Select(p => p.Trim()).Where(IsTextFontToken));
+            parts = parts.Take(1).Concat(parts.Skip(1).Where(p => !IsTextFontToken(p.Trim()))).ToArray();
             string text = parts[0].Trim();
             if (text == "") throw new FormatException("沒有文字（選項第一段為文字）");
+            if (parts.Length > 1 && parts[1].Trim().ToLower() == "boom")
+            {
+                // 爆炸模式：文字/boom，字級固定由 4pt 遞增
+                if (text.Length > 30) throw new FormatException($"爆炸模式文字最多 30 個字，目前 {text.Length} 個");
+                tabiefTextColor_btn.BackColor = colorParts.Length > 1 ? switchcolor(colorParts[1]) : Color.White;
+                tabiefText_txt.Text = text;
+                tabiefText_chk.Checked = true;
+                tabiefTextBoom_chk.Checked = true;
+                return;
+            }
+            tabiefTextBoom_chk.Checked = false;
             if (text.Length > 10) throw new FormatException($"文字最多 10 個字，目前 {text.Length} 個");
             decimal Number(int index, string name, NumericUpDown range)
             {
@@ -137,7 +151,7 @@ namespace Thunder
         }  // listbox控制文字模式
         private void funcDynamic(string colors, string option)
         {
-            // 參數：背景色-物件色；選項：形狀(ball/cube/strip)、方向(h/v/b)、size數字、speed數字，以 - 連接
+            // 參數：背景色-物件色；選項：形狀(ball/cube/strip/blur)、方向(h/v/b)、size數字、speed數字，以 - 連接
             mypicture.tag = "";  // 不使用匯入的背景圖
             string[] colorParts = colors.Split('-');
             tabiedBackColor_btn.BackColor = switchcolor(colorParts[0]);
@@ -151,6 +165,7 @@ namespace Thunder
                 if (t == "ball") shape = tabiedObjectBall_rdo;
                 else if (t == "cube") shape = tabiedObjectCube_rdo;
                 else if (t == "strip") shape = tabiedObjectStrip_rdo;
+                else if (t == "blur") shape = tabiedObjectBlur_rdo;
                 else if (t == "h") direction = tabiedMoveH_rdo;
                 else if (t == "v") direction = tabiedMoveV_rdo;
                 else if (t == "b") direction = tabiedMoveBevel_rdo;
@@ -167,9 +182,9 @@ namespace Thunder
                 throw new FormatException($"speed 需在 {tabiedMoveSpeed_nud.Minimum}~{tabiedMoveSpeed_nud.Maximum}");
             }
             shape.Checked = true;  // 先設形狀：選長條時會強制水平並停用斜角
-            if (shape == tabiedObjectStrip_rdo && direction == tabiedMoveBevel_rdo)
+            if ((shape == tabiedObjectStrip_rdo || shape == tabiedObjectBlur_rdo) && direction == tabiedMoveBevel_rdo)
             {
-                direction = tabiedMoveH_rdo;  // 長條不能斜角移動
+                direction = tabiedMoveH_rdo;  // 長條、模糊條不能斜角移動
             }
             direction.Checked = true;
             tabiedObjectSize_nud.Value = size;
@@ -181,7 +196,34 @@ namespace Thunder
             tabigFirstLevel_cmb.Text = "0";
             tabigLastLevel_cmb.Text = "255";
             tabigReverse_chk.Checked = false;
-            // 格式：[r-]方向-階數-分割[-起始.結束]；r- 為反向（分割需 ≥ 2），起始.結束 為灰階（例：255.0 由亮到暗）
+            tabigAll_chk.Checked = false;
+            // 全畫面格狀全階：all-階數（直排）或 all-h-階數（橫排）；顏色依參數（單色或 colorbar）
+            if (hv.StartsWith("all"))
+            {
+                string[] parts = hv.Split('-');
+                bool horizontal = parts.Length == 3 && parts[1] == "h";
+                bool validOrder = parts.Length == 2 || (parts.Length == 3 && (parts[1] == "h" || parts[1] == "v"));
+                if (!validOrder || !int.TryParse(parts[parts.Length - 1], out int count) || !AllLevelCounts.Contains(count))
+                {
+                    throw new FormatException($"全階「{hv}」格式應為 all-階數 或 all-h-階數，階數可用 {string.Join("、", AllLevelCounts)}，例如 all-256");
+                }
+                tabigHWay_rdo.Checked = horizontal;  // 排列方向跟著漸層方向
+                tabigVWay_rdo.Checked = !horizontal;
+                // 先切到漸層方向（離開 ColorBar 模式），全階才能勾選
+                tabigAll_chk.Checked = true;
+                tabigAllGrid_rdo.Checked = true;
+                tabigAll_cmb.SelectedItem = count.ToString();
+                ApplyGradientColor(color);
+                return;
+            }
+            // 結尾 -num：依漸層條件標示階數（全階顯示＋依漸層條件）
+            bool numbered = false;
+            if (hv.EndsWith("-num"))
+            {
+                numbered = true;
+                hv = hv.Substring(0, hv.Length - 4);
+            }
+            // 格式：[r-]方向-階數-分割[-起始.結束][-num]；r- 為反向（分割需 ≥ 2），起始.結束 為灰階（例：255.0 由亮到暗）
             bool reverse = hv.StartsWith("r-");
             if (reverse) hv = hv.Substring(2);
             string[] hvs = hv.Split('-');
@@ -233,6 +275,19 @@ namespace Thunder
                 tabigDivid_cmb.Text = "1";
             }
 
+            if (numbered && !tabigColorBar_rdo.Checked)
+            {
+                // 全階選單取不小於漸層階數的最小值，實際階數仍是漸層分幾階（取兩者較小）
+                int steps = int.TryParse(tabigStep_cmb.Text, out int s) ? s : 256;
+                tabigAll_cmb.SelectedItem = AllLevelCounts.Where(n => n >= steps).DefaultIfEmpty(AllLevelCounts.Last()).First().ToString();
+                tabigAllGrad_rdo.Checked = true;
+                tabigAll_chk.Checked = true;
+            }
+            ApplyGradientColor(color);
+        }  // listbox控制漸層
+        private void ApplyGradientColor(string color)
+        {
+            // 參數：單色（基底色彩）或 colorbar 寫法
             if (color.StartsWith("colorbar"))
             {
                 tabigOther_chk.Checked = true;
@@ -274,12 +329,35 @@ namespace Thunder
                 tabigOther_chk.Checked = false;
                 tabigBaseColor_lbl.BackColor = switchcolor(color); // 修改 Form1 的背景顏色  
             }
-        }  // listbox控制漸層
+        }  // 漸層顏色或 ColorBar
         private static bool IsColorMaskOption(string option)
         {
             // 舊寫法只有 0~2 與 . （例：10.01）；出現 / 、空格、英文字母或 % 就是顏色寫法
             return option.IndexOfAny(new[] { '/', ' ', '%' }) >= 0 || option.Any(char.IsLetter);
         }  // 判斷 Mask 選項是否為顏色寫法
+        private Color[] ParseMaskColorRows(string option, int w, int h)
+        {
+            // Mask 顏色寫法：每格一個顏色（名稱、R.G.B、N%Gray，或 0/1/2），格之間空格、列之間 /
+            string[] rows = option.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (rows.Length != h)
+            {
+                throw new FormatException($"高度為 {h}，選項需要 {h} 列（以 / 分隔），實際 {rows.Length} 列");
+            }
+            var colors = new Color[w * h];
+            for (int y = 0; y < h; y++)
+            {
+                string[] cells = rows[y].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (cells.Length != w)
+                {
+                    throw new FormatException($"寬度為 {w}，第 {y + 1} 列需要 {w} 格（以空格分隔），實際 {cells.Length} 格");
+                }
+                for (int x = 0; x < w; x++)
+                {
+                    colors[y * w + x] = cells[x] == "0" ? Color.Black : cells[x] == "1" ? Color.White : cells[x] == "2" ? Color.Gray : switchcolor(cells[x]);
+                }
+            }
+            return colors;
+        }  // 解析 Mask 顏色寫法
         private void funcMask(string num, string onoff)
         {
             string[] numParts = num.Split('-');
@@ -303,24 +381,7 @@ namespace Thunder
                     // 顏色寫法：每格一個顏色（名稱、R.G.B、N%Gray，或 0/1/2），格之間空格、列之間 /
                     tabiemPixel_rdo.Checked = true;
                     int w = (int)tabiemWNum_nud.Value, h = (int)tabiemHNum_nud.Value;
-                    string[] rows = onoff.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (rows.Length != h)
-                    {
-                        throw new FormatException($"高度為 {h}，選項需要 {h} 列（以 / 分隔），實際 {rows.Length} 列");
-                    }
-                    var colors = new Color[w * h];
-                    for (int y = 0; y < h; y++)
-                    {
-                        string[] cells = rows[y].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (cells.Length != w)
-                        {
-                            throw new FormatException($"寬度為 {w}，第 {y + 1} 列需要 {w} 格（以空格分隔），實際 {cells.Length} 格");
-                        }
-                        for (int x = 0; x < w; x++)
-                        {
-                            colors[y * w + x] = cells[x] == "0" ? Color.Black : cells[x] == "1" ? Color.White : cells[x] == "2" ? Color.Gray : switchcolor(cells[x]);
-                        }
-                    }
+                    Color[] colors = ParseMaskColorRows(onoff, w, h);
                     foreach (Panel targetPanel in tabiemPixelPanel_pnl.Controls.OfType<Panel>())
                     {
                         string[] coordinates = targetPanel.Tag.ToString().Split(',');
@@ -385,6 +446,10 @@ namespace Thunder
         }  // listbox控制遮罩
         private void funcWind(string color, string sizeloc)
         {
+            // 選項結尾可接蒙太奇：大小位置|名稱+名稱|亮度
+            string[] montageParts = sizeloc.Split('|');
+            sizeloc = montageParts[0];
+            ApplyMontageConfig(montageParts.Length > 1 ? montageParts[1] : "", montageParts.Length > 2 ? montageParts[2].Trim() : "");
             // 先重設 config 沒有指定的 ImgEditor 狀態，避免沿用使用者手動的設定
             tabiwDiagonal_cmb.SelectedIndex = 0;  // 斜角：無
             tabiwDiagonal_btn.Checked = false;    // 選單原本就是「無」時不會觸發同步，直接重設
@@ -483,60 +548,14 @@ namespace Thunder
                 string[] colorParts = color.Split('-');
                 if (colorParts.Length >= 3)
                 {
-                    int wnum = 0;
-                    int hnum = 0;
-                    string onoff = "";
-                    if (colorParts[2] == "black")
-                    {
-                        tabiwWinColor_rdo.Checked = true;
-                        tabiwWin_pic.Image = null;
-                        tabiwWin_pic.BackColor = Color.Black; // 修改 Form1 的背景顏色
-                    }
-                    else if (colorParts[2] == "gray")
-                    {
-                        tabiwWinColor_rdo.Checked = true;
-                        tabiwWin_pic.Image = null;
-                        tabiwWin_pic.BackColor = Color.Gray; // 修改 Form1 的背景顏色
-                    }
-                    else if (colorParts[2] == "dotw")
+                    // Custom-背景-窗口：每一段可以是常用 mask 名稱（dot1、row2.127…）或顏色
+                    // 先產生窗口再產生背景（兩者共用同一個自製圖面板）
+                    if (TryCustomMask(colorParts[2], out int winW, out int winH, out Color[] winCells))
                     {
                         tabiwWinCustom_rdo.Checked = true;
                         tabiwWin_pic.Image = null;
-                        windowPictureBox_Click(tabiwWinCustom_rdo, EventArgs.Empty);
-                        tabiwCustom_cmb.SelectedIndex = 0;
-                        wnum = 2;
-                        hnum = 2;
-                        onoff = "10.01";
-
-                        onoff = onoff.Replace(".", "");
-                        tabiwCMaskWNum_nud.Value = wnum;
-                        tabiwCMaskHNum_nud.Value = hnum;
-                        MaskPanelCreat(tabiwCMaskPixelClear_btn, EventArgs.Empty);
-                        for (int i = 0; i < hnum; i++)
-                        {
-                            for (int j = 0; j < wnum; j++)
-                            {
-                                Panel targetPanel =
-                                    tabiwCMaskPixelPanel_pnl.Controls[i * wnum + j] as Panel;
-                                if (targetPanel != null)
-                                {
-                                    // 解析 Panel 的座標 (Tag 格式為 "x,y")
-                                    string[] coordinates = targetPanel.Tag.ToString().Split(',');
-                                    // 計算在 onoff 字符串中的索引
-                                    int index = (int.Parse(coordinates[1]) * wnum + int.Parse(coordinates[0]));
-                                    // 設置 Panel 的顏色
-                                    if (onoff[index] == '1')
-                                    {
-                                        targetPanel.BackColor = Color.White;
-                                    }
-                                    else
-                                    {
-                                        targetPanel.BackColor = Color.Black;
-                                    }
-                                }
-                            }
-                        }
-                        Custom_btn_Click(tabiwCustom_btn, EventArgs.Empty);
+                        windowPictureBox_Click(tabiwWinCustom_rdo, EventArgs.Empty);  // 自製圖按鈕切成「窗口生成」
+                        ApplyCustomMask(winW, winH, winCells);
                     }
                     else
                     {
@@ -544,57 +563,12 @@ namespace Thunder
                         tabiwWin_pic.Image = null;
                         tabiwWin_pic.BackColor = switchcolor(colorParts[2]); // Custom-背景-窗口：第 3 段為窗口顏色
                     }
-
-
-                    if (colorParts[1] == "dotg")
+                    if (TryCustomMask(colorParts[1], out int backW, out int backH, out Color[] backCells))
                     {
                         tabiwBackCustom_rdo.Checked = true;
                         tabiwBack_pic.Image = null;
-                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
-                        tabiwCustom_cmb.SelectedIndex = 0;
-                        wnum = 2;
-                        hnum = 2;
-                        onoff = "20.02";
-                    }
-                    else if(colorParts[1] == "vstripeg")
-                    {
-                        tabiwBackCustom_rdo.Checked = true;
-                        tabiwBack_pic.Image = null;
-                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
-                        tabiwCustom_cmb.SelectedIndex = 0;
-                        wnum = 2;
-                        hnum = 2;
-                        onoff = "45.54";
-                    }
-                    else if(colorParts[1] == "vstripew")
-                    {
-                        tabiwBackCustom_rdo.Checked = true;
-                        tabiwBack_pic.Image = null;
-                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
-                        tabiwCustom_cmb.SelectedIndex = 0;
-                        wnum = 2;
-                        hnum = 2;
-                        onoff = "67.76";
-                    }
-                    else if (colorParts[1] == "dotdell")
-                    {
-                        tabiwBackCustom_rdo.Checked = true;
-                        tabiwBack_pic.Image = null;
-                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
-                        tabiwCustom_cmb.SelectedIndex = 0;
-                        wnum = 2;
-                        hnum = 2;
-                        onoff = "30.03";
-                    }
-                    else if (colorParts[1] == "roww")
-                    {
-                        tabiwBackCustom_rdo.Checked = true;
-                        tabiwBack_pic.Image = null;
-                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);
-                        tabiwCustom_cmb.SelectedIndex = 0;
-                        wnum = 2;
-                        hnum = 2;
-                        onoff = "11.00";
+                        windowPictureBox_Click(tabiwBackCustom_rdo, EventArgs.Empty);  // 自製圖按鈕切成「背景生成」
+                        ApplyCustomMask(backW, backH, backCells);
                     }
                     else
                     {
@@ -602,60 +576,10 @@ namespace Thunder
                         tabiwBack_pic.Image = null;
                         tabiwBack_pic.BackColor = switchcolor(colorParts[1]); // Custom-背景-窗口：第 2 段為背景顏色
                     }
-                    if (tabiwBackCustom_rdo.Checked == true && onoff != "")
-                    {
-                        onoff = onoff.Replace(".", "");
-                        tabiwCMaskWNum_nud.Value = wnum;
-                        tabiwCMaskHNum_nud.Value = hnum;
-                        MaskPanelCreat(tabiwCMaskPixelClear_btn, EventArgs.Empty);
-                        for (int i = 0; i < hnum; i++)
-                        {
-                            for (int j = 0; j < wnum; j++)
-                            {
-                                Panel targetPanel =
-                                    tabiwCMaskPixelPanel_pnl.Controls[i * wnum + j] as Panel;
-                                if (targetPanel != null)
-                                {
-                                    // 解析 Panel 的座標 (Tag 格式為 "x,y")
-                                    string[] coordinates = targetPanel.Tag.ToString().Split(',');
-                                    // 計算在 onoff 字符串中的索引
-                                    int index = (int.Parse(coordinates[1]) * wnum + int.Parse(coordinates[0]));
-                                    // 設置 Panel 的顏色
-                                    switch (onoff[index])
-                                    {
-                                        case '0':
-                                            targetPanel.BackColor = Color.Black;
-                                            break;
-                                        case '1':
-                                            targetPanel.BackColor = Color.White;
-                                            break;
-                                        case '2':
-                                            targetPanel.BackColor = Color.Gray;
-                                            break;
-                                        case '3':
-                                            targetPanel.BackColor = Color.FromArgb(0, 127, 127);
-                                            break;
-                                        case '4':
-                                            targetPanel.BackColor = Color.FromArgb(127, 0, 127);
-                                            break;
-                                        case '5':
-                                            targetPanel.BackColor = Color.FromArgb(0, 127, 0);
-                                            break;
-                                        case '6':
-                                            targetPanel.BackColor = Color.FromArgb(255, 0, 255);
-                                            break;
-                                        case '7':
-                                            targetPanel.BackColor = Color.FromArgb(0, 255, 0);
-                                            break;
-                                        default:
-                                            targetPanel.BackColor = Color.Black;
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                        Custom_btn_Click(tabiwCustom_btn, EventArgs.Empty);
-                    }
+                }
+                else
+                {
+                    throw new FormatException("Custom 格式應為 Custom-背景-窗口，例如 Custom-dot1.127-Black");
                 }
             }
             else
@@ -717,5 +641,136 @@ namespace Thunder
                 tabiwWinLocCenter_rdo.Checked = true;
             }
         } // listbox控制窗口
+        // Window 自製圖常用 mask：名稱 → 圖樣（每列以 . 分隔）
+        // 1 = 亮點、0 = 黑、M = 子像素 R+B、G = 子像素 G
+        // 名稱後加 .亮度（0~255）調整亮點的亮度，不寫為 255；另外可寫 幾h幾v，例如 2h1v（2 點寬、1 點高的棋盤）
+        private static readonly Dictionary<string, string> CustomMaskPatterns = new Dictionary<string, string>
+        {
+            ["dot1"] = "10.01",                     // 1 點棋盤
+            ["dot2"] = "1100.1100.0011.0011",       // 2×2 點棋盤
+            ["sub1"] = "MG.GM",                     // 子像素棋盤（R+B / G 交錯）
+            ["sub2"] = "MMGG.MMGG.GGMM.GGMM",       // 2×2 子像素棋盤
+            ["row1"] = "11.00",                     // 1 列橫條
+            ["row2"] = "11.11.00.00",               // 2 列橫條
+            ["col1"] = "10.10",                     // 1 行直條
+            ["col2"] = "1100.1100",                 // 2 行直條
+        };
+        // 舊寫法：仍可讀取，內建 config 已改用新名稱
+        private static readonly Dictionary<string, string> LegacyCustomMasks = new Dictionary<string, string>
+        {
+            ["dotw"] = "dot1", ["dotg"] = "dot1.127", ["vstripew"] = "sub1", ["vstripeg"] = "sub1.127", ["roww"] = "row1",
+        };
+        private const int MaxMaskBlock = 8;  // 幾h幾v 每格最多 8 點
+        private static bool TryCustomMask(string name, out int width, out int height, out Color[] cells)
+        {
+            width = height = 0;
+            cells = null;
+            name = name.Trim().ToLower();
+            if (LegacyCustomMasks.TryGetValue(name, out string modern)) name = modern;
+            if (name == "dotdell")
+            {
+                // Dell crosstalk：維持原本的 127 青 / 黑棋盤
+                // BGR 面板同樣點亮第 2、3 個子像素（G + R）
+                width = height = 2;
+                Color lit = _subPixelBgr ? Color.FromArgb(127, 127, 0) : Color.FromArgb(0, 127, 127);
+                cells = new[] { lit, Color.Black, Color.Black, lit };
+                return true;
+            }
+            // 拆出亮度：dot1.64 → dot1、64（名稱本身不含 .）
+            int level = 255;
+            string baseName = name;
+            int dot = name.IndexOf('.');
+            if (dot >= 0)
+            {
+                baseName = name.Substring(0, dot);
+                if (!int.TryParse(name.Substring(dot + 1), out level) || level < 0 || level > 255)
+                {
+                    if (!IsCustomMaskBase(baseName)) return false;  // 不是 mask 名稱就交給顏色解析（例如 127.127.127）
+                    throw new FormatException($"「{name}」的亮度需為 0~255 的整數，例如 {baseName}.127");
+                }
+            }
+            string[] rows;
+            if (CustomMaskPatterns.TryGetValue(baseName, out string pattern))
+            {
+                rows = pattern.Split('.');
+            }
+            else if (TryDiagonalMask(baseName, out rows))
+            {
+                // 右斜 / 左斜線
+            }
+            else if (TryHvMask(baseName, out rows))
+            {
+                // 幾h幾v 棋盤
+            }
+            else if (_userMasks.TryGetValue(baseName, out var user))
+            {
+                // 自訂 mask：保留原本顏色，.亮度 依比例調暗
+                width = user.width;
+                height = user.height;
+                cells = user.cells.Select(c => level == 255 ? c : Color.FromArgb(c.R * level / 255, c.G * level / 255, c.B * level / 255)).ToArray();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            height = rows.Length;
+            width = rows[0].Length;
+            cells = rows.SelectMany(r => r.Select(c =>
+            {
+                switch (c)
+                {
+                    case '1': return Color.FromArgb(level, level, level);
+                    case 'M': return Color.FromArgb(level, 0, level);
+                    case 'G': return Color.FromArgb(0, level, 0);
+                    default: return Color.Black;
+                }
+            })).ToArray();
+            return true;
+        }  // 解析常用 mask 名稱
+        private static bool IsCustomMaskBase(string baseName) => CustomMaskPatterns.ContainsKey(baseName) || TryHvMask(baseName, out _) || TryDiagonalMask(baseName, out _) || _userMasks.ContainsKey(baseName);
+        private static bool TryDiagonalMask(string baseName, out string[] rows)
+        {
+            // rdiag1~3 右斜（/ 方向）、ldiag1~3 左斜（\ 方向），數字為線寬；不寫數字為 2 點寬
+            // 線與線的間隔等於線寬（週期 = 2 × 線寬）；1 點寬時間隔用 2 點，否則會變成跟 dot1 一樣的棋盤
+            rows = null;
+            var match = System.Text.RegularExpressions.Regex.Match(baseName, @"^(r|l)diag([123]?)$");
+            if (!match.Success) return false;
+            bool right = match.Groups[1].Value == "r";
+            int width = match.Groups[2].Value == "" ? 2 : int.Parse(match.Groups[2].Value);
+            int period = width == 1 ? 3 : width * 2;
+            rows = Enumerable.Range(0, period).Select(y => new string(Enumerable.Range(0, period)
+                .Select(x => ((right ? x + y : x - y + period * period) % period) < width ? '1' : '0').ToArray())).ToArray();
+            return true;
+        }  // 斜線
+        private static bool TryHvMask(string baseName, out string[] rows)
+        {
+            // 幾h幾v：每格 h 點寬、v 點高的黑白棋盤，例如 2h1v → 1100.0011
+            rows = null;
+            var match = System.Text.RegularExpressions.Regex.Match(baseName, @"^(\d+)h(\d+)v$");
+            if (!match.Success) return false;
+            int h = int.Parse(match.Groups[1].Value), v = int.Parse(match.Groups[2].Value);
+            if (h < 1 || v < 1 || h > MaxMaskBlock || v > MaxMaskBlock)
+            {
+                throw new FormatException($"「{baseName}」每格的寬、高需為 1~{MaxMaskBlock} 點");
+            }
+            rows = Enumerable.Range(0, v * 2).Select(y => new string(Enumerable.Range(0, h * 2).Select(x => (x / h + y / v) % 2 == 0 ? '1' : '0').ToArray())).ToArray();
+            return true;
+        }  // 幾h幾v 棋盤
+        private void ApplyCustomMask(int width, int height, Color[] cells)
+        {
+            // 把圖樣填進自製圖面板，再依目前按鈕（背景生成 / 窗口生成）產生圖片
+            tabiwCustom_cmb.SelectedIndex = 0;  // Mask 模式
+            tabiwCMaskPixel_rdo.Checked = true;
+            tabiwCMaskWNum_nud.Value = width;
+            tabiwCMaskHNum_nud.Value = height;
+            MaskPanelCreat(tabiwCMaskPixelClear_btn, EventArgs.Empty);
+            foreach (Panel block in tabiwCMaskPixelPanel_pnl.Controls.OfType<Panel>())
+            {
+                var (x, y) = BlockCell(block);
+                block.BackColor = cells[y * width + x];
+            }
+            Custom_btn_Click(tabiwCustom_btn, EventArgs.Empty);
+        }  // 套用自製圖 mask
     }
 }
