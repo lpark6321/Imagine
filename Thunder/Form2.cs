@@ -575,8 +575,9 @@ namespace Thunder
         }  //左上角短暫顯示
         private void InvalidateCaption()
         {
-            // 名稱長度會變，重繪整條頂端
-            picwinPicture_pic.Invalidate(new Rectangle(0, 0, picwinPicture_pic.Width, Math.Max(_captionBounds.Height, CaptionTriggerArea.Height)));
+            // 名稱長度會變，重繪整條頂端；可能從主視窗或計時器（無 DPI 感知）呼叫，先切回這個視窗的 DPI 模式，否則 150% 時範圍被換算成 2/3、下半段留下殘影
+            using (mainWindow.WindowDpiScope(picwinPicture_pic))
+                picwinPicture_pic.Invalidate(new Rectangle(0, 0, picwinPicture_pic.Width, Math.Max(_captionBounds.Height, CaptionTriggerArea.Height)));
         }  //重繪名稱區域
         private void InitCaption()
         {
@@ -1028,8 +1029,11 @@ namespace Thunder
         {
             // 只重繪上次與這次的範圍，避免整張圖重畫
             Rectangle now = LensLayout(out _, out _);
-            picwinPicture_pic.Invalidate(_lensDrawn);
-            picwinPicture_pic.Invalidate(now);
+            using (mainWindow.WindowDpiScope(picwinPicture_pic))  // 與名稱相同：從其他 DPI 模式呼叫時範圍不被換算
+            {
+                picwinPicture_pic.Invalidate(_lensDrawn);
+                picwinPicture_pic.Invalidate(now);
+            }
             _lensDrawn = now;
         }  //重繪放大鏡
         private int LensPixels() => Math.Max(5, (LensTarget / _magnifierZoom) | 1);  // 放大鏡內顯示幾個像素（奇數，中心為游標像素）

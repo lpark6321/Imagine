@@ -58,14 +58,12 @@ namespace Thunder
         private string SelectedScreenDevice => mnsScreenlist_cmb.SelectedItem?.ToString();
         // 最外層佈局--------------------------------------------------------------------------------------------------
         private SplitContainer _mainSplit;
-        private int _mainLayoutTabWidth;
         private void InitMainLayout()
         {
             // 左欄分頁、右欄預覽改放進 SplitContainer（原本是兩個 Dock = Left）：
             // 兩欄各有寬度下限（原本設計的寬度），視窗大小改變時兩欄依比例自動調整，中間的分隔線也可以直接拖曳；
             // 程式沒有 DPI 感知，關掉主視窗的自動縮放，避免切換螢幕或全螢幕時被重新縮放
             int left = tabControl.Width, right = Math.Max(Showimage_flp.Width, Showimage_flp.PreferredSize.Width);
-            _mainLayoutTabWidth = left;
             const int splitterWidth = 5;
             // 主視窗最小寬度要放得下兩欄的下限加分隔線
             int border = Width - ClientSize.Width;
@@ -95,20 +93,6 @@ namespace Thunder
             _mainSplit.Panel2MinSize = right;
             _mainSplit.SplitterDistance = Math.Max(left, Math.Min(_mainSplit.Width - right - splitterWidth, left));
             toolTip.SetToolTip(_mainSplit, "拖曳中間的分隔線調整左右寬度");
-            tabControl.SizeChanged += (s, e) =>
-            {
-                // 偵測：分頁寬度不該小於下限；萬一發生，記下呼叫堆疊（找原因用）
-                if (tabControl.Width >= _mainLayoutTabWidth || WindowState == FormWindowState.Minimized || tabControl.Width == 0) return;
-                try
-                {
-                    System.IO.File.AppendAllText(System.IO.Path.Combine(Application.StartupPath, "layout_debug.log"),
-                        $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} 分頁寬度 {tabControl.Width}（下限 {_mainLayoutTabWidth}）分隔線 {_mainSplit.SplitterDistance}{Environment.NewLine}{Environment.StackTrace}{Environment.NewLine}{Environment.NewLine}");
-                }
-                catch (Exception)
-                {
-                    // 無法寫入記錄檔時略過
-                }
-            };
         }  // 建立最外層佈局
         private void OnDisplaySettingsChanged(object sender, EventArgs e)
         {
@@ -370,11 +354,12 @@ namespace Thunder
         private sealed class MainDpiContext : IDisposable
         {
             private readonly IntPtr _previous;
-            public MainDpiContext()
+            public MainDpiContext(IntPtr context)
             {
+                if (context == IntPtr.Zero) return;
                 try
                 {
-                    _previous = SetThreadDpiAwarenessContext(new IntPtr(-1));  // DPI_AWARENESS_CONTEXT_UNAWARE：與主視窗相同
+                    _previous = SetThreadDpiAwarenessContext(context);
                 }
                 catch (EntryPointNotFoundException)
                 {
@@ -383,7 +368,23 @@ namespace Thunder
             }
             public void Dispose() { if (_previous != IntPtr.Zero) SetThreadDpiAwarenessContext(_previous); }
         }
-        public static IDisposable MainDpiScope() => new MainDpiContext();
+        public static IDisposable MainDpiScope() => new MainDpiContext(new IntPtr(-1));  // DPI_AWARENESS_CONTEXT_UNAWARE：與主視窗相同
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetWindowDpiAwarenessContext(IntPtr hwnd);
+        public static IDisposable WindowDpiScope(Control control)
+        {
+            // 執行緒切到某個視窗自己的 DPI 模式：從其他模式（主視窗、計時器）呼叫 Invalidate 等傳座標的 API 時，座標才不會被 Windows 換算
+            IntPtr context = IntPtr.Zero;
+            try
+            {
+                if (control != null && control.IsHandleCreated) context = GetWindowDpiAwarenessContext(control.Handle);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // 舊版 Windows
+            }
+            return new MainDpiContext(context);
+        }
         // 從全螢幕視窗（個別螢幕 DPI 感知）呼叫主視窗時用：Windows 處理全螢幕視窗的訊息期間，執行緒是全螢幕視窗的 DPI 模式，
         // 這時直接操作主視窗（換螢幕、選清單、重新產生）會讓主視窗在錯誤的 DPI 下排版（例如 150% 螢幕上分頁被縮成 2/3），
         // 所以先切回主視窗的模式（無感知）再執行

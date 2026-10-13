@@ -51,6 +51,7 @@ namespace Thunder
             (new System.Text.RegularExpressions.Regex(@"^Mask 範本 (\w+)：亮點用「選擇顏色」（子像素圖樣用其亮度），暗點為黑$"), "Mask template $1: lit cells use the selected color (sub-pixel patterns use its brightness), dark cells are black"),
             (new System.Text.RegularExpressions.Regex(@"^(\w+)：按下後排進畫面，再按一次取消$"), "$1: press to add it to the screen, press again to remove"),
             (new System.Text.RegularExpressions.Regex(@"^子像素亮度設為 (\d+)$"), "Set sub-pixel brightness to $1"),
+            (new System.Text.RegularExpressions.Regex(@"^加入 ImgList（(\d+) 張）$"), "Add to ImgList ($1 images)"),
             (new System.Text.RegularExpressions.Regex(@"^蒙太奇亮度設為 (\d+)$"), "Set montage brightness to $1"),
             (new System.Text.RegularExpressions.Regex(@"^右斜(\d)$"), "R-diag $1"),
             (new System.Text.RegularExpressions.Regex(@"^左斜(\d)$"), "L-diag $1"),

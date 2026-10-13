@@ -250,7 +250,245 @@ namespace Thunder
             tabDirList.Controls.Add(bar);
             tabdlPatternList_lvw.BringToFront();  // 清單最後 Dock，填滿按鈕以外的空間
             ShowDirListFolder();
+            // 右鍵：選取的圖片加到 ImgList（Image 類型，加在 ImgList 選取項目的下一列）
+            var addToImgList = new ToolStripMenuItem("加入 ImgList", null, (s, e) =>
+                AddImageFilesToList(tabdlPatternList_lvw.SelectedItems.Cast<ListViewItem>().OrderBy(i => i.Index).Select(i => i.Tag.ToString()), fromDirList: true))
+            {
+                ToolTipText = "選取的圖片以 Image 類型加到 ImgList（加在 ImgList 選取項目的下一列，沒有選取時加在最後）"
+            };
+            var dirListMenu = new ContextMenuStrip();
+            dirListMenu.Items.Add(addToImgList);
+            dirListMenu.Opening += (s, e) =>
+            {
+                int count = tabdlPatternList_lvw.SelectedItems.Count;
+                if (count == 0) { e.Cancel = true; return; }
+                addToImgList.Text = T(count > 1 ? $"加入 ImgList（{count} 張）" : "加入 ImgList");
+            };
+            tabdlPatternList_lvw.ContextMenuStrip = dirListMenu;
         }  // DirList 重新讀取與選擇資料夾
+        // DirList 讀取與縮圖：清單先列出（只讀檔頭取得寬高），縮圖在背景執行緒產生（看得到的先做），做過的縮圖依檔案快取---------
+        private static readonly Size DirThumbSize = new Size(90, 90);
+        private static readonly Dictionary<string, Bitmap> _dirThumbCache = new Dictionary<string, Bitmap>();  // 路徑|修改時間|大小 → 縮圖（重新讀取時沒改過的圖不必重做）
+        private const int DirThumbCacheLimit = 3000;
+        private int _dirListGeneration;  // 每次讀取加一，背景工作看到不同就停止
+        private Timer _dirThumbTimer;
+        private DirThumbJob _dirThumbJob;
+        private sealed class DirThumbJob
+        {
+            public int Generation;
+            public string[] Paths, Keys;
+            public int[] State;  // 0 未做、1 處理中、2 完成
+            public int Next = -1;  // 依序處理到哪一張
+            public readonly System.Collections.Concurrent.ConcurrentQueue<int> Priority = new System.Collections.Concurrent.ConcurrentQueue<int>();  // 畫面上看得到的先做
+            public readonly System.Collections.Concurrent.ConcurrentQueue<(int index, Bitmap thumbnail)> Done = new System.Collections.Concurrent.ConcurrentQueue<(int, Bitmap)>();
+            public int Remaining;
+        }
+        private static string DirThumbKey(FileInfo file) => $"{file.FullName}|{file.LastWriteTimeUtc.Ticks}|{file.Length}";
+        private void PopulateListView()
+        {
+            int generation = ++_dirListGeneration;  // 上一次還沒做完的背景縮圖會自己停止
+            tabdlPatternList_lvw.BeginUpdate();
+            try
+            {
+                tabdlPatternList_lvw.Items.Clear();
+                tabdlPatternList_lvw.Groups.Clear();
+                ImageList old = tabdlPatternList_lvw.LargeImageList;
+                tabdlPatternList_lvw.LargeImageList = new ImageList { ImageSize = DirThumbSize, ColorDepth = ColorDepth.Depth32Bit };
+                old?.Dispose();
+
+                // 分組：JPG → PNG → BMP，組內依檔名自然排序，讓全螢幕左右切換的順序與畫面一致
+                string[] groupOrder = { ".jpg", ".png", ".bmp" };
+                var groups = new Dictionary<string, ListViewGroup>
+                {
+                    [".jpg"] = new ListViewGroup("JPG 圖片", HorizontalAlignment.Left),
+                    [".png"] = new ListViewGroup("PNG 圖片", HorizontalAlignment.Left),
+                    [".bmp"] = new ListViewGroup("BMP 圖片", HorizontalAlignment.Left),
+                };
+                foreach (string extension in groupOrder) tabdlPatternList_lvw.Groups.Add(groups[extension]);
+
+                FileInfo[] files = new DirectoryInfo(_dirListFolder).GetFiles()
+                    .Where(file => groupOrder.Contains(file.Extension.ToLower())).ToArray();
+                Array.Sort(files, (a, b) =>
+                {
+                    int byGroup = Array.IndexOf(groupOrder, a.Extension.ToLower()).CompareTo(Array.IndexOf(groupOrder, b.Extension.ToLower()));
+                    return byGroup != 0 ? byGroup : StrCmpLogicalW(a.Name, b.Name);
+                });
+
+                var items = new List<ListViewItem>();
+                var keys = new List<string>();
+                var failed = new List<string>();
+                foreach (FileInfo file in files)
+                {
+                    Size size;
+                    try
+                    {
+                        // 只讀檔頭取得寬高（不解碼整張圖）
+                        using (var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        using (Image header = Image.FromStream(stream, false, false))
+                        {
+                            size = header.Size;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        failed.Add($"{file.Name}：{ex.Message}");
+                        continue;
+                    }
+                    string key = DirThumbKey(file);
+                    var item = new ListViewItem(file.Name) { Tag = file.FullName, ImageKey = key, Group = groups[file.Extension.ToLower()] };
+                    item.SubItems.Add(file.Name);  // 名稱
+                    item.SubItems.Add(size.Width.ToString());  // 寬
+                    item.SubItems.Add(size.Height.ToString());  // 高
+                    lock (_dirThumbCache)
+                    {
+                        if (_dirThumbCache.TryGetValue(key, out Bitmap cached)) tabdlPatternList_lvw.LargeImageList.Images.Add(key, cached);
+                    }
+                    items.Add(item);
+                    keys.Add(key);
+                }
+                tabdlPatternList_lvw.Items.AddRange(items.ToArray());
+                if (failed.Count > 0)
+                {
+                    BeginInvoke((Action)(() => MessageBox.Show($"無法讀取 {failed.Count} 張圖片：\r\n" + string.Join("\r\n", failed.Take(20)) + (failed.Count > 20 ? "\r\n…" : ""), "DirList", MessageBoxButtons.OK, MessageBoxIcon.Warning)));
+                }
+                StartDirThumbnails(generation, items.Select(i => i.Tag.ToString()).ToArray(), keys.ToArray());
+            }
+            finally
+            {
+                tabdlPatternList_lvw.EndUpdate();
+            }
+        }  // listview圖片導入列表
+        private void StartDirThumbnails(int generation, string[] paths, string[] keys)
+        {
+            var job = new DirThumbJob { Generation = generation, Paths = paths, Keys = keys, State = new int[paths.Length] };
+            for (int i = 0; i < paths.Length; i++)
+            {
+                if (tabdlPatternList_lvw.LargeImageList.Images.ContainsKey(keys[i])) job.State[i] = 2;  // 快取已有
+            }
+            job.Remaining = job.State.Count(state => state != 2);
+            _dirThumbJob = job;
+            if (_dirThumbTimer == null)
+            {
+                _dirThumbTimer = new Timer { Interval = 100 };
+                _dirThumbTimer.Tick += (s, e) => PumpDirThumbnails();
+                FormClosed += (s, e) => { _dirListGeneration++; _dirThumbTimer.Dispose(); };
+            }
+            if (job.Remaining == 0) { _dirThumbTimer.Stop(); return; }
+            _dirThumbTimer.Start();
+            // 背景解碼：GDI+ 各執行緒用自己的物件就可以平行處理
+            int workers = Math.Max(1, Math.Min(4, Environment.ProcessorCount / 2));
+            for (int w = 0; w < workers; w++)
+            {
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    while (job.Generation == _dirListGeneration)
+                    {
+                        int index = -1;
+                        while (job.Priority.TryDequeue(out int wanted))
+                        {
+                            if (System.Threading.Interlocked.CompareExchange(ref job.State[wanted], 1, 0) == 0) { index = wanted; break; }
+                        }
+                        while (index < 0)
+                        {
+                            int next = System.Threading.Interlocked.Increment(ref job.Next);
+                            if (next >= job.Paths.Length) return;
+                            if (System.Threading.Interlocked.CompareExchange(ref job.State[next], 1, 0) == 0) index = next;
+                        }
+                        job.Done.Enqueue((index, RenderDirThumbnail(job.Paths[index])));
+                    }
+                });
+            }
+        }  // 開始背景產生 DirList 縮圖
+        private static Bitmap RenderDirThumbnail(string path)
+        {
+            // 保持比例縮小、置中，外框一圈灰線（白圖在白底上也看得到）；讀不到時畫紅色叉叉
+            var thumbnail = new Bitmap(DirThumbSize.Width, DirThumbSize.Height, PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(thumbnail))
+            {
+                try
+                {
+                    using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (Image image = Image.FromStream(stream, false, false))
+                    {
+                        float scale = Math.Min((DirThumbSize.Width - 2f) / image.Width, (DirThumbSize.Height - 2f) / image.Height);
+                        int w = Math.Max(1, (int)Math.Round(image.Width * scale)), h = Math.Max(1, (int)Math.Round(image.Height * scale));
+                        var target = new Rectangle((DirThumbSize.Width - w) / 2, (DirThumbSize.Height - h) / 2, w, h);
+                        g.InterpolationMode = scale >= 1 ? InterpolationMode.NearestNeighbor : InterpolationMode.HighQualityBicubic;  // 小圖放大時保留像素
+                        g.PixelOffsetMode = PixelOffsetMode.Half;
+                        if (image.Width > w * 4 && image.Height > h * 4)
+                        {
+                            // 大圖先快速縮到目標的 4 倍，再高品質縮小（直接從 4K 高品質縮到 90 很慢）
+                            using (var middle = new Bitmap(w * 4, h * 4, PixelFormat.Format32bppArgb))
+                            {
+                                using (Graphics mg = Graphics.FromImage(middle))
+                                {
+                                    mg.InterpolationMode = InterpolationMode.Bilinear;
+                                    mg.PixelOffsetMode = PixelOffsetMode.Half;
+                                    mg.DrawImage(image, new Rectangle(0, 0, middle.Width, middle.Height));
+                                }
+                                g.DrawImage(middle, target);
+                            }
+                        }
+                        else
+                        {
+                            g.DrawImage(image, target);
+                        }
+                        g.PixelOffsetMode = PixelOffsetMode.None;
+                        g.DrawRectangle(Pens.Gray, target.X - 1, target.Y - 1, target.Width + 1, target.Height + 1);
+                    }
+                }
+                catch (Exception)
+                {
+                    using (var pen = new Pen(Color.FromArgb(200, 60, 60), 3))
+                    {
+                        g.DrawLine(pen, 20, 20, DirThumbSize.Width - 20, DirThumbSize.Height - 20);
+                        g.DrawLine(pen, DirThumbSize.Width - 20, 20, 20, DirThumbSize.Height - 20);
+                    }
+                }
+            }
+            return thumbnail;
+        }  // 產生一張 DirList 縮圖
+        private void QueueVisibleDirThumbnails(DirThumbJob job)
+        {
+            // 畫面上看得到、還沒做的優先
+            if (!tabdlPatternList_lvw.IsHandleCreated) return;
+            Rectangle client = tabdlPatternList_lvw.ClientRectangle;
+            foreach (ListViewItem item in tabdlPatternList_lvw.Items)
+            {
+                int index = item.Index;
+                if (index >= job.State.Length || job.State[index] != 0) continue;
+                if (ListItemBounds(tabdlPatternList_lvw, item).IntersectsWith(client)) job.Priority.Enqueue(index);
+            }
+        }  // 排入看得到的縮圖
+        private void PumpDirThumbnails()
+        {
+            // 計時器（主執行緒）：把做好的縮圖放進清單，並更新優先順序
+            DirThumbJob job = _dirThumbJob;
+            if (job == null || job.Generation != _dirListGeneration) { _dirThumbTimer.Stop(); return; }
+            ImageList images = tabdlPatternList_lvw.LargeImageList;
+            bool added = false;
+            while (job.Done.TryDequeue(out var done))
+            {
+                string key = job.Keys[done.index];
+                if (!images.Images.ContainsKey(key)) images.Images.Add(key, done.thumbnail);
+                lock (_dirThumbCache)
+                {
+                    if (_dirThumbCache.Count >= DirThumbCacheLimit)
+                    {
+                        foreach (Bitmap bitmap in _dirThumbCache.Values) bitmap.Dispose();
+                        _dirThumbCache.Clear();
+                    }
+                    if (_dirThumbCache.TryGetValue(key, out Bitmap previous) && previous != done.thumbnail) previous.Dispose();
+                    _dirThumbCache[key] = done.thumbnail;
+                }
+                job.State[done.index] = 2;
+                job.Remaining--;
+                added = true;
+            }
+            if (added) tabdlPatternList_lvw.Invalidate();
+            if (job.Remaining <= 0) { _dirThumbTimer.Stop(); return; }
+            if (job.Priority.IsEmpty && tabControl.SelectedTab == tabDirList) QueueVisibleDirThumbnails(job);
+        }  // 放入做好的縮圖
         private string _dirListFolder = Application.StartupPath;  // DirList 讀取的資料夾（預設為程式資料夾）
         private Label dirListFolder_lbl;
         private void ChooseDirListFolder()

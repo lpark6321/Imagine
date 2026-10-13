@@ -132,6 +132,11 @@ namespace Thunder
         private void LoadSelectedConfigFile()
         {
             if (!(cfgFile_cmb.SelectedItem is ConfigFileItem item)) return;
+            if (!ConfirmDiscardConfig())
+            {
+                BeginInvoke((Action)SyncConfigFileCombo);  // 取消：下拉選單改回目前的來源（等選單收起後再改，否則會被蓋回去）
+                return;
+            }
             try
             {
                 if (item.Path == BuiltinConfigName)
@@ -276,7 +281,7 @@ namespace Thunder
                     using (OpenFileDialog openFileDialog = new OpenFileDialog())
                     {
                         openFileDialog.Filter = "Text Files|*.txt";
-                        if (openFileDialog.ShowDialog() == DialogResult.OK)
+                        if (openFileDialog.ShowDialog() == DialogResult.OK && ConfirmDiscardConfig())
                         {
                             try
                             {
@@ -291,28 +296,60 @@ namespace Thunder
                 }
                 else if (targetbutton.Name == "saveConfigToolStripMenuItem")
                 {
-                    // 儲存配置檔案
-                    using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-                    {
-                        saveFileDialog.Filter = "Text Files|*.txt";
-                        saveFileDialog.FileName = "config.txt";
-                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                        {
-                            // 第一行寫欄名，其餘照原始內容寫回；UTF-8（含 BOM）方便記事本與 Excel 開啟
-                            var lines = new[] { string.Join(",", ConfigColumns) }.Concat(ConfigLinesWithGroups());  // 含群組標題、搜尋中被篩掉的項目
-                            try
-                            {
-                                File.WriteAllText(saveFileDialog.FileName, string.Join(Environment.NewLine, lines), Encoding.UTF8);
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show($"儲存失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                        }
-                    }
+                    SaveConfigAs();
                 }
             }
         }  // 設定檔案載入與儲存
+        private bool SaveConfigAs()
+        {
+            // 儲存配置檔案；回傳是否真的存檔（取消或失敗為 false）
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Text Files|*.txt";
+                saveFileDialog.FileName = "config.txt";
+                string source = tabilPatternList_lst.Tag?.ToString();
+                if (!string.IsNullOrEmpty(source) && File.Exists(source))
+                {
+                    // 預設存回目前的 config 檔
+                    saveFileDialog.InitialDirectory = Path.GetDirectoryName(source);
+                    saveFileDialog.FileName = Path.GetFileName(source);
+                }
+                if (saveFileDialog.ShowDialog() != DialogResult.OK) return false;
+                // 第一行寫欄名，其餘照原始內容寫回；UTF-8（含 BOM）方便記事本與 Excel 開啟
+                List<string> configLines = ConfigLinesWithGroups();  // 含群組標題、搜尋中被篩掉的項目
+                var lines = new[] { string.Join(",", ConfigColumns) }.Concat(configLines);
+                try
+                {
+                    File.WriteAllText(saveFileDialog.FileName, string.Join(Environment.NewLine, lines), Encoding.UTF8);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"儲存失敗：{ex.Message}", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+                _savedConfigLines = configLines;
+                ssrStatus_lbl.Text = $"已儲存：{saveFileDialog.FileName}";
+                return true;
+            }
+        }  // 另存 config
+        private List<string> _savedConfigLines;  // 載入或儲存時的內容，用來判斷有沒有變更
+        private bool ConfigModified => _savedConfigLines != null && !_savedConfigLines.SequenceEqual(ConfigLinesWithGroups());  // 復原回原樣也算沒變更
+        private bool ConfirmDiscardConfig()
+        {
+            // config 有變更時詢問是否儲存：是（開啟儲存，存檔成功才繼續）、否（放棄變更繼續）、取消（不繼續）；回傳是否繼續
+            if (!ConfigModified) return true;
+            DialogResult answer = MessageBox.Show(this, T("ImgList 的 config 已變更，要儲存嗎？"), "PatternMagic", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            return answer == DialogResult.No || (answer == DialogResult.Yes && SaveConfigAs());  // 儲存對話框按取消也不繼續
+        }  // 換掉或關閉 config 前確認
+        private void InitConfigSavePrompt()
+        {
+            // 關閉前提醒儲存（換 config 時在開啟、拖入、下拉選單各自呼叫 ConfirmDiscardConfig）
+            FormClosing += (s, e) =>
+            {
+                if (e.Cancel || e.CloseReason == CloseReason.TaskManagerClosing) return;
+                if (!ConfirmDiscardConfig()) e.Cancel = true;
+            };
+        }  // 關閉前提醒儲存 config
         private static readonly Color ConfigErrorBackColor = Color.FromArgb(255, 215, 215);
         private void MarkConfigItem(ListViewItem item, string error)
         {

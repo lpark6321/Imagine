@@ -148,15 +148,79 @@ namespace Thunder
             ListViewGroup group = neighbor?.Group ?? tabilPatternList_lst.Groups.Cast<ListViewGroup>().FirstOrDefault();
             if (item.Group != group) item.Group = group;
         }  // 跟著鄰近項目的群組
+        private void SyncGroupedOrder()
+        {
+            // 分組顯示時，插入、移動或改群組後畫面不一定照清單順序排（編號會亂跳）：
+            // 照清單順序清空再依序加回，群組、收合、選取與捲動位置保留
+            if (!tabilPatternList_lst.ShowGroups || !tabilPatternList_lst.IsHandleCreated || tabilPatternList_lst.Items.Count == 0) return;
+            ListViewItem[] items = tabilPatternList_lst.Items.Cast<ListViewItem>().ToArray();
+            ListViewGroup[] groups = items.Select(item => item.Group).ToArray();
+            var selected = tabilPatternList_lst.SelectedItems.Cast<ListViewItem>().ToList();
+            ListViewItem focused = tabilPatternList_lst.FocusedItem;
+            // 記下畫面最上面看得到的項目和它的位置，重排後捲回同一個位置（清空重加會把捲軸歸零；分組時 TopItem 不準）
+            ListViewItem anchor = tabilPatternList_lst.Items.Cast<ListViewItem>().Select(i => (item: i, bounds: ItemBounds(i)))
+                .Where(x => x.bounds.Height > 0 && x.bounds.Bottom > 0).OrderBy(x => x.bounds.Top).Select(x => x.item).FirstOrDefault();
+            int anchorTop = ItemBounds(anchor).Top;
+            var collapsed = CollapsedGroupNames();
+            bool moving = _movingConfigLine;
+            _movingConfigLine = true;  // 重新選取時不重新產生圖片
+            tabilPatternList_lst.BeginUpdate();
+            try
+            {
+                tabilPatternList_lst.Items.Clear();
+                for (int i = 0; i < items.Length; i++)
+                {
+                    if (items[i].Group != groups[i]) items[i].Group = groups[i];
+                }
+                tabilPatternList_lst.Items.AddRange(items);
+                ApplyGroupStates(collapsed);
+                foreach (ListViewItem item in selected) item.Selected = true;
+                if (focused != null) focused.Focused = true;
+            }
+            finally
+            {
+                tabilPatternList_lst.EndUpdate();
+                _movingConfigLine = moving;
+            }
+            Rectangle anchorNow = ItemBounds(anchor);
+            if (anchorNow.Height > 0 && anchorNow.Top != anchorTop)
+            {
+                SendMessageInt(tabilPatternList_lst.Handle, LVM_SCROLL, IntPtr.Zero, (IntPtr)(anchorNow.Top - anchorTop));
+            }
+        }  // 分組時依清單順序重排畫面
         private void UpdateGroupHeaders()
         {
             // 群組標題顯示項目數；未分組的顯示「（未分組）」
             foreach (ListViewGroup group in tabilPatternList_lst.Groups)
             {
                 string header = $"{(group.Name == "" ? "（未分組）" : group.Name)}（{group.Items.Count}）";
-                if (group.Header != header) group.Header = header;
+                if (group.Header != header) SetGroupHeader(group, header);
             }
         }  // 更新群組標題
+        private static readonly FieldInfo GroupHeaderField = typeof(ListViewGroup).GetField("header", BindingFlags.Instance | BindingFlags.NonPublic);
+        private void SetGroupHeader(ListViewGroup group, string header)
+        {
+            // ListViewGroup.Header 的 setter 會重建整個清單的 handle：選取事件重跑（ImgEditor 被切成選取項目的設定）、捲動與拖拉狀態也會重設
+            // 所以改成直接改欄位，再用 LVM_SETGROUPINFO 更新畫面上的標題
+            int id = GroupId(group);
+            if (GroupHeaderField == null || id < 0)
+            {
+                group.Header = header;
+                return;
+            }
+            GroupHeaderField.SetValue(group, header);
+            if (!tabilPatternList_lst.IsHandleCreated) return;
+            IntPtr text = Marshal.StringToHGlobalUni(header);
+            try
+            {
+                var info = new LVGROUP { cbSize = Marshal.SizeOf(typeof(LVGROUP)), mask = LVGF_HEADER, iGroupId = id, pszHeader = text, cchHeader = header.Length };
+                SendMessage(tabilPatternList_lst.Handle, LVM_SETGROUPINFO, (IntPtr)id, ref info);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(text);
+            }
+        }  // 改群組標題（不重建清單）
         // 群組收合（.NET Framework 沒有內建，用 LVM_SETGROUPINFO 設定 LVGS_COLLAPSIBLE）
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct LVGROUP
@@ -167,8 +231,20 @@ namespace Thunder
         }
         [DllImport("user32.dll")] private static extern IntPtr SendMessage(IntPtr hwnd, int msg, IntPtr wParam, ref LVGROUP group);
         [DllImport("user32.dll", EntryPoint = "SendMessage")] private static extern IntPtr SendMessageInt(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam);
-        private const int LVM_SETGROUPINFO = 0x1000 + 147, LVM_GETGROUPSTATE = 0x1000 + 92, LVGF_STATE = 0x4, LVGS_COLLAPSED = 0x1, LVGS_COLLAPSIBLE = 0x8;
+        private const int LVM_SETGROUPINFO = 0x1000 + 147, LVM_GETGROUPSTATE = 0x1000 + 92, LVM_SCROLL = 0x1000 + 20, LVGF_HEADER = 0x1, LVGF_STATE = 0x4, LVGS_COLLAPSED = 0x1, LVGS_COLLAPSIBLE = 0x8;
         private static readonly PropertyInfo GroupIdProperty = typeof(ListViewGroup).GetProperty("ID", BindingFlags.Instance | BindingFlags.NonPublic);
+        [StructLayout(LayoutKind.Sequential)] private struct NativeRect { public int Left, Top, Right, Bottom; }
+        [DllImport("user32.dll", EntryPoint = "SendMessage")] private static extern IntPtr SendMessageRect(IntPtr hwnd, int msg, IntPtr wParam, ref NativeRect rect);
+        private const int LVM_GETITEMRECT = 0x1000 + 14;
+        private Rectangle ItemBounds(ListViewItem item) => ListItemBounds(tabilPatternList_lst, item);
+        private static Rectangle ListItemBounds(ListView list, ListViewItem item)
+        {
+            // 項目在畫面上的範圍；收合群組內的項目沒有範圍，回傳 Empty（ListViewItem.Bounds 在縮圖模式會丟例外）
+            if (item == null || item.ListView != list || !list.IsHandleCreated) return Rectangle.Empty;
+            var rect = new NativeRect();  // Left = LVIR_BOUNDS
+            if (SendMessageRect(list.Handle, LVM_GETITEMRECT, (IntPtr)item.Index, ref rect) == IntPtr.Zero) return Rectangle.Empty;
+            return Rectangle.FromLTRB(rect.Left, rect.Top, rect.Right, rect.Bottom);
+        }  // 項目範圍（不丟例外）
         private static int GroupId(ListViewGroup group) => GroupIdProperty != null ? (int)GroupIdProperty.GetValue(group) : -1;
         private bool IsGroupCollapsed(ListViewGroup group)
         {
@@ -319,11 +395,20 @@ namespace Thunder
         private bool _suppressFilter;  // 清除搜尋框時不觸發篩選
         // 拖入圖片：每張加一行 Image------------------------------------------------------------------------------------
         private static readonly string[] ImageExtensions = { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tif", ".tiff" };
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] private static extern int GetLongPathName(string shortPath, StringBuilder longPath, int size);
+        private static string LongPath(string path)
+        {
+            var buffer = new StringBuilder(1024);
+            int length = GetLongPathName(path, buffer, buffer.Capacity);
+            return length > 0 && length < buffer.Capacity ? buffer.ToString() : path;
+        }  // 8.3 短檔名轉長檔名（不存在的路徑原樣回傳）
         private static bool IsImageFile(string path) => ImageExtensions.Contains(Path.GetExtension(path).ToLower());
-        private void AddImageFilesToList(IEnumerable<string> files)
+        private void AddImageFilesToList(IEnumerable<string> files, bool fromDirList = false)
         {
             // 加在選取項目的下一列（沒有選取時加在最後），名稱用檔名；在 config 資料夾內的圖寫成相對路徑
-            var images = files.Where(IsImageFile).OrderBy(f => f, StringComparer.OrdinalIgnoreCase).ToList();
+            // fromDirList：照 DirList 的順序、不切換預覽（使用者還在 DirList 分頁）
+            var images = files.Where(IsImageFile).ToList();
+            if (!fromDirList) images = images.OrderBy(f => f, StringComparer.OrdinalIgnoreCase).ToList();
             var skipped = images.Where(f => f.Contains(",")).ToList();  // 逗號是 config 的欄位分隔，不能出現在路徑
             images = images.Except(skipped).ToList();
             if (images.Count == 0)
@@ -332,7 +417,8 @@ namespace Thunder
                 return;
             }
             string source = tabilPatternList_lst.Tag?.ToString();
-            string folder = (!string.IsNullOrEmpty(source) && File.Exists(source) ? Path.GetDirectoryName(source) : Application.StartupPath).TrimEnd('\\') + "\\";
+            string folder = LongPath(!string.IsNullOrEmpty(source) && File.Exists(source) ? Path.GetDirectoryName(source) : Application.StartupPath).TrimEnd('\\') + "\\";
+            images = images.Select(LongPath).ToList();  // 短檔名（如 ETHAN~1.HUA）與長檔名統一，才能判斷是否在 config 資料夾內
             ListViewItem last = null;
             using (SuspendFilter())
             {
@@ -348,11 +434,21 @@ namespace Thunder
                     MarkConfigItem(last, null);
                 }
                 RenumberPatternList();
-                last.Selected = true;  // 預覽最後一張
-                last.Focused = true;
-                last.EnsureVisible();
+                bool moving = _movingConfigLine;
+                _movingConfigLine = fromDirList;  // 從 DirList 加入：只選取，不重新產生預覽
+                try
+                {
+                    tabilPatternList_lst.SelectedItems.Clear();
+                    last.Selected = true;  // 預覽最後一張
+                    last.Focused = true;
+                    last.EnsureVisible();
+                }
+                finally
+                {
+                    _movingConfigLine = moving;
+                }
             }
-            ssrStatus_lbl.Text = $"已加入 {images.Count} 張圖片（Image 類型）{(skipped.Count > 0 ? $"，{skipped.Count} 張路徑含逗號未加入" : "")}，要保留請存 config 檔";
+            ssrStatus_lbl.Text = $"已加入{(fromDirList ? " ImgList" : "")} {images.Count} 張圖片（Image 類型）{(skipped.Count > 0 ? $"，{skipped.Count} 張路徑含逗號未加入" : "")}，要保留請存 config 檔";
         }  // 拖入圖片
         // 隨機播放-----------------------------------------------------------------------------------------------------
         private readonly Random _slideRandom = new Random();
@@ -413,13 +509,13 @@ namespace Thunder
             {
                 string key = ThumbnailKey(item);
                 if (item.ImageKey != key) item.ImageKey = key;
-                if (_thumbnails.Images.ContainsKey(key) || !item.Bounds.IntersectsWith(client)) continue;
+                if (_thumbnails.Images.ContainsKey(key) || !ItemBounds(item).IntersectsWith(client)) continue;  // 收合群組內的項目沒有範圍
                 if (_thumbnails.Images.Count > 500) _thumbnails.Images.Clear();  // 換解析度多次後清掉舊的
                 using (Bitmap thumbnail = RenderThumbnail(item.Tag.ToString(), ThumbnailSize, width, height))
                 {
                     _thumbnails.Images.Add(key, thumbnail);
                 }
-                tabilPatternList_lst.Invalidate(item.Bounds);
+                tabilPatternList_lst.Invalidate(ItemBounds(item));
                 return;
             }
         }  // 產生下一張縮圖

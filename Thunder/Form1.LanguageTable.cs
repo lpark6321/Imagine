@@ -10,6 +10,9 @@ namespace Thunder
             // 主視窗、分頁、通用按鈕
             ["最近使用"] = "Recent",
             ["新增至 ImgList"] = "Add to ImgList",
+            ["加入 ImgList"] = "Add to ImgList",
+            ["ImgList 的 config 已變更，要儲存嗎？"] = "The ImgList config has changed. Save it?",
+            ["選取的圖片以 Image 類型加到 ImgList（加在 ImgList 選取項目的下一列，沒有選取時加在最後）"] = "Add the selected images to ImgList as Image lines (after the selected ImgList item, or at the end)",
             ["把目前頁面的設定轉成一行 config，加到 ImgList 最後一列"] = "Convert the current page into a config line and append it to ImgList",
             ["最近開啟 / 編輯的 10 張圖片：單擊選取、雙擊或 Enter 開啟"] = "Last 10 opened / edited images: click to select, double-click or Enter to open",
             ["開啟最近使用的圖片（單擊只選取）"] = "Open a recent image (single click only selects)",

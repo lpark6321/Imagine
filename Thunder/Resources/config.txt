@@ -132,6 +132,7 @@ CrossTalkB_7,Window,excel7,
 55_2line Vstripe-L128,Mask,s-4*2-127,110011001100.110011001100
 55_Hstripe-L128,Mask,p-2*2,127.127.127 127.127.127/Black Black
 #== Test Pattern ==
+蒙太奇,Window,127.127.127-127.127.127,50%c|dot1+dot2+sub1+sub2+row1+row2+col1+col2|127
 HDR_test,Dynamic,Black-White,
 全階V,Gradient,White,all-256
 全階H,Gradient,White,all-h-256
@@ -146,6 +147,10 @@ Test resolution,Test,resolution,
 Test hue-h,Test,hue-h,
 Test hue-v,Test,hue-v,
 Test hue-ring,Test,hue-ring,
-Test shading,Test,shading,
 Test banding,Test,banding,
-蒙太奇,Window,127.127.127-127.127.127,50%c|dot1+dot2+sub1+sub2+row1+row2+col1+col2|127
+Test shading,Test,shading,
+Test zoneplate,Test,zoneplate,
+Test noise-100pt-g4,Test,noise-100pt-g4,
+Test colorchecker,Test,colorchecker,
+Test geometry,Test,geometry,
+Test sharpness,Test,sharpness,

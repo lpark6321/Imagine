@@ -40,6 +40,7 @@ namespace Thunder
             mnsPattername_txt.TextBox.ImeMode = ImeMode.NoControl;
             SetupPatternList();
             InitConfigEditor();
+            InitConfigSavePrompt();
             InitWindowOverlayList();
             InitEditorToConfig();
             InitMaskQuickButtons();
@@ -71,6 +72,7 @@ namespace Thunder
             InitMultiScreen();
             InitDisplayMenu();
             InitMainLayout();  // 最外層改用固定欄寬的表格
+            Text = $"PatternMagic_v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";  // 標題帶版本號（取自 AssemblyInfo）
             InitLanguage();  // 最後執行：上面建立的介面一起翻譯
             //Mainwindow_Load(this, EventArgs.Empty);
             mypicture = new MyPicture(this);
@@ -1657,96 +1659,6 @@ namespace Thunder
         }  // 狀態列點擊開啟程式資料夾
         [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
         private static extern int StrCmpLogicalW(string x, string y);  // 與檔案總管相同的自然排序 (1,2,...,9,10)
-        private void PopulateListView()
-        {
-            // 清空現有項目
-            tabdlPatternList_lvw.Items.Clear();
-            tabdlPatternList_lvw.Groups.Clear();
-            tabdlPatternList_lvw.LargeImageList = new ImageList
-            {
-                ImageSize = new Size(90, 90) // 設置縮略圖大小
-            };
-
-            // 定義分組
-            ListViewGroup jpgGroup = new ListViewGroup("JPG 圖片", HorizontalAlignment.Left);
-            ListViewGroup pngGroup = new ListViewGroup("PNG 圖片", HorizontalAlignment.Left);
-            ListViewGroup bmpGroup = new ListViewGroup("BMP 圖片", HorizontalAlignment.Left);
-
-            tabdlPatternList_lvw.Groups.Add(jpgGroup);
-            tabdlPatternList_lvw.Groups.Add(pngGroup);
-            tabdlPatternList_lvw.Groups.Add(bmpGroup);
-
-            // DirList 讀取的資料夾（預設程式資料夾，可用「選擇資料夾」更換）
-            string folderPath = _dirListFolder;
-
-            // 獲取資料夾中的所有 JPG、PNG 和 BMP 檔案
-            string[] imageFiles = Directory.GetFiles(folderPath, "*.*")
-                                            .Where(file => file.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                                                           file.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                                                           file.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase))
-                                            .ToArray();
-            // 依分組 (JPG→PNG→BMP) 再依檔名自然排序，讓全螢幕左右切換的順序與畫面一致
-            string[] groupOrder = { ".jpg", ".png", ".bmp" };
-            Array.Sort(imageFiles, (a, b) =>
-            {
-                int byGroup = Array.IndexOf(groupOrder, Path.GetExtension(a).ToLower())
-                    .CompareTo(Array.IndexOf(groupOrder, Path.GetExtension(b).ToLower()));
-                return byGroup != 0 ? byGroup : StrCmpLogicalW(Path.GetFileName(a), Path.GetFileName(b));
-            });
-
-            // 添加圖片到 ListView
-            foreach (string imagePath in imageFiles)
-            {
-                try
-                {
-                    // 加載圖片
-                    using (Image img = Image.FromFile(imagePath))
-                    {
-                        string fileName = Path.GetFileName(imagePath);
-                        string extension = Path.GetExtension(imagePath).ToLower();
-                        int width = img.Width;
-                        int height = img.Height;
-                        // 生成縮圖
-                        Image thumbnail = img.GetThumbnailImage(56, 56, null, IntPtr.Zero);
-                        // 添加到 ImageList
-                        tabdlPatternList_lvw.LargeImageList.Images.Add(fileName, thumbnail);
-
-                        // 創建 ListViewItem
-                        ListViewItem item = new ListViewItem(fileName)
-                        {
-                            Tag = imagePath, // 存儲完整路徑
-                            ImageKey = fileName // 對應 ImageList 的鍵值
-                        };
-
-                        // 添加子項目（檔案名稱、寬、高）
-                        item.SubItems.Add(fileName); // 名稱
-                        item.SubItems.Add(width.ToString()); // 寬
-                        item.SubItems.Add(height.ToString()); // 高
-
-                        // 根據副檔名分組
-                        if (extension == ".jpg")
-                        {
-                            item.Group = jpgGroup;
-                        }
-                        else if (extension == ".png")
-                        {
-                            item.Group = pngGroup;
-                        }
-                        else if (extension == ".bmp")
-                        {
-                            item.Group = bmpGroup;
-                        }
-
-                        // 添加到 ListView
-                        tabdlPatternList_lvw.Items.Add(item);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"無法加載圖片：{imagePath}\n錯誤：{ex.Message}");
-                }
-            }
-        }  // listview圖片導入列表
         private void tabilPatternList_lst_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (sender is ListView targetList && !_movingConfigLine)
@@ -1911,6 +1823,7 @@ namespace Thunder
         private void RenumberPatternList()
         {
             if (IsFiltering) return;  // 搜尋中保留原本的編號
+            SyncGroupedOrder();
             for (int i = 0; i < tabilPatternList_lst.Items.Count; i++)
             {
                 tabilPatternList_lst.Items[i].Text = (i + 1).ToString();
@@ -1935,6 +1848,7 @@ namespace Thunder
             ClearSearchSilently();  // 換 config 時清除搜尋
             PopulateListBox(configText);
             _configUndo.Clear();  // 換了 config 檔，復原紀錄不再適用
+            _savedConfigLines = ConfigLinesWithGroups();  // 之後與這份比較，判斷關閉前要不要提醒儲存
             tabilPatternList_lst.Tag = source;  // 記錄 config 來源
             if (cfgFile_cmb != null) RefreshConfigFiles();  // 檔案下拉選單顯示目前來源
             // 載入時不逐行檢查（行數多時很花時間）：點選項目時才檢查並標紅，右鍵「檢查全部設定」可一次檢查
@@ -2154,6 +2068,7 @@ namespace Thunder
                 string filePath = files.FirstOrDefault(file => Path.GetExtension(file).ToLower() == ".txt");
                 if (filePath != null)
                 {
+                    if (!ConfirmDiscardConfig()) return;  // 目前的 config 有變更：先問要不要儲存
                     try
                     {
                         LoadConfig(ReadConfigText(filePath), filePath);
